@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <COMReference Include="Surfer">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>12</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>54c3f9a2-980b-1068-83f9-0000c02a351c</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+</Project>
