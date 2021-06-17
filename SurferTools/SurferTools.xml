@@ -9,6 +9,11 @@
             Service to interact with the Surfer application using COM
             </summary>
         </member>
+        <member name="M:SurferTools.SurferService.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
         <member name="M:SurferTools.SurferService.ShowHideSurfer(System.Boolean)">
             <summary>
             Show or hide the Surfer application
@@ -37,6 +42,17 @@
             Create a plot document
             </summary>
             <returns>The created plot document</returns>
+        </member>
+        <member name="M:SurferTools.SurferService.InverseDistanceGridding(System.String,System.String,System.Int32)">
+            <summary>
+            Creates a grid from irregularly spaced XYZ data using the Inverse Distance to a Power gridding method
+            </summary>
+            <param name="csvFileLocation">The location of the file with the irregularly spaced XYZ data, coordinates must be in meter (RD or UTM)</param>
+            <param name="newGridFilename">The location of the newly created file</param>
+            <param name="columnIndexZ">The column index of the Z-value</param>
+            <returns>True o success, false otherwise</returns>
+            <exception cref="T:System.IO.FileNotFoundException"></exception>
+            <exception cref="T:System.Exception"></exception>
         </member>
     </members>
 </doc>

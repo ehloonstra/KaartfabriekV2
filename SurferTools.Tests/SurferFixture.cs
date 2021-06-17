@@ -1,11 +1,14 @@
 ﻿using System;
+using Surfer;
 
 namespace SurferTools.Tests
 {
     public class SurferFixture: IDisposable
     {
-        public SurferService SurferService = new();
-        public bool CloseSurferOnTestFinish = true;
+        internal SurferService SurferService = new();
+        internal bool CloseSurferOnTestFinish = true;
+
+        internal IPlotDocument PlotDocument = null;
 
         public SurferFixture()
         {

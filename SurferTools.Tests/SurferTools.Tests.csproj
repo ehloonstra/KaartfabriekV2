@@ -30,4 +30,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestData\01 velddata-RD.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
