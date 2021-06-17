@@ -4,5 +4,39 @@
         <name>SurferTools</name>
     </assembly>
     <members>
+        <member name="T:SurferTools.SurferService">
+            <summary>
+            Service to interact with the Surfer application using COM
+            </summary>
+        </member>
+        <member name="M:SurferTools.SurferService.ShowHideSurfer(System.Boolean)">
+            <summary>
+            Show or hide the Surfer application
+            </summary>
+            <param name="visible">If its value is set to 'true', the surfer application window is visible and if its value is set to 'false', the application window is hidden.</param>
+            <returns>The application window visibility</returns>
+        </member>
+        <member name="P:SurferTools.SurferService.IsVisible">
+            <summary>
+            Get the application window visibility
+            </summary>
+        </member>
+        <member name="M:SurferTools.SurferService.QuitSurfer">
+            <summary>
+            Terminates the Surfer application.
+            </summary>
+        </member>
+        <member name="M:SurferTools.SurferService.GetNumDocuments">
+            <summary>
+            Get the number of documents open
+            </summary>
+            <returns>The number of documents open</returns>
+        </member>
+        <member name="M:SurferTools.SurferService.AddPlotDocument">
+            <summary>
+            Create a plot document
+            </summary>
+            <returns>The created plot document</returns>
+        </member>
     </members>
 </doc>

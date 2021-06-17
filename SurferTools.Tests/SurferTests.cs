@@ -6,49 +6,33 @@ using Xunit.Abstractions;
 
 namespace SurferTools.Tests
 {
-    public class SurferTests : IDisposable
+    public class SurferTests : IClassFixture<SurferFixture>
     {
         private readonly ITestOutputHelper _output;
-        private readonly SurferService _surferService = new();
-        private bool _closeSurferOnTestFinish = true;
+        private readonly SurferFixture _fixture;
 
-        public SurferTests(ITestOutputHelper output)
+        public SurferTests(ITestOutputHelper output, SurferFixture fixture)
         {
             _output = output;
+            _fixture = fixture;
             _output.WriteLine("In ctor SurferTests");
-        }
-
-        public void Dispose()
-        {
-            if (_closeSurferOnTestFinish)
-            {
-                // Clean up:
-                _surferService?.QuitSurfer();
-                _output.WriteLine("Surfer is closed in Dispose()");
-            }
-            else
-            {
-                _surferService.ShowHideSurfer(true);
-            }
-
-            GC.SuppressFinalize(this);
         }
 
         [Fact]
         public async Task ShowHideSurfer()
         {
             // Show Surfer
-            var retVal = _surferService.ShowHideSurfer(true);
+            var retVal = _fixture.SurferService.ShowHideSurfer(true);
             retVal.ShouldBeTrue("Surfer is not visible");
-            _surferService.IsVisible.ShouldBeTrue("Surfer is not visible");
+            _fixture.SurferService.IsVisible.ShouldBeTrue("Surfer is not visible");
 
             // Wait 5 seconds:
             await Task.Delay(5_000);
 
             // Hide Surfer
-            retVal = _surferService.ShowHideSurfer(false);
+            retVal = _fixture.SurferService.ShowHideSurfer(false);
             retVal.ShouldBeFalse("Surfer is still visible");
-            _surferService.IsVisible.ShouldBeFalse("Surfer is still visible");
+            _fixture.SurferService.IsVisible.ShouldBeFalse("Surfer is still visible");
 
             _output.WriteLine("ShowHideSurfer was successfull");
         }
@@ -56,13 +40,13 @@ namespace SurferTools.Tests
         [Fact]
         public void AddPlotDocument()
         {
-            _closeSurferOnTestFinish = false;
-            var currentNumDocuments = _surferService.GetNumDocuments();
-            var retVal = _surferService.AddPlotDocument();
+            _fixture.CloseSurferOnTestFinish = false;
+            var currentNumDocuments = _fixture.SurferService.GetNumDocuments();
+            var retVal = _fixture.SurferService.AddPlotDocument();
             retVal.ShouldNotBeNull("New plot document is null");
             _output.WriteLine(retVal.FullName);
 
-            var newNumDocuments = _surferService.GetNumDocuments();
+            var newNumDocuments = _fixture.SurferService.GetNumDocuments();
             newNumDocuments.ShouldBe(currentNumDocuments + 1, "Number of documents is unexpected");
             
             _output.WriteLine("AddPlotDocument was successfull");
