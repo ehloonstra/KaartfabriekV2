@@ -1,0 +1,5 @@
+# Info of csv:
+"D:\dev\MapWindow\MapWinGIS\git\support\GDAL_SDK\v142\bin\x64\ogrinfo" -ro -al "01 velddata.csv" -oo X_POSSIBLE_NAMES=lon -oo Y_POSSIBLE_NAMES=lat
+
+# Reproject:
+"D:\dev\MapWindow\MapWinGIS\git\support\GDAL_SDK\v142\bin\x64\ogr2ogr" -f CSV -lco GEOMETRY=AS_XY -lco SEPARATOR=SEMICOLON -lco STRING_QUOTING=IF_NEEDED -s_srs "EPSG:4326" -t_srs "EPSG:28992" -oo X_POSSIBLE_NAMES=lon -oo Y_POSSIBLE_NAMES=lat "01 velddata-RD.csv" "01 velddata.csv"
