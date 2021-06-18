@@ -4,6 +4,41 @@
         <name>SurferTools</name>
     </assembly>
     <members>
+        <member name="T:SurferTools.Limits">
+            <summary>
+            To hold the layer limits
+            </summary>
+            <remarks>Can this me modified to a struct or record?</remarks>
+        </member>
+        <member name="P:SurferTools.Limits.Xmin">
+            <summary>
+            The minimum map limit in the X direction
+            </summary>
+        </member>
+        <member name="P:SurferTools.Limits.Ymin">
+            <summary>
+            The minimum map limit in the Y direction
+            </summary>
+        </member>
+        <member name="P:SurferTools.Limits.Xmax">
+            <summary>
+            The maximum map limit in the X direction
+            </summary>
+        </member>
+        <member name="P:SurferTools.Limits.Ymax">
+            <summary>
+            The maximum map limit in the Y direction
+            </summary>
+        </member>
+        <member name="M:SurferTools.Limits.#ctor(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Set the limits
+            </summary>
+            <param name="xMin"></param>
+            <param name="xMax"></param>
+            <param name="yMin"></param>
+            <param name="yMax"></param>
+        </member>
         <member name="T:SurferTools.SurferService">
             <summary>
             Service to interact with the Surfer application using COM
@@ -53,6 +88,18 @@
             <returns>True o success, false otherwise</returns>
             <exception cref="T:System.IO.FileNotFoundException"></exception>
             <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:SurferTools.SurferService.AddPostMap(Surfer.IPlotDocument,System.String,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Add a postmap
+            </summary>
+            <param name="plotDocument"></param>
+            <param name="csvFileLocation"></param>
+            <param name="zCol"></param>
+            <param name="xCol"></param>
+            <param name="yCol"></param>
+            <param name="limitIncrease">How much should the map from limits be increased</param>
+            <returns>Returns a MapFrame object.</returns>
         </member>
     </members>
 </doc>

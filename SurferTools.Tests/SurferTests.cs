@@ -12,11 +12,13 @@ namespace SurferTools.Tests
     {
         private readonly ITestOutputHelper _output;
         private readonly SurferFixture _fixture;
+        private readonly string _csvFileLocation;
 
         public SurferTests(ITestOutputHelper output, SurferFixture fixture)
         {
             _output = output;
             _fixture = fixture;
+            _csvFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, @"TestData\01 velddata-RD.csv");
             _output.WriteLine("In ctor SurferTests");
         }
 
@@ -45,21 +47,43 @@ namespace SurferTools.Tests
             _fixture.CloseSurferOnTestFinish = false;
 
             // Create the grid:
-            var csvFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, @"TestData\01 velddata-RD.csv");
-            var newGridFilename = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(csvFileLocation) + ".grd");
+            var newGridFilename = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(_csvFileLocation) + ".grd");
             if (File.Exists(newGridFilename)) File.Delete(newGridFilename);
 
-            var retVal = _fixture.SurferService.InverseDistanceGridding(csvFileLocation, newGridFilename, 16);
+            var retVal = _fixture.SurferService.InverseDistanceGridding(_csvFileLocation, newGridFilename, 16);
             retVal.ShouldBeTrue("Gridding was not successful");
             File.Exists(newGridFilename).ShouldBeTrue("New grid file doesn't exists");
-            
+
             // Need a plot document:
             GetPlotDocument();
 
             // Add the grid as a contour map:
             var mapFrame = _fixture.PlotDocument.Shapes.AddContourMap(newGridFilename);
-            // TODO: Resize, set coordinates
-            // mapFrame.
+        }
+
+        [Fact]
+        public void AddPostMap()
+        {
+            _fixture.CloseSurferOnTestFinish = false;
+            // Need a plot document:
+            GetPlotDocument();
+
+            _fixture.SurferService.AddPostMap(_fixture.PlotDocument, _csvFileLocation, 16);
+        }
+
+
+        [Fact]
+        public void FullRun()
+        {
+            // Init Surfer service:
+            var surferService = new SurferService();
+            // Get plot document:
+            var plotDocument = surferService.AddPlotDocument();
+            // Add post map:
+            var mapFrame = surferService.AddPostMap(plotDocument, _csvFileLocation, 16);
+            // Get limits:
+            var dataLimits = new Limits(mapFrame.xMin, mapFrame.xMax, mapFrame.yMin, mapFrame.yMax);
+
 
         }
 
