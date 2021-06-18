@@ -3,3 +3,17 @@
 
 # Reproject:
 "D:\dev\MapWindow\MapWinGIS\git\support\GDAL_SDK\v142\bin\x64\ogr2ogr" -f CSV -lco GEOMETRY=AS_XY -lco SEPARATOR=SEMICOLON -lco STRING_QUOTING=IF_NEEDED -s_srs "EPSG:4326" -t_srs "EPSG:28992" -oo X_POSSIBLE_NAMES=lon -oo Y_POSSIBLE_NAMES=lat "01 velddata-RD.csv" "01 velddata.csv"
+
+
+"D:\dev\MapWindow\MapWinGIS\git\support\GDAL_SDK\v142\bin\x64\ogrinfo" --formats
+
+# Om het perceel op te halen bij PDOK en om te zetten naar een RD Shapefile OBV centroide
+"D:\dev\MapWindow\MapWinGIS\git\support\GDAL_SDK\v142\bin\x64\ogr2ogr" -f "ESRI Shapefile" -s_srs "EPSG:4326" -t_srs "EPSG:28992" "Perceel.shp" "WFS:https://geodata.nationaalgeoregister.nl/kadastralekaart/wfs/v4_0?service=WFS&request=GetFeature&version=2.0.0&typename=kadastralekaartv4:perceel&srsname=EPSG:4326&outputFormat=application/json&Filter=%3CFilter%3E%3CContains%3E%3CPropertyName%3Egeom%3C/PropertyName%3E%3Cgml:Point%3E%3Cgml:coordinates%3E5.506447077,52.198316575%3C/gml:coordinates%3E%3C/gml:Point%3E%3C/Contains%3E%3C/Filter%3E"
+
+# Om het perceel op te halen bij PDOK (kadaster) en om te zetten naar een RD Shapefile OBV BBOX
+"D:\dev\MapWindow\MapWinGIS\git\support\GDAL_SDK\v142\bin\x64\ogr2ogr" -f "ESRI Shapefile" -s_srs "EPSG:4326" -t_srs "EPSG:28992" "Perceel-bbox.shp" "WFS:https://geodata.nationaalgeoregister.nl/kadastralekaart/wfs/v4_0?service=WFS&request=GetFeature&version=2.0.0&typename=kadastralekaartv4:perceel&srsname=EPSG:4326&outputFormat=application/json&bbox=163049,467594,163256,468020,EPSG:28992"
+
+
+# Om het perceel op te halen bij PDOK (AAN) en om te zetten naar een RD Shapefile OBV BBOX
+# Geen conversie nodig:
+"D:\dev\MapWindow\MapWinGIS\git\support\GDAL_SDK\v142\bin\x64\ogr2ogr" -f "ESRI Shapefile" --debug ON  -s_srs "EPSG:4326" -t_srs "EPSG:28992" "Perceel-aan.shp" "WFS:https://geodata.nationaalgeoregister.nl/aan/wfs?service=WFS&request=GetFeature&version=2.0.0&typename=aan&srsname=EPSG:4326&outputFormat=application/json&bbox=163049,467594,163256,468020,EPSG:28992"
