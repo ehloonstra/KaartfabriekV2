@@ -9,14 +9,27 @@ namespace SurferTools
     /// </summary>
     public class SurferService
     {
-        private readonly Application _surferApp = new();
+        private Application _surferApp;
 
         /// <summary>
         /// Constructor
         /// </summary>
         public SurferService()
         {
-            _surferApp.PageUnits = SrfPageUnits.srfUnitsCentimeter;
+            GetSurferObject();
+        }
+
+        private void GetSurferObject()
+        {
+            var obj = ComTools.GetActiveObject("Surfer.Application");
+            if (obj is null)
+            {
+                _surferApp = new Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
+            }
+            else
+            {
+                _surferApp = obj as Application;
+            }
         }
 
         /// <summary>
@@ -50,7 +63,7 @@ namespace SurferTools
         {
             try
             {
-                IPlotDocument plot = _surferApp.Documents.Add(SrfDocTypes.srfDocPlot);
+                IPlotDocument plot = _surferApp.Documents.Add();
 
                 // Set page orientation:
                 plot.PageSetup.Orientation = SrfPaperOrientation.srfLandscape;
@@ -107,7 +120,7 @@ namespace SurferTools
                     SearchMinData: searchMinData, SearchDataPerSect: searchMaxData / searchNumSectors,
                     SearchMaxEmpty: Math.Max(1, searchNumSectors - 1), SearchMaxData: searchMaxData,
                     xSize: gridSpacing, ySize: gridSpacing,
-
+                    OutGridOptions: "UseDefaults=1, ForgetOptions=1, SaveRefInfoAsGSIREF=1",
                     ShowReport: false);
             }
             catch (Exception e)
@@ -126,12 +139,13 @@ namespace SurferTools
         /// </summary>
         /// <param name="plotDocument"></param>
         /// <param name="csvFileLocation"></param>
+        /// <param name="layerName">The name of the layer in Surfer</param>
         /// <param name="zCol"></param>
         /// <param name="xCol"></param>
         /// <param name="yCol"></param>
         /// <param name="limitIncrease">How much should the map from limits be increased</param>
         /// <returns>Returns a MapFrame object.</returns>
-        public IMapFrame AddPostMap(IPlotDocument plotDocument, string csvFileLocation, int zCol, int xCol = 1, int yCol = 2, int limitIncrease = 20)
+        public IMapFrame AddPostMap(IPlotDocument plotDocument, string csvFileLocation, string layerName,  int zCol, int xCol = 1, int yCol = 2, int limitIncrease = 20)
         {
             _surferApp.ScreenUpdating = false;
 
@@ -156,7 +170,7 @@ namespace SurferTools
                     throw new Exception("Cannot get postMapLayer");
 
                 // Change its name
-                postMapLayer.Name = "K-40";
+                postMapLayer.Name = layerName;
 
                 // Set symbols:
                 postMapLayer.Symbol.Index = 12; //	Returns/sets the glyph index.

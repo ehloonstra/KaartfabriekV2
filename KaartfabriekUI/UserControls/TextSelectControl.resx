@@ -57,4 +57,24 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="btnSelectFolder.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAAOpJREFUSEvdlb0NwjAQRl1QMAQlBQNQUjIABQMwCAUSA6SkoGAECkZgAEoKSgoK
+        CkaA74t/hONDSu5Ekyc95XK5nGNbclxvOLR0BlW8W7qCKqRmkke4aeECZkjNLHI5M+KDCkpf1NWfMxjU
+        d3+AzR8+rFlCbqjVBAe4+NCNYJyRxTNMMHHyoVvDZrFG9kkwsfNhPZNmscYxTDDBESchtnqFGUxyU7Yh
+        tso+GUzO4S3EVqcwg0nOoFmo8Q4L+GAfrlZ5GhS8IEeWXugql7pAKtT4hOJxIxVrLE7RiFSssThFI9+/
+        RYtD2Cuc+wAM9zuomVn4cQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnSelectFile.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wAAADsABataJCQAAAJ1JREFUSEtjoDfQAeL9QPyfTHwaiF2AGCfYDMTYNJKCrwMxTnAfiLFpIhXjBMPD
+        AlAkN5CJ1wMxQQtACskFCUA8OCwwAGJQUJGCJYCYaAs0gHg+iVgEiAdPEJELBk8Q0TySyQWDxwIFKE0K
+        FgBioi2wgLJJwTJAPALi4DAQg4pckEJy8GwgfgzEOAGowgYpALmCHPwaiFOAmF6AgQEAIsjS6W5duPAA
+        AAAASUVORK5CYII=
+</value>
+  </data>
 </root>

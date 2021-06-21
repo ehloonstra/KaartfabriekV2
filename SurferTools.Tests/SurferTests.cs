@@ -59,6 +59,7 @@ namespace SurferTools.Tests
 
             // Add the grid as a contour map:
             var mapFrame = _fixture.PlotDocument.Shapes.AddContourMap(newGridFilename);
+            mapFrame.ShouldNotBeNull("Map frame is null");
         }
 
         [Fact]
@@ -68,7 +69,8 @@ namespace SurferTools.Tests
             // Need a plot document:
             GetPlotDocument();
 
-            _fixture.SurferService.AddPostMap(_fixture.PlotDocument, _csvFileLocation, 16);
+            var mapFrame = _fixture.SurferService.AddPostMap(_fixture.PlotDocument, _csvFileLocation, "Velddata", 16);
+            mapFrame.ShouldNotBeNull("Map frame is null");
         }
 
 
@@ -80,11 +82,9 @@ namespace SurferTools.Tests
             // Get plot document:
             var plotDocument = surferService.AddPlotDocument();
             // Add post map:
-            var mapFrame = surferService.AddPostMap(plotDocument, _csvFileLocation, 16);
+            var mapFrame = surferService.AddPostMap(plotDocument, _csvFileLocation, "Velddata", 16);
             // Get limits:
             var dataLimits = new Limits(mapFrame.xMin, mapFrame.xMax, mapFrame.yMin, mapFrame.yMax);
-
-
         }
 
         private void GetPlotDocument()

@@ -4,6 +4,18 @@
         <name>SurferTools</name>
     </assembly>
     <members>
+        <member name="T:SurferTools.ComTools">
+            <summary>
+            Methods to interact with COM
+            </summary>
+        </member>
+        <member name="M:SurferTools.ComTools.GetActiveObject(System.String)">
+            <summary>
+            Get the active COM obejct by prog ID
+            </summary>
+            <param name="progId"></param>
+            <returns></returns>
+        </member>
         <member name="T:SurferTools.Limits">
             <summary>
             To hold the layer limits
@@ -38,6 +50,21 @@
             <param name="xMax"></param>
             <param name="yMin"></param>
             <param name="yMax"></param>
+        </member>
+        <member name="T:SurferTools.ProcessTools">
+            <summary>
+            Methods using System.Diagnostics.Process
+            </summary>
+        </member>
+        <member name="M:SurferTools.ProcessTools.ConvertLatLongToProjected(System.String,System.String,System.String)">
+            <summary>
+            Reproject a CSV file to a projected coordinate system
+            </summary>
+            <param name="fileName">The file to process</param>
+            <param name="epsgCode">The EPSG-code to project to</param>
+            <param name="label">The label which will be added to the new file name</param>
+            <returns>The location of the new file</returns>
+            <exception cref="T:System.NullReferenceException"></exception>
         </member>
         <member name="T:SurferTools.SurferService">
             <summary>
@@ -89,12 +116,13 @@
             <exception cref="T:System.IO.FileNotFoundException"></exception>
             <exception cref="T:System.Exception"></exception>
         </member>
-        <member name="M:SurferTools.SurferService.AddPostMap(Surfer.IPlotDocument,System.String,System.Int32,System.Int32,System.Int32,System.Int32)">
+        <member name="M:SurferTools.SurferService.AddPostMap(Surfer.IPlotDocument,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
             Add a postmap
             </summary>
             <param name="plotDocument"></param>
             <param name="csvFileLocation"></param>
+            <param name="layerName">The name of the layer in Surfer</param>
             <param name="zCol"></param>
             <param name="xCol"></param>
             <param name="yCol"></param>
