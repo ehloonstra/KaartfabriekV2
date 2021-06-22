@@ -5,10 +5,10 @@ namespace SurferTools.Tests
 {
     public class SurferFixture: IDisposable
     {
-        internal SurferService SurferService = new();
+        internal SurferService SurferService = new(SurferConstants.Epsg28992);
         internal bool CloseSurferOnTestFinish = true;
 
-        internal IPlotDocument PlotDocument = null;
+        internal IPlotDocument3 PlotDocument = null;
 
         public SurferFixture()
         {

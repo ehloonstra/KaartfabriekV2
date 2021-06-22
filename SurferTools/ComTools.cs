@@ -9,7 +9,7 @@ namespace SurferTools
     public class ComTools
     {
         [DllImport("oleaut32.dll", PreserveSig = false)]
-        static extern void GetActiveObject(
+        private static extern void GetActiveObject(
             ref Guid rclsid,
             IntPtr pvReserved,
             [MarshalAs(UnmanagedType.IUnknown)] out object ppunk
@@ -28,10 +28,20 @@ namespace SurferTools
         /// <returns></returns>
         public static object GetActiveObject(string progId)
         {
-            CLSIDFromProgID(progId, out var clsid);
-            GetActiveObject(ref clsid, IntPtr.Zero, out var obj);
+            try
+            {
+                CLSIDFromProgID(progId, out var clsid);
+                GetActiveObject(ref clsid, IntPtr.Zero, out var obj);
 
-            return obj;
+                return obj;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                // Swallow: throw;
+            }
+
+            return null;
         }
     }
 }

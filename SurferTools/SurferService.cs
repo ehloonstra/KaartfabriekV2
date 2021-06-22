@@ -9,13 +9,16 @@ namespace SurferTools
     /// </summary>
     public class SurferService
     {
+        private readonly string _epsgCode;
+        private IPlotDocument3 _activePlotDocument;
         private Application _surferApp;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public SurferService()
+        public SurferService(string epsgCode)
         {
+            _epsgCode = epsgCode;
             GetSurferObject();
         }
 
@@ -24,11 +27,17 @@ namespace SurferTools
             var obj = ComTools.GetActiveObject("Surfer.Application");
             if (obj is null)
             {
+                // Surfer is not loaded, create new instance
                 _surferApp = new Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
+                _activePlotDocument = AddPlotDocument();
             }
             else
             {
                 _surferApp = obj as Application;
+                if (_surferApp != null)
+                {
+                    _activePlotDocument = _surferApp.ActiveDocument ?? AddPlotDocument();
+                }
             }
         }
 
@@ -59,11 +68,11 @@ namespace SurferTools
         /// Create a plot document
         /// </summary>
         /// <returns>The created plot document</returns>
-        public IPlotDocument AddPlotDocument()
+        private IPlotDocument3 AddPlotDocument()
         {
             try
             {
-                IPlotDocument plot = _surferApp.Documents.Add();
+                IPlotDocument3 plot = _surferApp.Documents.Add();
 
                 // Set page orientation:
                 plot.PageSetup.Orientation = SrfPaperOrientation.srfLandscape;
@@ -76,6 +85,16 @@ namespace SurferTools
                 LogException(e, "Error in AddPlotDocument");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Save the plot document to disk
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns>True on success, false otherwise</returns>
+        public bool SavePlotDocument(string fileName)
+        {
+            return _activePlotDocument.SaveAs(fileName, "", SrfSaveFormat.srfSaveFormatSrf15);
         }
 
         /// <summary>
@@ -137,33 +156,18 @@ namespace SurferTools
         /// <summary>
         /// Add a postmap
         /// </summary>
-        /// <param name="plotDocument"></param>
         /// <param name="csvFileLocation"></param>
         /// <param name="layerName">The name of the layer in Surfer</param>
-        /// <param name="zCol"></param>
         /// <param name="xCol"></param>
         /// <param name="yCol"></param>
-        /// <param name="limitIncrease">How much should the map from limits be increased</param>
         /// <returns>Returns a MapFrame object.</returns>
-        public IMapFrame AddPostMap(IPlotDocument plotDocument, string csvFileLocation, string layerName,  int zCol, int xCol = 1, int yCol = 2, int limitIncrease = 20)
+        public IMapFrame AddPostMap(string csvFileLocation, string layerName, int xCol = 1, int yCol = 2)
         {
             _surferApp.ScreenUpdating = false;
 
             try
             {
-                var mapFrame = plotDocument.Shapes.AddPostMap2(csvFileLocation, xCol, yCol, zCol);
-
-                // Increase limits:
-                mapFrame.SetLimits(Math.Floor(mapFrame.xMin) - limitIncrease, Math.Floor(mapFrame.xMax) + limitIncrease,
-                    Math.Floor(mapFrame.yMin) - limitIncrease, Math.Floor(mapFrame.yMax) + limitIncrease);
-
-                // Make it fit on the page:
-                var ratioHeight = (plotDocument.PageSetup.Height - plotDocument.PageSetup.TopMargin - plotDocument.PageSetup.BottomMargin) / mapFrame.Height;
-                var ratioWidth = (plotDocument.PageSetup.Width - plotDocument.PageSetup.LeftMargin - plotDocument.PageSetup.RightMargin) / mapFrame.Width;
-                var ratio = Math.Min(ratioHeight, ratioWidth);
-                mapFrame.Height *= ratio;
-                mapFrame.Width *= ratio;
-                mapFrame.Top = plotDocument.PageSetup.Height - plotDocument.PageSetup.TopMargin;
+                var mapFrame = _activePlotDocument.Shapes.AddPostMap2(csvFileLocation, xCol, yCol);
 
                 // Get the added layer:
                 if (mapFrame.Overlays.Item(1) is not IPostLayer2 postMapLayer)
@@ -172,22 +176,17 @@ namespace SurferTools
                 // Change its name
                 postMapLayer.Name = layerName;
 
-                // Set symbols:
+                // Set default symbol settings:
                 postMapLayer.Symbol.Index = 12; //	Returns/sets the glyph index.
                 postMapLayer.Symbol.Color = srfColor.srfColorRed;
                 postMapLayer.Symbol.Size = 0.15; // Returns/sets the symbol height in page units.
                 postMapLayer.SymCol = 0;  // Returns/sets the column containing the symbol type (0 if none).
 
-                // Set rainbow coloring:
-                postMapLayer.SymbolColorMethod = SrfSymbolColorMethod.srfSymbolColorMethodGradient;
-                // TODO: LoadPreset doesn't exists:  postMapLayer.SymbolColorMap.LoadPreset("Rainbow")
-                // TODO: Results in hiding the data: postMapLayer.SymbolColorCol = zCol; // Returns/sets the symbol color column.
-
                 // No labels
                 postMapLayer.LabCol = 0; // Returns/sets the column containing the labels (0 if none).
 
                 // Set the coordinate system:
-                postMapLayer.CoordinateSystem = SurferConstants.Epsg28992;
+                postMapLayer.CoordinateSystem = _epsgCode;
 
                 return mapFrame;
             }
@@ -202,6 +201,154 @@ namespace SurferTools
             }
         }
 
+        /// <summary>
+        /// Add shapefile as base layer
+        /// </summary>
+        /// <param name="sfLocation">The location of the shapefile</param>
+        /// <returns>The new map frame</returns>
+        public IMapFrame AddShapefile(string sfLocation)
+        {
+            _surferApp.ScreenUpdating = false;
+
+            try
+            {
+                var mapFrame = _activePlotDocument.Shapes.AddBaseMap(sfLocation);
+                // Get the added layer:
+                if (mapFrame.Overlays.Item(1) is not IBaseLayer baseMapLayer)
+                    throw new Exception("Cannot get baseMapLayer");
+
+                // Line properties:
+                baseMapLayer.Line.ForeColor = srfColor.srfColorPurple;
+                baseMapLayer.Line.Width = 0.01;
+
+                baseMapLayer.CoordinateSystem = _epsgCode;
+
+                return mapFrame;
+            }
+            catch (Exception e)
+            {
+                LogException(e, "Error in AddShapefile");
+                throw;
+            }
+            finally
+            {
+                _surferApp.ScreenUpdating = true;
+            }
+        }
+
+
+        /// <summary>
+        /// Add georeferenced image (i.e. luchtfoto)
+        /// </summary>
+        /// <param name="imageLocation"></param>
+        /// <returns></returns>
+        public IMapFrame AddGeoreferencedImage(string imageLocation)
+        {
+            _surferApp.ScreenUpdating = false;
+
+            try
+            {
+                var mapFrame = _activePlotDocument.Shapes.AddBaseMap(imageLocation);
+                return mapFrame;
+            }
+            catch (Exception e)
+            {
+                LogException(e, "Error in AddShapefile");
+                throw;
+            }
+            finally
+            {
+                _surferApp.ScreenUpdating = true;
+            }
+        }
+
+        /// <summary>
+        /// Merge all map frames into one map frame
+        /// </summary>
+        /// <param name="mapFrames">The list of map frames</param>
+        /// <returns>The new map frame</returns>
+        public IMapFrame MergeMapFrames(params IMapFrame[] mapFrames)
+        {
+            _surferApp.ScreenUpdating = false;
+            try
+            {
+                _activePlotDocument.Selection.DeselectAll();
+                foreach (var mapFrame in mapFrames)
+                {
+                    mapFrame.Selected = true;
+                }
+
+                var newMapFrame = _activePlotDocument.Selection.OverlayMaps();
+                _activePlotDocument.Selection.DeselectAll();
+
+                return newMapFrame;
+            }
+            catch (Exception e)
+            {
+                LogException(e, "Error in MergeMapFrames");
+                throw;
+            }
+            finally
+            {
+                _surferApp.ScreenUpdating = true;
+            }
+        }
+
+        /// <summary>
+        /// Make the map frame fit nicely on the page
+        /// </summary>
+        /// <param name="mapFrame"></param>
+        public void MakeMapFrameFit(IMapFrame mapFrame)
+        {
+            // Make it fit on the page:
+            var pageSetup = _activePlotDocument.PageSetup;
+            var ratioHeight = (pageSetup.Height - pageSetup.TopMargin - pageSetup.BottomMargin) / mapFrame.Height;
+            var ratioWidth = (pageSetup.Width - pageSetup.LeftMargin - pageSetup.RightMargin) / mapFrame.Width;
+            var ratio = Math.Min(ratioHeight, ratioWidth);
+            mapFrame.Height *= ratio;
+            mapFrame.Width *= ratio;
+            mapFrame.Top = pageSetup.Height - pageSetup.TopMargin;
+            mapFrame.Left = pageSetup.LeftMargin;
+        }
+
+        /// <summary>
+        /// Set Post map layer symbology coloring
+        /// </summary>
+        /// <param name="postMapLayer"></param>
+        /// <param name="zColumn"></param>
+        public void SetColoringVelddataPostmap(IPostLayer2 postMapLayer, int zColumn)
+        {
+            if (postMapLayer is null) return;
+
+            _surferApp.ScreenUpdating = false;
+            try
+            {
+                // Set rainbow coloring:
+                // Load the color file:
+                postMapLayer.SymbolColorMap.LoadFile(Path.Combine(GetSurferSamplesLocation(), "Rainbow.clr"));
+                postMapLayer.SymbolColorMethod = SrfSymbolColorMethod.srfSymbolColorMethodGradient;
+                postMapLayer.SymbolColorCol = zColumn; // Returns/sets the symbol color column.
+            }
+            catch (Exception e)
+            {
+                LogException(e, "Error in SetColoringVelddataPostmap");
+                throw;
+            }
+            finally
+            {
+                _surferApp.ScreenUpdating = true;
+            }
+        }
+
+        /// <summary>
+        /// Enable the labels for the monsterdata Post map
+        /// </summary>
+        /// <param name="postMapLayer"></param>
+        /// <param name="labColumn"></param>
+        public void SetLabelMonsterdataPostmap(IPostLayer2 postMapLayer, int labColumn)
+        {
+            postMapLayer.LabCol = labColumn;
+        }
 
         private static void LogException(Exception exception, string msg)
         {
@@ -225,5 +372,14 @@ namespace SurferTools
 
         //}
 
+
+        /// <summary>
+        /// Get the samples folder of Surfer for the color maps
+        /// </summary>
+        /// <returns></returns>
+        public string GetSurferSamplesLocation()
+        {
+            return Path.Combine(_surferApp.Path, "Samples");
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Shouldly;
+using Surfer;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -54,59 +55,62 @@ namespace SurferTools.Tests
             retVal.ShouldBeTrue("Gridding was not successful");
             File.Exists(newGridFilename).ShouldBeTrue("New grid file doesn't exists");
 
-            // Need a plot document:
-            GetPlotDocument();
-
-            // Add the grid as a contour map:
-            var mapFrame = _fixture.PlotDocument.Shapes.AddContourMap(newGridFilename);
-            mapFrame.ShouldNotBeNull("Map frame is null");
+            // TODO: Add the grid as a contour map:
+            //var mapFrame = _fixture.PlotDocument.Shapes.AddContourMap(newGridFilename);
+            //mapFrame.ShouldNotBeNull("Map frame is null");
         }
 
         [Fact]
         public void AddPostMap()
         {
             _fixture.CloseSurferOnTestFinish = false;
-            // Need a plot document:
-            GetPlotDocument();
 
-            var mapFrame = _fixture.SurferService.AddPostMap(_fixture.PlotDocument, _csvFileLocation, "Velddata", 16);
+            var mapFrame = _fixture.SurferService.AddPostMap( _csvFileLocation, "Velddata");
             mapFrame.ShouldNotBeNull("Map frame is null");
+            _fixture.SurferService.SetColoringVelddataPostmap(mapFrame.Overlays.Item(1) as IPostLayer2, 16);
         }
-
 
         [Fact]
-        public void FullRun()
+        public void RoundUpTo1()
         {
-            // Init Surfer service:
-            var surferService = new SurferService();
-            // Get plot document:
-            var plotDocument = surferService.AddPlotDocument();
-            // Add post map:
-            var mapFrame = surferService.AddPostMap(plotDocument, _csvFileLocation, "Velddata", 16);
-            // Get limits:
-            var dataLimits = new Limits(mapFrame.xMin, mapFrame.xMax, mapFrame.yMin, mapFrame.yMax);
+            var limits = new Limits(162834.4, 163312.9, 467386, 468325);
+            var newLimits = Limits.RoundUp(limits, 1);
+            _output.WriteLine(newLimits.ToString());
+            newLimits.Xmin.ShouldBe(162834);
+            newLimits.Ymin.ShouldBe(467386);
+            newLimits.Xmax.ShouldBe(163313);
+            newLimits.Ymax.ShouldBe(468326);
         }
 
-        private void GetPlotDocument()
+        [Fact]
+        public void RoundUpTo50()
         {
-            if (_fixture.PlotDocument is null)
-                AddPlotDocument();
-
-            if (_fixture.PlotDocument is null)
-                throw new ShouldAssertException("Can't get the plot document");
+            var limits = new Limits(162834.4, 163312.9, 467386, 468325);
+            var newLimits = Limits.RoundUp(limits, 50);
+            _output.WriteLine(newLimits.ToString());
+            newLimits.Xmin.ShouldBe(162800);
+            newLimits.Ymin.ShouldBe(467350);
+            newLimits.Xmax.ShouldBe(163350);
+            newLimits.Ymax.ShouldBe(468350);
         }
 
-        private void AddPlotDocument()
+        [Fact]
+        public void RoundUpTo100()
         {
-            var currentNumDocuments = _fixture.SurferService.GetNumDocuments();
-            _fixture.PlotDocument = _fixture.SurferService.AddPlotDocument();
-            _fixture.PlotDocument.ShouldNotBeNull("New plot document is null");
-            _output.WriteLine(_fixture.PlotDocument.FullName);
+            var limits = new Limits(162834, 163312, 467386, 468325);
+            var newLimits = Limits.RoundUp(limits, 100);
+            _output.WriteLine(newLimits.ToString());
+            newLimits.Xmin.ShouldBe(162800);
+            newLimits.Ymin.ShouldBe(467300);
+            newLimits.Xmax.ShouldBe(163400);
+            newLimits.Ymax.ShouldBe(468400);
+        }
 
-            var newNumDocuments = _fixture.SurferService.GetNumDocuments();
-            newNumDocuments.ShouldBe(currentNumDocuments + 1, "Number of documents is unexpected");
-
-            _output.WriteLine("AddPlotDocument was successfull");
+        [Fact]
+        public void GetSurferSamplesLocation()
+        {
+            var result = _fixture.SurferService.GetSurferSamplesLocation();
+            result.ShouldBe(@"D:\Program Files\Golden Software\Surfer\Samples");
         }
     }
 }

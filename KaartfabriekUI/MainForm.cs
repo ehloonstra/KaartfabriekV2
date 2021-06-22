@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using KaartfabriekUI.Service;
+using Surfer;
 using SurferTools;
 
 namespace KaartfabriekUI
@@ -63,25 +65,21 @@ namespace KaartfabriekUI
         {
             // TODO: Check input, enable this button when input files exist.
 
-            var surferService = new SurferService();
-            var plotDocument = surferService.AddPlotDocument();
-            // Add Velddata:
-            surferService.AddPostMap(plotDocument, VeldDataLocation.TextboxText, "Velddata", 16);
-            // TODO: Coloring is not correct
+            try
+            {
+                var service = new KaartfabriekService();
+                var result = service.OpenDataForBlanking(WorkingFolder.TextboxText, VeldDataLocation.TextboxText,
+                    MonsterDataLocation.TextboxText);
 
-            // Add Monsterdata:
-            surferService.AddPostMap(plotDocument, MonsterDataLocation.TextboxText, "Monsterdata", 3);
-            // TODO: Show label of monsterdata
-            // TODO: layer is added as second map frame.
+                // Enable when success:
+                BlankFileLocation.Enabled = result;
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
 
-            // Get AAN-data:
-            // Add AAN-data:
-
-            // Increase limits:
-            // Add luchtfoto:
-
-            // Toon Surfer:
-            surferService.ShowHideSurfer(true);
         }
 
         private void WorkingFolder_TextboxUpdated(object sender, EventArgs e)

@@ -1,4 +1,6 @@
-﻿namespace SurferTools
+﻿using System;
+
+namespace SurferTools
 {
     /// <summary>
     /// To hold the layer limits
@@ -15,7 +17,7 @@
         /// The minimum map limit in the Y direction
         /// </summary>
         public double Ymin { get; set; }
-        
+
         /// <summary>
         /// The maximum map limit in the X direction
         /// </summary>
@@ -40,5 +42,41 @@
             Xmax = xMax;
             Ymax = yMax;
         }
+
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
+        public Limits()
+        {
+
+        }
+
+        /// <summary>
+        /// Round up to the round up value
+        /// </summary>
+        /// <param name="limits"></param>
+        /// <param name="roundUpValue"></param>
+        /// <returns>New limits</returns>
+        public static Limits RoundUp(Limits limits, int roundUpValue)
+        {
+            return new()
+            {
+                Xmin = Math.Round(limits.Xmin / roundUpValue, MidpointRounding.ToZero) * roundUpValue,
+                Ymin = Math.Round(limits.Ymin / roundUpValue, MidpointRounding.ToZero) * roundUpValue,
+                Xmax = (Math.Round(limits.Xmax / roundUpValue, MidpointRounding.ToZero) * roundUpValue) + roundUpValue,
+                Ymax = (Math.Round(limits.Ymax / roundUpValue, MidpointRounding.ToZero) * roundUpValue) + roundUpValue
+            };
+        }
+
+        #region Overrides of Object
+
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString()
+        {
+            return $"Xmin: {Xmin}; Xmax: {Xmax}; Ymin: {Ymin}; Ymax: {Ymax}; ";
+        }
+
+        #endregion
     }
 }
