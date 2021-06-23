@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using KaartfabriekUI.Service;
 using Surfer;
@@ -7,8 +8,12 @@ using SurferTools;
 
 namespace KaartfabriekUI
 {
+    /// <summary>
+    /// The main form
+    /// </summary>
     public partial class MainForm : Form
     {
+        /// <inheritdoc />
         public MainForm()
         {
             InitializeComponent();
@@ -69,7 +74,8 @@ namespace KaartfabriekUI
             {
                 var service = new KaartfabriekService();
                 var result = service.OpenDataForBlanking(WorkingFolder.TextboxText, VeldDataLocation.TextboxText,
-                    MonsterDataLocation.TextboxText);
+                    MonsterDataLocation.TextboxText, 
+                    CboXcoord.SelectedIndex + 1, CboYcoord.SelectedIndex + 1,  CboK40.SelectedIndex + 1);
 
                 // Enable when success:
                 BlankFileLocation.Enabled = result;
@@ -88,6 +94,51 @@ namespace KaartfabriekUI
             VeldDataLocation.InitialDirectory = WorkingFolder.TextboxText;
             MonsterDataLocation.InitialDirectory = WorkingFolder.TextboxText;
             BlankFileLocation.InitialDirectory = WorkingFolder.TextboxText;
+        }
+
+        private void BtnReadColumns_Click(object sender, EventArgs e)
+        {
+            PushHeaderVelddataToComboboxes();
+        }
+
+        private void PushHeaderVelddataToComboboxes()
+        {
+            if (string.IsNullOrEmpty(VeldDataLocation.TextboxText))
+            {
+                MessageBox.Show(@"Selecteer eerst de velddata");
+                return;
+            }
+
+            if (!File.Exists(VeldDataLocation.TextboxText))
+            {
+                MessageBox.Show(@"Kan de velddata niet vinden");
+                return;
+            }
+
+            var header = File.ReadLines(VeldDataLocation.TextboxText).First();
+            if (string.IsNullOrWhiteSpace(header))
+            {
+                MessageBox.Show(@"De velddata heeft geen inhoud");
+                return;
+            }
+
+            // Send data to the comboboxes:
+            CboXcoord.Data = header;
+            CboYcoord.Data = header;
+            CboAlt.Data = header;
+            CboK40.Data = header;
+            CboU238.Data = header;
+            CboTh232.Data = header;
+            CboCs137.Data = header;
+        }
+
+        private void BtnMaakNuclideGrids_Click(object sender, EventArgs e)
+        {
+            var service = new KaartfabriekService();
+            service.CreateNuclideGrids(WorkingFolder.TextboxText, VeldDataLocation.TextboxText, BlankFileLocation.TextboxText,
+                CboXcoord.SelectedIndex + 1, CboYcoord.SelectedIndex + 1, CboAlt.SelectedIndex + 1,
+                CboK40.SelectedIndex + 1, CboU238.SelectedIndex + 1, CboTh232.SelectedIndex + 1,
+                CboCs137.SelectedIndex + 1);
         }
     }
 }

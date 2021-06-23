@@ -1,0 +1,226 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>KaartfabriekUI</name>
+    </assembly>
+    <members>
+        <member name="T:KaartfabriekUI.MainForm">
+            <summary>
+            The main form
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.MainForm.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="F:KaartfabriekUI.MainForm.components">
+            <summary>
+             Required designer variable.
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.MainForm.Dispose(System.Boolean)">
+            <summary>
+             Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:KaartfabriekUI.MainForm.InitializeComponent">
+            <summary>
+             Required method for Designer support - do not modify
+             the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:KaartfabriekUI.Program">
+            <summary>
+            Starting point
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.Program.Main">
+            <summary>
+             The main entry point for the application.
+            </summary>
+        </member>
+        <member name="T:KaartfabriekUI.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="T:KaartfabriekUI.Service.KaartfabriekService">
+            <summary>
+            Service for the GUI
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.OpenDataForBlanking(System.String,System.String,System.String,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Action to perform after clicking the button
+            </summary>
+            <param name="workingFolder"></param>
+            <param name="veldDataLocation"></param>
+            <param name="monsterDataLocation"></param>
+            <param name="colX"></param>
+            <param name="colY"></param>
+            <param name="colK40"></param>
+            <returns></returns>
+        </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateNuclideGrids(System.String,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Create the nuclide grids and add them to the active map
+            </summary>
+            <param name="workingFolder"></param>
+            <param name="veldDataLocation"></param>
+            <param name="blankFileLocation"></param>
+            <param name="colX"></param>
+            <param name="colY"></param>
+            <param name="colAlt"></param>
+            <param name="colK40"></param>
+            <param name="colU238"></param>
+            <param name="colTh232"></param>
+            <param name="colCs137"></param>
+        </member>
+        <member name="T:KaartfabriekUI.UserControls.ColumnSelectControl">
+            <summary>
+            User control to select the column
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.UserControls.ColumnSelectControl.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.ColumnSelectControl.Label">
+            <summary>
+            Label displayed above the textbox
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.ColumnSelectControl.SelectedText">
+            <summary>
+            Text selected in the combobox
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.ColumnSelectControl.SelectedIndex">
+            <summary>
+            Selected index of the combobox (zero-based)
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.ColumnSelectControl.PresetValue">
+            <summary>
+            Preselect this value in the combobox
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.ColumnSelectControl.Data">
+            <summary>
+            String with the possible columns, seperated by semicolon
+            </summary>
+        </member>
+        <member name="T:KaartfabriekUI.UserControls.ColumnSelectControl.ComboboxItem">
+            <summary>
+            Helper class to hold the combobox item
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.ColumnSelectControl.ComboboxItem.Id">
+            <summary>
+            The id of the item
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.ColumnSelectControl.ComboboxItem.Value">
+            <summary>
+            The display value of the item
+            </summary>
+        </member>
+        <member name="F:KaartfabriekUI.UserControls.ColumnSelectControl.components">
+            <summary> 
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.UserControls.ColumnSelectControl.Dispose(System.Boolean)">
+            <summary> 
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:KaartfabriekUI.UserControls.ColumnSelectControl.InitializeComponent">
+            <summary> 
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:KaartfabriekUI.UserControls.TextSelectControl">
+            <summary>
+            User control to select a file of folder
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.UserControls.TextSelectControl.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.TextSelectControl.TextboxText">
+            <summary>
+            Text displayed in the textbox
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.TextSelectControl.Label">
+            <summary>
+            Label displayed above the textbox
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.TextSelectControl.InitialDirectory">
+            <summary>
+            Initial directory for the file select dialogs
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.TextSelectControl.SelectionType">
+            <summary>
+            Type of selection, file or folder
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.UserControls.TextSelectControl.FileFilter">
+            <summary>
+            File filter
+            </summary>
+        </member>
+        <member name="E:KaartfabriekUI.UserControls.TextSelectControl.TextboxUpdated">
+            <summary>
+            Event raised when the textbox was changed
+            </summary>
+        </member>
+        <member name="T:KaartfabriekUI.UserControls.TextSelectControl.SelectType">
+            <summary>
+            Enumaration of the possible types, file or folder
+            </summary>
+        </member>
+        <member name="F:KaartfabriekUI.UserControls.TextSelectControl.SelectType.Folder">
+            <summary>
+            Folder
+            </summary>
+        </member>
+        <member name="F:KaartfabriekUI.UserControls.TextSelectControl.SelectType.File">
+            <summary>
+            File
+            </summary>
+        </member>
+        <member name="F:KaartfabriekUI.UserControls.TextSelectControl.components">
+            <summary> 
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.UserControls.TextSelectControl.Dispose(System.Boolean)">
+            <summary> 
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:KaartfabriekUI.UserControls.TextSelectControl.InitializeComponent">
+            <summary> 
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+    </members>
+</doc>

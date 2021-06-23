@@ -7,6 +7,10 @@
     <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>D:\dev\TopX\Loonstra\Git\KaartfabriekUI\KaartfabriekUI.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <COMReference Include="Surfer">
       <WrapperTool>tlbimp</WrapperTool>

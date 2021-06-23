@@ -13,13 +13,19 @@ namespace SurferTools
         private IPlotDocument3 _activePlotDocument;
         private Application _surferApp;
 
+        private const string OutGridOptions = "UseDefaults=1, ForgetOptions=1, SaveRefInfoAsInternal=1, SaveRefInfoAsGSIREF=1";
+
+
         /// <summary>
-        /// Constructor
+        /// Constructor 
         /// </summary>
-        public SurferService(string epsgCode)
+        /// <param name="epsgCode">The epsg code for all layers</param>
+        /// <param name="workingFolder">The working folder</param>
+        public SurferService(string epsgCode, string workingFolder)
         {
             _epsgCode = epsgCode;
             GetSurferObject();
+            _surferApp.DefaultFilePath = workingFolder;
         }
 
         private void GetSurferObject()
@@ -88,6 +94,15 @@ namespace SurferTools
         }
 
         /// <summary>
+        /// Create new plot document and activate it
+        /// </summary>
+        public void CreateNewActivePlotDocument()
+        {
+            var plot = AddPlotDocument();
+            _activePlotDocument = plot;
+        }
+
+        /// <summary>
         /// Save the plot document to disk
         /// </summary>
         /// <param name="fileName"></param>
@@ -102,11 +117,14 @@ namespace SurferTools
         /// </summary>
         /// <param name="csvFileLocation">The location of the file with the irregularly spaced XYZ data, coordinates must be in meter (RD or UTM)</param>
         /// <param name="newGridFilename">The location of the newly created file</param>
-        /// <param name="columnIndexZ">The column index of the Z-value</param>
-        /// <returns>True o success, false otherwise</returns>
+        /// <param name="colX"></param>
+        /// <param name="colY"></param>
+        /// <param name="colZ">The column index of the Z-value</param>
+        /// <param name="limits">The limits</param>
+        /// <returns>True on success, false otherwise</returns>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="Exception"></exception>
-        public bool InverseDistanceGridding(string csvFileLocation, string newGridFilename, int columnIndexZ)
+        public bool InverseDistanceGridding(string csvFileLocation, string newGridFilename, int colX, int colY, int colZ, Limits limits)
         {
             // D:\dev\TopX\Loonstra\Svn\Surfer\trunk\clsSurfer.cls r1159
 
@@ -117,8 +135,6 @@ namespace SurferTools
             // For now constants, should be flexible:
             const int searchRadius = 30; // in meters
             const int searchNumSectors = 1;
-            const int xCol = 1;
-            const int yCol = 2;
             const int idPower = 2;
             const int idSmoothing = 20;
             const float gridSpacing = 3.5f; // in meters
@@ -126,25 +142,86 @@ namespace SurferTools
             if (!File.Exists(csvFileLocation))
                 throw new FileNotFoundException("Griddata file not found", csvFileLocation);
 
-            // TODO: Add limits:
-
             _surferApp.ScreenUpdating = false;
             try
             {
                 return _surferApp.GridData6(DataFile: csvFileLocation, OutGrid: newGridFilename,
                     SearchEnable: true, SearchNumSectors: searchNumSectors, SearchRad1: searchRadius,
                     SearchRad2: searchRadius,
-                    Algorithm: SrfGridAlgorithm.srfInverseDistance,
-                    xCol: xCol, yCol: yCol, zCol: columnIndexZ, IDPower: idPower, IDSmoothing: idSmoothing,
+                    xCol: colX, yCol: colY, zCol: colZ,
+                    Algorithm: SrfGridAlgorithm.srfInverseDistance, IDPower: idPower, IDSmoothing: idSmoothing,
                     SearchMinData: searchMinData, SearchDataPerSect: searchMaxData / searchNumSectors,
                     SearchMaxEmpty: Math.Max(1, searchNumSectors - 1), SearchMaxData: searchMaxData,
                     xSize: gridSpacing, ySize: gridSpacing,
-                    OutGridOptions: "UseDefaults=1, ForgetOptions=1, SaveRefInfoAsGSIREF=1",
+                    xMin: limits.Xmin, yMin: limits.Ymin, xMax: limits.Xmax, yMax: limits.Ymax,
+                    OutGridOptions: OutGridOptions,
                     ShowReport: false);
             }
             catch (Exception e)
             {
                 LogException(e, "Error in GridData6");
+                throw;
+            }
+            finally
+            {
+                _surferApp.ScreenUpdating = true;
+            }
+        }
+
+
+        /// <summary>
+        /// Set the grid values outside the blank file to NoData
+        /// </summary>
+        /// <param name="gridFileLocation"></param>
+        /// <param name="blankFileLocation"></param>
+        /// <param name="outputFileLocation"></param>
+        /// <returns></returns>
+        /// <exception cref="FileNotFoundException"></exception>
+        public bool GridAssignNoData(string gridFileLocation, string blankFileLocation, string outputFileLocation)
+        {
+            try
+            {
+                if (!File.Exists(gridFileLocation)) throw new FileNotFoundException("Cannot find input grid");
+                if (!File.Exists(blankFileLocation)) throw new FileNotFoundException("Cannot find blank file");
+
+                return _surferApp.GridAssignNoData(InGrid: gridFileLocation, NoDataFile: blankFileLocation,
+                    Side: SrfNoDataPolygonSide.srfNoDataPolyMixed,
+                    OutGrid: outputFileLocation, OutGridOptions: OutGridOptions);
+            }
+            catch (Exception e)
+            {
+                LogException(e, "Error in GridAssignNoData");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Add the contour lines of the grid
+        /// </summary>
+        /// <param name="gridFileLocation"></param>
+        /// <param name="layerName"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public IMapFrame AddContour(string gridFileLocation, string layerName)
+        {
+            _surferApp.ScreenUpdating = false;
+            try
+            {
+                var mapFrame =_activePlotDocument.Shapes.AddContourMap(gridFileLocation);
+                // Get the added layer:
+                if (mapFrame.Overlays.Item(1) is not IContourLayer contourLayer)
+                    throw new Exception("Cannot get contourLayer");
+
+                contourLayer.CoordinateSystem = _epsgCode;
+                contourLayer.FillContours = true;
+                contourLayer.SmoothContours = SrfConSmoothType.srfConSmoothHigh;
+                contourLayer.Name = layerName;
+
+                return mapFrame;
+            }
+            catch (Exception e)
+            {
+                LogException(e, "Error in AddContour");
                 throw;
             }
             finally
@@ -219,7 +296,7 @@ namespace SurferTools
 
                 // Line properties:
                 baseMapLayer.Line.ForeColor = srfColor.srfColorPurple;
-                baseMapLayer.Line.Width = 0.01;
+                baseMapLayer.Line.Width = 0.02;
 
                 baseMapLayer.CoordinateSystem = _epsgCode;
 
@@ -272,14 +349,14 @@ namespace SurferTools
             _surferApp.ScreenUpdating = false;
             try
             {
-                _activePlotDocument.Selection.DeselectAll();
+                DeselectAll();
                 foreach (var mapFrame in mapFrames)
                 {
                     mapFrame.Selected = true;
                 }
 
                 var newMapFrame = _activePlotDocument.Selection.OverlayMaps();
-                _activePlotDocument.Selection.DeselectAll();
+                DeselectAll();
 
                 return newMapFrame;
             }
@@ -293,6 +370,20 @@ namespace SurferTools
                 _surferApp.ScreenUpdating = true;
             }
         }
+
+        /// <summary>
+        /// Deselect all on active plotdocument
+        /// </summary>
+        public void DeselectAll()
+        {
+            _activePlotDocument.Selection.DeselectAll();
+        }
+
+        public ISelection GetSelection()
+        {
+            return _activePlotDocument.Selection;
+        }
+
 
         /// <summary>
         /// Make the map frame fit nicely on the page
@@ -324,10 +415,10 @@ namespace SurferTools
             try
             {
                 // Set rainbow coloring:
+                postMapLayer.SymbolColorCol = zColumn; // Returns/sets the symbol color column.
+                postMapLayer.SymbolColorMethod = SrfSymbolColorMethod.srfSymbolColorMethodGradient;
                 // Load the color file:
                 postMapLayer.SymbolColorMap.LoadFile(Path.Combine(GetSurferSamplesLocation(), "Rainbow.clr"));
-                postMapLayer.SymbolColorMethod = SrfSymbolColorMethod.srfSymbolColorMethodGradient;
-                postMapLayer.SymbolColorCol = zColumn; // Returns/sets the symbol color column.
             }
             catch (Exception e)
             {
@@ -362,17 +453,6 @@ namespace SurferTools
             }
         }
 
-
-        //public IPlotDocument OpenTemplatePlotDocument(string templatePath)
-        //{
-        //    if (!File.Exists(templatePath))
-        //        throw new FileNotFoundException("Cannot find template plot document", templatePath);
-
-        //    _surferApp.Documents.Open()
-
-        //}
-
-
         /// <summary>
         /// Get the samples folder of Surfer for the color maps
         /// </summary>
@@ -380,6 +460,18 @@ namespace SurferTools
         public string GetSurferSamplesLocation()
         {
             return Path.Combine(_surferApp.Path, "Samples");
+        }
+
+        public string BufferPolygon(IMapFrame mapFrame, int bufferDistance)
+        {
+            if (mapFrame.Overlays.Item(1) is not IBaseLayer baseMapLayer)
+                throw new Exception("Cannot get baseMapLayer");
+
+            Console.WriteLine(baseMapLayer.Shapes.Count);
+            Console.WriteLine(baseMapLayer.Shapes.Item(1).GetType());
+
+            return "TODO";
+
         }
     }
 }

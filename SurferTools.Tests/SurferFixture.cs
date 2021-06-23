@@ -1,14 +1,12 @@
 ﻿using System;
-using Surfer;
+using System.IO;
 
 namespace SurferTools.Tests
 {
     public class SurferFixture: IDisposable
     {
-        internal SurferService SurferService = new(SurferConstants.Epsg28992);
+        internal SurferService SurferService = new(SurferConstants.Epsg28992, Path.GetTempPath());
         internal bool CloseSurferOnTestFinish = true;
-
-        internal IPlotDocument3 PlotDocument = null;
 
         public SurferFixture()
         {

@@ -6,6 +6,7 @@ using Shouldly;
 using Surfer;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace SurferTools.Tests
 {
@@ -51,7 +52,8 @@ namespace SurferTools.Tests
             var newGridFilename = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(_csvFileLocation) + ".grd");
             if (File.Exists(newGridFilename)) File.Delete(newGridFilename);
 
-            var retVal = _fixture.SurferService.InverseDistanceGridding(_csvFileLocation, newGridFilename, 16);
+            // TODO: add limits:
+            var retVal = _fixture.SurferService.InverseDistanceGridding(_csvFileLocation, newGridFilename, 1, 2, 16, null);
             retVal.ShouldBeTrue("Gridding was not successful");
             File.Exists(newGridFilename).ShouldBeTrue("New grid file doesn't exists");
 
@@ -65,9 +67,41 @@ namespace SurferTools.Tests
         {
             _fixture.CloseSurferOnTestFinish = false;
 
-            var mapFrame = _fixture.SurferService.AddPostMap( _csvFileLocation, "Velddata");
+            var mapFrame = _fixture.SurferService.AddPostMap(_csvFileLocation, "Velddata");
             mapFrame.ShouldNotBeNull("Map frame is null");
             _fixture.SurferService.SetColoringVelddataPostmap(mapFrame.Overlays.Item(1) as IPostLayer2, 16);
+        }
+
+        [Fact]
+        public void BufferBlankFile()
+        {
+            var surferApp = new Surfer.Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
+            // Add PlotDocument:
+            if (!(surferApp.Documents.Add() is IPlotDocument3 plot))
+                throw new Exception("Could not add plot document");
+
+            // Set page orientation:
+            plot.PageSetup.Orientation = SrfPaperOrientation.srfLandscape;
+            plot.Activate();
+
+            // Add blank file:
+            var mapFrame = plot.Shapes.AddBaseMap(@"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\Aan.bln");
+
+            if (mapFrame.Overlays.Item(1) is not IVectorBaseLayer2 baseMapLayer)
+                throw new Exception("Cannot get baseMapLayer");
+
+            if (baseMapLayer.Shapes.Item(1) is not IPolygon2 polygon)
+                throw new Exception("Cannot get polygon");
+
+            plot.Selection.DeselectAll();
+            // polygon.Select();  <=== Throws 0x80020009 DISP_E_EXCEPTION
+            // polygon.Selected = true;  <=== Throws 0x80020009 DISP_E_EXCEPTION
+            // plot.Selection.Buffer <== Doesn't exists
+
+            plot.Selection.Combine(); // <== Does exists
+            plot.Selection.StackMaps(); // <== Does exists
+
+            surferApp.Visible = true;
         }
 
         [Fact]

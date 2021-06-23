@@ -53,7 +53,6 @@ namespace KaartfabriekUI.UserControls
             this.textbox.Size = new System.Drawing.Size(272, 23);
             this.textbox.TabIndex = 1;
             this.textbox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.textbox.TextChanged += new System.EventHandler(this.textbox_TextChanged);
             // 
             // btnSelectFolder
             // 
