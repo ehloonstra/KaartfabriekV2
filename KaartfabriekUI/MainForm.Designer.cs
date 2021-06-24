@@ -38,8 +38,8 @@ namespace KaartfabriekUI
             this.VeldDataLocation = new KaartfabriekUI.UserControls.TextSelectControl();
             this.WorkingFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.BlankFileLocation = new KaartfabriekUI.UserControls.TextSelectControl();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.BtnLoadVelddataInSurfer = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -54,6 +54,7 @@ namespace KaartfabriekUI
             this.BtnReadColumns = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.BtnMaakNuclideGrids = new System.Windows.Forms.Button();
+            this.CboTotalCount = new KaartfabriekUI.UserControls.ColumnSelectControl();
             this.Voorbereiding.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -143,18 +144,6 @@ namespace KaartfabriekUI
             this.toolTip1.SetToolTip(this.WorkingFolder, "Selecteer de locatie van de werkfolder");
             this.WorkingFolder.TextboxUpdated += new System.EventHandler(this.WorkingFolder_TextboxUpdated);
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.BlankFileLocation);
-            this.groupBox1.Controls.Add(this.BtnLoadVelddataInSurfer);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(12, 192);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(467, 170);
-            this.groupBox1.TabIndex = 1;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "3. Perceelsgrens";
-            // 
             // BlankFileLocation
             // 
             this.BlankFileLocation.FileFilter = "blank files|*.bln";
@@ -167,6 +156,18 @@ namespace KaartfabriekUI
             this.BlankFileLocation.TabIndex = 2;
             this.BlankFileLocation.TextboxText = "";
             this.toolTip1.SetToolTip(this.BlankFileLocation, "Selecteer de locatie van de blank file");
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.BlankFileLocation);
+            this.groupBox1.Controls.Add(this.BtnLoadVelddataInSurfer);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Location = new System.Drawing.Point(12, 192);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(467, 170);
+            this.groupBox1.TabIndex = 1;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "3. Perceelsgrens";
             // 
             // BtnLoadVelddataInSurfer
             // 
@@ -203,6 +204,7 @@ namespace KaartfabriekUI
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.CboTotalCount);
             this.groupBox2.Controls.Add(this.CboCs137);
             this.groupBox2.Controls.Add(this.CboTh232);
             this.groupBox2.Controls.Add(this.CboU238);
@@ -325,6 +327,17 @@ namespace KaartfabriekUI
             this.BtnMaakNuclideGrids.UseVisualStyleBackColor = true;
             this.BtnMaakNuclideGrids.Click += new System.EventHandler(this.BtnMaakNuclideGrids_Click);
             // 
+            // CboTotalCount
+            // 
+            this.CboTotalCount.Data = null;
+            this.CboTotalCount.Label = "Total count:";
+            this.CboTotalCount.Location = new System.Drawing.Point(307, 61);
+            this.CboTotalCount.Name = "CboTotalCount";
+            this.CboTotalCount.PresetValue = "Countrate";
+            this.CboTotalCount.SelectedText = "";
+            this.CboTotalCount.Size = new System.Drawing.Size(90, 44);
+            this.CboTotalCount.TabIndex = 8;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -374,6 +387,7 @@ namespace KaartfabriekUI
         private UserControls.ColumnSelectControl CboAlt;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Button BtnMaakNuclideGrids;
+        private UserControls.ColumnSelectControl CboTotalCount;
     }
 }
 

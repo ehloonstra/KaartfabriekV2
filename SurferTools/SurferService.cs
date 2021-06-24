@@ -200,14 +200,16 @@ namespace SurferTools
         /// </summary>
         /// <param name="gridFileLocation"></param>
         /// <param name="layerName"></param>
+        /// <param name="showColorScale"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public IMapFrame AddContour(string gridFileLocation, string layerName)
+        public IMapFrame AddContour(string gridFileLocation, string layerName, bool showColorScale)
         {
             _surferApp.ScreenUpdating = false;
             try
             {
-                var mapFrame =_activePlotDocument.Shapes.AddContourMap(gridFileLocation);
+                var mapFrame = _activePlotDocument.Shapes.AddContourMap(gridFileLocation);
+
                 // Get the added layer:
                 if (mapFrame.Overlays.Item(1) is not IContourLayer contourLayer)
                     throw new Exception("Cannot get contourLayer");
@@ -216,6 +218,21 @@ namespace SurferTools
                 contourLayer.FillContours = true;
                 contourLayer.SmoothContours = SrfConSmoothType.srfConSmoothHigh;
                 contourLayer.Name = layerName;
+
+                contourLayer.ShowMajorLabels = false;
+                contourLayer.ShowMinorLabels = false;
+
+                contourLayer.ShowColorScale = showColorScale;
+                if (showColorScale)
+                {
+                    contourLayer.ColorScale.Title = layerName;
+                    contourLayer.ColorScale.TitlePosition = SrfColorScaleTitlePosition.srfColorScaleTitlePositionBottom;
+                    contourLayer.ColorScale.TitleOffsetVertical = 1d;
+                    contourLayer.ColorScale.TitleAngle = 0;
+
+                    contourLayer.ColorScale.Top = mapFrame.Top - mapFrame.Height + contourLayer.ColorScale.Height + 1; // Align bottom
+                    contourLayer.ColorScale.Left = mapFrame.Left + mapFrame.Width;
+                }
 
                 return mapFrame;
             }
@@ -228,6 +245,17 @@ namespace SurferTools
             {
                 _surferApp.ScreenUpdating = true;
             }
+        }
+
+        /// <summary>
+        /// Group the selection into an IComposite
+        /// </summary>
+        /// <param name="name">The name of the group</param>
+        public void GroupSelection(string name)
+        {
+            var group = _activePlotDocument.Selection.Combine();
+            group.Name = name;
+            DeselectAll();
         }
 
         /// <summary>
@@ -292,7 +320,7 @@ namespace SurferTools
                 var mapFrame = _activePlotDocument.Shapes.AddBaseMap(sfLocation);
                 // Get the added layer:
                 if (mapFrame.Overlays.Item(1) is not IBaseLayer baseMapLayer)
-                    throw new Exception("Cannot get baseMapLayer");
+                    throw new Exception("Cannot get BaseMapLayer");
 
                 // Line properties:
                 baseMapLayer.Line.ForeColor = srfColor.srfColorPurple;
@@ -358,6 +386,10 @@ namespace SurferTools
                 var newMapFrame = _activePlotDocument.Selection.OverlayMaps();
                 DeselectAll();
 
+                // Change axis:
+                newMapFrame.Axes.Item("Right Axis").MajorTickType = SrfTickType.srfTickNone;
+                newMapFrame.Axes.Item("Top Axis").MajorTickType = SrfTickType.srfTickNone;
+
                 return newMapFrame;
             }
             catch (Exception e)
@@ -378,12 +410,6 @@ namespace SurferTools
         {
             _activePlotDocument.Selection.DeselectAll();
         }
-
-        public ISelection GetSelection()
-        {
-            return _activePlotDocument.Selection;
-        }
-
 
         /// <summary>
         /// Make the map frame fit nicely on the page
@@ -462,6 +488,13 @@ namespace SurferTools
             return Path.Combine(_surferApp.Path, "Samples");
         }
 
+        /// <summary>
+        /// Buffer a polygon
+        /// </summary>
+        /// <param name="mapFrame"></param>
+        /// <param name="bufferDistance"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public string BufferPolygon(IMapFrame mapFrame, int bufferDistance)
         {
             if (mapFrame.Overlays.Item(1) is not IBaseLayer baseMapLayer)
@@ -472,6 +505,59 @@ namespace SurferTools
 
             return "TODO";
 
+        }
+
+        /// <summary>
+        /// Align the 6 maps nicely on the plot
+        /// </summary>
+        public void AlignNuclideGrids()
+        {
+            DeselectAll();
+            var scale = 1d;
+            var pageSetup = _activePlotDocument.PageSetup;
+            var previousWidths = 0d;
+            const float gap = 0.5f;
+            var mapOnRow = 0;
+
+            var numMaps = _activePlotDocument.Shapes.Count;
+            for (var i = 1; i <= numMaps; i++)
+            {
+                if (_activePlotDocument.Shapes.Item(i) is not IComposite group)
+                    continue;
+
+                if (i == 1)
+                {
+                    var ratioHeight = (pageSetup.Height / 2 - pageSetup.TopMargin - pageSetup.BottomMargin) /
+                                      group.Height;
+                    var ratioWidth = ((pageSetup.Width / 3) - pageSetup.LeftMargin - pageSetup.RightMargin) /
+                                     group.Width;
+                    scale = Math.Min(ratioHeight, ratioWidth);
+                }
+
+                // Scale:
+                group.Height *= scale;
+                group.Width *= scale;
+
+                if (i <= 3)
+                {
+                    group.Top = pageSetup.Height - pageSetup.TopMargin;
+                }
+                else
+                {
+                    group.Top = pageSetup.Height - pageSetup.TopMargin - group.Height - gap;
+                }
+                group.Left = pageSetup.LeftMargin + previousWidths + mapOnRow * gap;
+                mapOnRow++;
+
+                // Save previous widths:
+                previousWidths += group.Width;
+
+                if (i != 3) continue;
+
+                // Reset, start at the beginning:
+                previousWidths = 0d;
+                mapOnRow = 0;
+            }
         }
     }
 }

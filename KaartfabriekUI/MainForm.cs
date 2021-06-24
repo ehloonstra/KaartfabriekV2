@@ -130,6 +130,7 @@ namespace KaartfabriekUI
             CboU238.Data = header;
             CboTh232.Data = header;
             CboCs137.Data = header;
+            CboTotalCount.Data = header;
         }
 
         private void BtnMaakNuclideGrids_Click(object sender, EventArgs e)
@@ -138,7 +139,7 @@ namespace KaartfabriekUI
             service.CreateNuclideGrids(WorkingFolder.TextboxText, VeldDataLocation.TextboxText, BlankFileLocation.TextboxText,
                 CboXcoord.SelectedIndex + 1, CboYcoord.SelectedIndex + 1, CboAlt.SelectedIndex + 1,
                 CboK40.SelectedIndex + 1, CboU238.SelectedIndex + 1, CboTh232.SelectedIndex + 1,
-                CboCs137.SelectedIndex + 1);
+                CboCs137.SelectedIndex + 1, CboTotalCount.SelectedIndex + 1);
         }
     }
 }

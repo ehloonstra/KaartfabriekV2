@@ -57,10 +57,6 @@ namespace KaartfabriekUI.Service
             var mergedMapFrame = surferService.MergeMapFrames(mapFrameVelddata, mapFrameMonsterdata,
                 mapFrameAan, mapFrameLuchtfoto);
 
-            // Change axis:
-            mergedMapFrame.Axes.Item("Right Axis").MajorTickType = SrfTickType.srfTickNone;
-            mergedMapFrame.Axes.Item("Top Axis").MajorTickType = SrfTickType.srfTickNone;
-
             surferService.MakeMapFrameFit(mergedMapFrame);
 
             // Save result:
@@ -83,28 +79,34 @@ namespace KaartfabriekUI.Service
         /// <param name="colU238"></param>
         /// <param name="colTh232"></param>
         /// <param name="colCs137"></param>
+        /// <param name="colTc"></param>
         public void CreateNuclideGrids(string workingFolder, string veldDataLocation, string blankFileLocation,
-            int colX, int colY, int colAlt, int colK40, int colU238, int colTh232, int colCs137)
+            int colX, int colY, int colAlt, int colK40, int colU238, int colTh232, int colCs137, int colTc)
         {
             // TODO: Check inputs
 
             // TODO: Make EPSG-code flexible:
             var surferService = new SurferService(SurferConstants.Epsg28992, workingFolder);
 
+            var nuclideGridsFolder = Path.Combine(workingFolder, "nuclide grids");
+            if (!Directory.Exists(nuclideGridsFolder)) Directory.CreateDirectory(nuclideGridsFolder);
+            
             try
             {
                 // Create new plot document:
                 surferService.CreateNewActivePlotDocument();
 
-                var mapAlt = CreateNuclideGrid("Alt.grd", "Altitude", colAlt);
-                var mapK40 = CreateNuclideGrid("K40.grd", "K-40", colK40);
-                var mapU238 = CreateNuclideGrid("U238.grd", "U-238", colU238);
-                var mapTh232 = CreateNuclideGrid("Th232.grd", "Th-232", colTh232);
-                var mapCs137 = CreateNuclideGrid("Cs137.grd", "Cs-137", colCs137);
+                CreateNuclideGrid("Alt.grd", "Altitude", colAlt);
+                CreateNuclideGrid("K40.grd", "K-40", colK40);
+                CreateNuclideGrid("U238.grd", "U-238", colU238);
+                CreateNuclideGrid("Th232.grd", "Th-232", colTh232);
+                CreateNuclideGrid("Cs137.grd", "Cs-137", colCs137);
+                CreateNuclideGrid("TC.grd", "TC", colTc);
 
-                // TODO: Add label with nuclide name
 
-                // TODO: Show maps nicely on plot (resize, align horizontally
+                // Show maps nicely on plot (resize, align horizontally
+                surferService.AlignNuclideGrids();
+                surferService.SavePlotDocument(Path.Combine(nuclideGridsFolder, "nuclideGrids.srf"));
             }
             catch (Exception e)
             {
@@ -115,7 +117,7 @@ namespace KaartfabriekUI.Service
                 surferService.ShowHideSurfer(true);
             }
 
-            IMapFrame CreateNuclideGrid(string fileName, string layerName, int colZ)
+            void CreateNuclideGrid(string fileName, string layerName, int colZ)
             {
                 // Add blank file to get the limits:
                 var mapBlankFile = surferService.AddShapefile(blankFileLocation);
@@ -125,8 +127,6 @@ namespace KaartfabriekUI.Service
                 // Temp file:
                 var tmpGridLocation = Path.Combine(workingFolder, "tmpGrid.grd");
                 // Final file:
-                var nuclideGridsFolder = Path.Combine(workingFolder, "nuclide grids");
-                if (!Directory.Exists(nuclideGridsFolder)) Directory.CreateDirectory(nuclideGridsFolder);
                 var outGridLocation = Path.Combine(nuclideGridsFolder, fileName);
 
                 // Grid velddata:
@@ -136,16 +136,32 @@ namespace KaartfabriekUI.Service
                 // Blank file:
                 // TODO: Blank using buffered file:
                 if (!surferService.GridAssignNoData(tmpGridLocation, blankFileLocation, outGridLocation))
-                    return null;
+                    return;
 
                 // Clean-up tmp file:
                 File.Delete(tmpGridLocation);
                 // Add contour layer:
-                var mapContour = surferService.AddContour(outGridLocation, layerName);
-                return surferService.MergeMapFrames(mapContour, mapBlankFile);
+                var mapContour = surferService.AddContour(outGridLocation, layerName, true);
+                var mergedMapFrame = surferService.MergeMapFrames(mapBlankFile, mapContour);
+
+                // Group:
+                surferService.DeselectAll();
+                // Get the contour layer:
+                var numOverlays = mergedMapFrame.Overlays.Count;
+                for (var i = 1; i <= numOverlays; i++)
+                {
+                    if (mergedMapFrame.Overlays.Item(i) is not IContourLayer contourLayer) continue;
+
+                    // Select the color scale:
+                    contourLayer.ColorScale.Selected = true;
+                    // Move:
+                    contourLayer.SetZOrder(SrfZOrder.srfZOToBack);
+                    break;
+                }
+
+                mergedMapFrame.Selected = true;
+                surferService.GroupSelection(layerName);
             }
         }
-
-
     }
 }

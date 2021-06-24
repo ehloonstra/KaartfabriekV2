@@ -72,7 +72,7 @@
             <param name="colK40"></param>
             <returns></returns>
         </member>
-        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateNuclideGrids(System.String,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateNuclideGrids(System.String,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
             Create the nuclide grids and add them to the active map
             </summary>
@@ -86,6 +86,7 @@
             <param name="colU238"></param>
             <param name="colTh232"></param>
             <param name="colCs137"></param>
+            <param name="colTc"></param>
         </member>
         <member name="T:KaartfabriekUI.UserControls.ColumnSelectControl">
             <summary>

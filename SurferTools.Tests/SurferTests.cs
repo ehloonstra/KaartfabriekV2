@@ -90,16 +90,24 @@ namespace SurferTools.Tests
             if (mapFrame.Overlays.Item(1) is not IVectorBaseLayer2 baseMapLayer)
                 throw new Exception("Cannot get baseMapLayer");
 
+            // baseMapLayer.Shapes.StartEditing(); <== Doesn't exists
+
             if (baseMapLayer.Shapes.Item(1) is not IPolygon2 polygon)
                 throw new Exception("Cannot get polygon");
-
+            
             plot.Selection.DeselectAll();
             // polygon.Select();  <=== Throws 0x80020009 DISP_E_EXCEPTION
             // polygon.Selected = true;  <=== Throws 0x80020009 DISP_E_EXCEPTION
-            // plot.Selection.Buffer <== Doesn't exists
+            // plot.Selection.Buffer(NumberBuffers: 1, BufferDistance: 20) <== Doesn't exists
 
-            plot.Selection.Combine(); // <== Does exists
-            plot.Selection.StackMaps(); // <== Does exists
+            if (baseMapLayer.Shapes.Item(baseMapLayer.Shapes.Count) is not IPolygon2 bufferedPolygon)
+                throw new Exception("Cannot get buffered polygon");
+
+            bufferedPolygon.Name = "Buffer Polygon";
+            bufferedPolygon.Line.ForeColorRGBA.Color = srfColor.srfColorForestGreen;
+            bufferedPolygon.Fill.ForeColorRGBA.Color = srfColor.srfColorForestGreen;
+            bufferedPolygon.Fill.Pattern = "25 Percent";
+            bufferedPolygon.SetZOrder(SrfZOrder.srfZOToBack);
 
             surferApp.Visible = true;
         }
