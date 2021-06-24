@@ -443,8 +443,15 @@ namespace SurferTools
                 // Set rainbow coloring:
                 postMapLayer.SymbolColorCol = zColumn; // Returns/sets the symbol color column.
                 postMapLayer.SymbolColorMethod = SrfSymbolColorMethod.srfSymbolColorMethodGradient;
+
+                if (postMapLayer.SymbolColorMap is not IColorMap2 colorMap)
+                    throw new Exception("Cannot get colorMap");
                 // Load the color file:
-                postMapLayer.SymbolColorMap.LoadFile(Path.Combine(GetSurferSamplesLocation(), "Rainbow.clr"));
+                //postMapLayer.SymbolColorMap.LoadFile(Path.Combine(GetSurferSamplesLocation(), "Rainbow.clr"));
+                colorMap.LoadPreset("Rainbow");
+
+                // Force reload:
+                postMapLayer.DataFile = postMapLayer.DataFile;
             }
             catch (Exception e)
             {

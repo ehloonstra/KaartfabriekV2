@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -69,7 +70,12 @@ namespace SurferTools.Tests
 
             var mapFrame = _fixture.SurferService.AddPostMap(_csvFileLocation, "Velddata");
             mapFrame.ShouldNotBeNull("Map frame is null");
-            _fixture.SurferService.SetColoringVelddataPostmap(mapFrame.Overlays.Item(1) as IPostLayer2, 16);
+
+            if (mapFrame is not IMapFrame3 mapFrame3)
+                throw new Exception("Cannot get mapFrame3");
+            _fixture.SurferService.SetColoringVelddataPostmap(mapFrame3.Overlays.Item(1) as IPostLayer2, 16);
+            // Trying to force a refresh
+            
         }
 
         [Fact]
@@ -77,7 +83,7 @@ namespace SurferTools.Tests
         {
             var surferApp = new Surfer.Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
             // Add PlotDocument:
-            if (!(surferApp.Documents.Add() is IPlotDocument3 plot))
+            if (surferApp.Documents.Add() is not IPlotDocument3 plot)
                 throw new Exception("Could not add plot document");
 
             // Set page orientation:
@@ -90,15 +96,22 @@ namespace SurferTools.Tests
             if (mapFrame.Overlays.Item(1) is not IVectorBaseLayer2 baseMapLayer)
                 throw new Exception("Cannot get baseMapLayer");
 
-            // baseMapLayer.Shapes.StartEditing(); <== Doesn't exists
+            if (baseMapLayer.Shapes is not IShapes7 shapes)
+                throw new Exception("Cannot get shapes");
+
+            plot.Selection.DeselectAll();
+
+            shapes.StartEditing();
 
             if (baseMapLayer.Shapes.Item(1) is not IPolygon2 polygon)
                 throw new Exception("Cannot get polygon");
-            
-            plot.Selection.DeselectAll();
-            // polygon.Select();  <=== Throws 0x80020009 DISP_E_EXCEPTION
-            // polygon.Selected = true;  <=== Throws 0x80020009 DISP_E_EXCEPTION
-            // plot.Selection.Buffer(NumberBuffers: 1, BufferDistance: 20) <== Doesn't exists
+
+            polygon.Selected = true;
+
+            if (plot.Selection is not ISelection3 plotSelection)
+                throw new Exception("Cannot get plot selection");
+
+            plotSelection.Buffer(NumberBuffers: 1, BufferDistance: 20);
 
             if (baseMapLayer.Shapes.Item(baseMapLayer.Shapes.Count) is not IPolygon2 bufferedPolygon)
                 throw new Exception("Cannot get buffered polygon");
@@ -109,7 +122,78 @@ namespace SurferTools.Tests
             bufferedPolygon.Fill.Pattern = "25 Percent";
             bufferedPolygon.SetZOrder(SrfZOrder.srfZOToBack);
 
+            shapes.StopEditing();
+
             surferApp.Visible = true;
+        }
+
+        [Fact]
+        public void GridMath()
+        {
+            var surferApp = new Surfer.Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
+            // Add PlotDocument:
+            if (surferApp.Documents.Add() is not IPlotDocument3 plot)
+                throw new Exception("Could not add plot document");
+
+            // Set page orientation:
+            plot.PageSetup.Orientation = SrfPaperOrientation.srfLandscape;
+            plot.Activate();
+
+            var gridMathInput = new List<IGridMathInput>
+            {
+                surferApp.NewGridMathInput(
+                    @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Cs137.grd",
+                    "A"),
+                surferApp.NewGridMathInput(
+                    @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\K40.grd",
+                    "B")
+            };
+
+            var outGrid =
+                @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\MathTest.grd";
+            surferApp.GridMath3("2*A+B", gridMathInput.ToArray(), outGrid);
+
+            plot.Shapes.AddContourMap(outGrid);
+
+            surferApp.Visible = true;
+        }
+
+        [Fact]
+        public void ListAllSurferMethods()
+        {
+            // ListAllMethods(typeof(IPlotDocument3));
+            //ListAllMethods(typeof(ISelection3));
+            //ListAllMethods(typeof(IShapes7));
+            // ListAllMethods(typeof(IMarkerFormat));
+            //ListAllMethods(typeof(IColorMap));
+            //ListAllMethods(typeof(IColorMap2));
+            ListAllMethods(typeof(IPostLayer2));
+            //ListAllMethods(typeof(IContourLayer));
+            //ListAllMethods(typeof(IMapFrame3));
+        }
+
+        private void ListAllMethods(Type myType)
+        {
+            _output.WriteLine("Listing the methods of " + myType.Name);
+            // Get the public methods.
+            var myArrayMethodInfo = myType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            _output.WriteLine("\nThe number of public methods is {0}.", myArrayMethodInfo.Length);
+            // Display all the methods.
+            DisplayMethodInfo(myArrayMethodInfo);
+            // Get the nonpublic methods.
+            var myArrayMethodInfo1 = myType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            _output.WriteLine("\nThe number of protected methods is {0}.", myArrayMethodInfo1.Length);
+            // Display information for all methods.
+            DisplayMethodInfo(myArrayMethodInfo1);
+        }
+
+        private void DisplayMethodInfo(IEnumerable<MethodInfo> myArrayMethodInfo)
+        {
+            // Display information for all methods.
+            foreach (var myMethodInfo in myArrayMethodInfo)
+            {
+                _output.WriteLine("\nThe name of the method is {0}. It returns {1}", myMethodInfo.Name, myMethodInfo.ReturnType);
+            }
         }
 
         [Fact]
