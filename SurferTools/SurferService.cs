@@ -504,14 +504,44 @@ namespace SurferTools
         /// <exception cref="Exception"></exception>
         public string BufferPolygon(IMapFrame mapFrame, int bufferDistance)
         {
-            if (mapFrame.Overlays.Item(1) is not IBaseLayer baseMapLayer)
-                throw new Exception("Cannot get baseMapLayer");
+            if (mapFrame.Overlays.Item(1) is not IVectorBaseLayer2 baseMapLayer)
+                throw new Exception("Cannot get IVectorBaseLayer2");
 
-            Console.WriteLine(baseMapLayer.Shapes.Count);
-            Console.WriteLine(baseMapLayer.Shapes.Item(1).GetType());
+            if (baseMapLayer.Shapes is not IShapes7 shapes)
+                throw new Exception("Cannot get shapes");
 
-            return "TODO";
+            DeselectAll();
 
+            shapes.StartEditing();
+
+            if (baseMapLayer.Shapes.Item(1) is not IPolygon2 polygon)
+                throw new Exception("Cannot get polygon");
+
+            polygon.Selected = true;
+
+            if (_activePlotDocument.Selection is not ISelection3 plotSelection)
+                throw new Exception("Cannot get plot selection");
+
+            plotSelection.Buffer(1, bufferDistance);
+
+            if (baseMapLayer.Shapes.Item(baseMapLayer.Shapes.Count) is not IPolygon2 bufferedPolygon)
+                throw new Exception("Cannot get buffered polygon");
+
+            bufferedPolygon.Name = "Buffer Polygon";
+            bufferedPolygon.Line.ForeColorRGBA.Color = srfColor.srfColorForestGreen;
+            bufferedPolygon.SetZOrder(SrfZOrder.srfZOToFront);
+            
+            // Save buffered polygon:
+            DeselectAll();
+            bufferedPolygon.Selected = true;
+            var newFilename = Path.ChangeExtension(baseMapLayer.FileName, ".buffered.bln");
+            _activePlotDocument.Export(newFilename, true);
+
+            bufferedPolygon.Delete();
+
+            shapes.StopEditing();
+
+            return newFilename;
         }
 
         /// <summary>

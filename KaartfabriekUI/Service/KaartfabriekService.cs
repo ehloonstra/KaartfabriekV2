@@ -90,6 +90,8 @@ namespace KaartfabriekUI.Service
 
             var nuclideGridsFolder = Path.Combine(workingFolder, "nuclide grids");
             if (!Directory.Exists(nuclideGridsFolder)) Directory.CreateDirectory(nuclideGridsFolder);
+
+            var bufferedBlankFileLocation = string.Empty;
             
             try
             {
@@ -121,8 +123,18 @@ namespace KaartfabriekUI.Service
             {
                 // Add blank file to get the limits:
                 var mapBlankFile = surferService.AddShapefile(blankFileLocation);
-                // Buffer blank file:
-                // TODO: Werkt niet, vraag gesteld aan GS: var bufferedBlankFileLocation = surferService.BufferPolygon(mapBlankFile, 10);
+                if (!File.Exists(bufferedBlankFileLocation))
+                {
+                    // Buffer blank file:
+                    bufferedBlankFileLocation = surferService.BufferPolygon(mapBlankFile, 10);
+                    if (!File.Exists(bufferedBlankFileLocation))
+                    {
+                        MessageBox.Show(@"Het maken van een buffer om de blank file is niet goed gegaan.");
+                        return;
+                    }
+                }
+
+                var mapBufferedBlankFile = surferService.AddShapefile(bufferedBlankFileLocation);
 
                 // Temp file:
                 var tmpGridLocation = Path.Combine(workingFolder, "tmpGrid.grd");
@@ -132,14 +144,15 @@ namespace KaartfabriekUI.Service
                 // Grid velddata:
                 surferService.InverseDistanceGridding(veldDataLocation, tmpGridLocation, colX, colY, colZ,
                     Limits.RoundUp(
-                        new Limits(mapBlankFile.xMin, mapBlankFile.xMax, mapBlankFile.yMin, mapBlankFile.yMax), 50));
-                // Blank file:
-                // TODO: Blank using buffered file:
-                if (!surferService.GridAssignNoData(tmpGridLocation, blankFileLocation, outGridLocation))
+                        new Limits(mapBufferedBlankFile.xMin, mapBufferedBlankFile.xMax, mapBufferedBlankFile.yMin, mapBufferedBlankFile.yMax), 50));
+                // Blank using buffered file:
+                if (!surferService.GridAssignNoData(tmpGridLocation, bufferedBlankFileLocation, outGridLocation))
                     return;
 
                 // Clean-up tmp file:
                 File.Delete(tmpGridLocation);
+                // Delete buffered blank file map frame:
+                mapBufferedBlankFile.Delete();
                 // Add contour layer:
                 var mapContour = surferService.AddContour(outGridLocation, layerName, true);
                 var mergedMapFrame = surferService.MergeMapFrames(mapBlankFile, mapContour);
