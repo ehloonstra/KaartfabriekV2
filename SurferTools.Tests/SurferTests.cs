@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Shared;
 using Shouldly;
 using Surfer;
 using Xunit;
@@ -75,7 +76,7 @@ namespace SurferTools.Tests
                 throw new Exception("Cannot get mapFrame3");
             _fixture.SurferService.SetColoringVelddataPostmap(mapFrame3.Overlays.Item(1) as IPostLayer2, 16);
             // Trying to force a refresh
-            
+
         }
 
         [Fact]
@@ -170,6 +171,54 @@ namespace SurferTools.Tests
             ListAllMethods(typeof(IPostLayer2));
             //ListAllMethods(typeof(IContourLayer));
             //ListAllMethods(typeof(IMapFrame3));
+        }
+
+        [Fact]
+        public void TestProjectFile()
+        {
+            // Create project
+            var project = new Project
+            {
+                WorkingFolder = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp",
+                SampleDataFileLocation =
+                    @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\01 Lange Kamp\01 monsterdata.csv",
+                SampleDataFileLocationProjected =
+                @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\01 Lange Kamp\01 monsterdata.csv",
+                FieldDataFileLocation = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\01 Lange Kamp\01 velddata.csv",
+                FieldDataFileLocationProjected = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\01 Lange Kamp\01 velddata-RD.csv",
+                FieldBorderLocation = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\01 Lange Kamp\Aan.bln",
+                FieldBorderLocationBuffered = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\01 Lange Kamp\Aan.buffered.bln",
+                ColumnIndexes = new ColumnIndexes { X = 1, Y = 2, Alt = 3, K40 = 16, Cs137 = 17, Th232 = 18, U238 = 19, Tc = 20 },
+                NuclideGridLocations = new NuclideGridLocations
+                {
+                    AltLocation = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Alt.grd",
+                    K40Location = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\K40.grd",
+                    Cs137Location = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Cs137.grd",
+                    Th232Location = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Th232.grd",
+                    U238Location = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\U238.grd",
+                    TcLocation = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\TC.grd"
+                }
+            };
+
+            // Check values
+            project.WorkingFolder.ShouldBe(@"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp");
+            project.ColumnIndexes.K40.ShouldBe(16);
+            project.NuclideGridLocations.AltLocation.ShouldBe(@"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Alt.grd");
+            project.GridSettings.GridSpacing.ShouldBe(3.5f);
+
+            // Write project file:
+            var fileName = Path.Combine(Path.GetTempPath(), "project.json");
+            project.Save(fileName);
+            _output.WriteLine(fileName);
+
+            // Read project file:
+            var newProject = Project.Load(fileName);
+
+            // Check values
+            newProject.WorkingFolder.ShouldBe(project.WorkingFolder);
+            newProject.ColumnIndexes.K40.ShouldBe(project.ColumnIndexes.K40);
+            newProject.NuclideGridLocations.AltLocation.ShouldBe(project.NuclideGridLocations.AltLocation);
+            newProject.GridSettings.GridSpacing.ShouldBe(project.GridSettings.GridSpacing);
         }
 
         private void ListAllMethods(Type myType)
