@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KaartfabriekUI", "Kaartfabr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurferTools", "SurferTools\SurferTools.csproj", "{B1A66747-5D6D-4178-B694-3457C7C1193E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurferTools.Tests", "SurferTools.Tests\SurferTools.Tests.csproj", "{8DFF5F01-F01E-473F-9738-1AB9C2763D9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurferTools.Tests", "SurferTools.Tests\SurferTools.Tests.csproj", "{8DFF5F01-F01E-473F-9738-1AB9C2763D9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{DF43CB25-53AC-40F3-9587-E195300330B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{8DFF5F01-F01E-473F-9738-1AB9C2763D9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DFF5F01-F01E-473F-9738-1AB9C2763D9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DFF5F01-F01E-473F-9738-1AB9C2763D9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF43CB25-53AC-40F3-9587-E195300330B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF43CB25-53AC-40F3-9587-E195300330B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF43CB25-53AC-40F3-9587-E195300330B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF43CB25-53AC-40F3-9587-E195300330B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

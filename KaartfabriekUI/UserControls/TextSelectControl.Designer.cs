@@ -50,7 +50,7 @@ namespace KaartfabriekUI.UserControls
             this.textbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.textbox.Location = new System.Drawing.Point(3, 18);
             this.textbox.Name = "textbox";
-            this.textbox.Size = new System.Drawing.Size(272, 23);
+            this.textbox.Size = new System.Drawing.Size(277, 23);
             this.textbox.TabIndex = 1;
             this.textbox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
@@ -60,7 +60,7 @@ namespace KaartfabriekUI.UserControls
             this.btnSelectFolder.AutoSize = true;
             this.btnSelectFolder.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.btnSelectFolder.Image = ((System.Drawing.Image)(resources.GetObject("btnSelectFolder.Image")));
-            this.btnSelectFolder.Location = new System.Drawing.Point(281, 13);
+            this.btnSelectFolder.Location = new System.Drawing.Point(286, 13);
             this.btnSelectFolder.Name = "btnSelectFolder";
             this.btnSelectFolder.Size = new System.Drawing.Size(30, 30);
             this.btnSelectFolder.TabIndex = 2;
@@ -74,7 +74,7 @@ namespace KaartfabriekUI.UserControls
             this.btnSelectFile.AutoSize = true;
             this.btnSelectFile.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.btnSelectFile.Image = ((System.Drawing.Image)(resources.GetObject("btnSelectFile.Image")));
-            this.btnSelectFile.Location = new System.Drawing.Point(281, 13);
+            this.btnSelectFile.Location = new System.Drawing.Point(286, 14);
             this.btnSelectFile.Name = "btnSelectFile";
             this.btnSelectFile.Size = new System.Drawing.Size(30, 30);
             this.btnSelectFile.TabIndex = 3;
@@ -91,7 +91,7 @@ namespace KaartfabriekUI.UserControls
             this.Controls.Add(this.textbox);
             this.Controls.Add(this.label);
             this.Name = "TextSelectControl";
-            this.Size = new System.Drawing.Size(317, 44);
+            this.Size = new System.Drawing.Size(316, 44);
             this.ResumeLayout(false);
             this.PerformLayout();
 
