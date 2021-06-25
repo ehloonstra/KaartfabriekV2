@@ -68,6 +68,17 @@ namespace KaartfabriekUI.UserControls
             }
         }
 
+        /// <summary>
+        /// Event raised when the textbox was changed
+        /// </summary>
+        [Description("Event raised when the combobox was changed")]
+        public event EventHandler ComboboxSelectedIndexChanged;
+
+        private void cboColumn_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboboxSelectedIndexChanged?.Invoke(this, e);
+        }
+
         private void SetDataSource()
         {
             if (string.IsNullOrWhiteSpace(Data)) return;

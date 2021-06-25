@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using Shared;
 using Surfer;
 using SurferTools;
 
@@ -11,6 +12,16 @@ namespace KaartfabriekUI.Service
     /// </summary>
     public class KaartfabriekService
     {
+        private readonly ProjectFile _projectFile;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="projectFile"></param>
+        public KaartfabriekService(ProjectFile projectFile)
+        {
+            _projectFile = projectFile;
+        }
 
         /// <summary>
         /// Action to perform after clicking the button
@@ -92,19 +103,50 @@ namespace KaartfabriekUI.Service
             if (!Directory.Exists(nuclideGridsFolder)) Directory.CreateDirectory(nuclideGridsFolder);
 
             var bufferedBlankFileLocation = string.Empty;
+            IMapFrame mapBufferedBlankFile;
             
             try
             {
                 // Create new plot document:
                 surferService.CreateNewActivePlotDocument();
+                // Add blank file to get the limits:
+                var mapBlankFileTmp = surferService.AddShapefile(blankFileLocation);
+                if (!File.Exists(bufferedBlankFileLocation))
+                {
+                    // Buffer blank file:
+                    bufferedBlankFileLocation = surferService.BufferPolygon(mapBlankFileTmp, 10);
+                    if (!File.Exists(bufferedBlankFileLocation))
+                    {
+                        MessageBox.Show(@"Het maken van een buffer om de blank file is niet goed gegaan.");
+                        return;
+                    }
+                }
 
-                CreateNuclideGrid("Alt.grd", "Altitude", colAlt);
-                CreateNuclideGrid("K40.grd", "K-40", colK40);
-                CreateNuclideGrid("U238.grd", "U-238", colU238);
-                CreateNuclideGrid("Th232.grd", "Th-232", colTh232);
-                CreateNuclideGrid("Cs137.grd", "Cs-137", colCs137);
-                CreateNuclideGrid("TC.grd", "TC", colTc);
+                if (_projectFile is not null) _projectFile.FieldBorderLocationBuffered = bufferedBlankFileLocation;
 
+                mapBufferedBlankFile = surferService.AddShapefile(bufferedBlankFileLocation);
+
+                var altGrid = CreateNuclideGrid("Alt.grd", "Altitude", colAlt);
+                var k40Grid = CreateNuclideGrid("K40.grd", "K-40", colK40);
+                var u238Grid = CreateNuclideGrid("U238.grd", "U-238", colU238);
+                var th232Grid = CreateNuclideGrid("Th232.grd", "Th-232", colTh232);
+                var cs137Grid = CreateNuclideGrid("Cs137.grd", "Cs-137", colCs137);
+                var tcGrid = CreateNuclideGrid("TC.grd", "TC", colTc);
+
+                if (_projectFile is not null)
+                {
+                    _projectFile.NuclideGridLocations.Alt = altGrid;
+                    _projectFile.NuclideGridLocations.K40 = k40Grid;
+                    _projectFile.NuclideGridLocations.U238 = u238Grid;
+                    _projectFile.NuclideGridLocations.Th232 = th232Grid;
+                    _projectFile.NuclideGridLocations.Cs137 = cs137Grid;
+                    _projectFile.NuclideGridLocations.Tc = tcGrid;
+                    _projectFile.Save();
+                }
+
+                // Delete temp map frames:
+                mapBlankFileTmp.Delete();
+                mapBufferedBlankFile.Delete();
 
                 // Show maps nicely on plot (resize, align horizontally
                 surferService.AlignNuclideGrids();
@@ -119,22 +161,10 @@ namespace KaartfabriekUI.Service
                 surferService.ShowHideSurfer(true);
             }
 
-            void CreateNuclideGrid(string fileName, string layerName, int colZ)
+            string CreateNuclideGrid(string fileName, string layerName, int colZ)
             {
-                // Add blank file to get the limits:
+                // Load blank file:
                 var mapBlankFile = surferService.AddShapefile(blankFileLocation);
-                if (!File.Exists(bufferedBlankFileLocation))
-                {
-                    // Buffer blank file:
-                    bufferedBlankFileLocation = surferService.BufferPolygon(mapBlankFile, 10);
-                    if (!File.Exists(bufferedBlankFileLocation))
-                    {
-                        MessageBox.Show(@"Het maken van een buffer om de blank file is niet goed gegaan.");
-                        return;
-                    }
-                }
-
-                var mapBufferedBlankFile = surferService.AddShapefile(bufferedBlankFileLocation);
 
                 // Temp file:
                 var tmpGridLocation = Path.Combine(workingFolder, "tmpGrid.grd");
@@ -147,12 +177,10 @@ namespace KaartfabriekUI.Service
                         new Limits(mapBufferedBlankFile.xMin, mapBufferedBlankFile.xMax, mapBufferedBlankFile.yMin, mapBufferedBlankFile.yMax), 50));
                 // Blank using buffered file:
                 if (!surferService.GridAssignNoData(tmpGridLocation, bufferedBlankFileLocation, outGridLocation))
-                    return;
+                    return "";
 
                 // Clean-up tmp file:
                 File.Delete(tmpGridLocation);
-                // Delete buffered blank file map frame:
-                mapBufferedBlankFile.Delete();
                 // Add contour layer:
                 var mapContour = surferService.AddContour(outGridLocation, layerName, true);
                 var mergedMapFrame = surferService.MergeMapFrames(mapBlankFile, mapContour);
@@ -174,6 +202,8 @@ namespace KaartfabriekUI.Service
 
                 mergedMapFrame.Selected = true;
                 surferService.GroupSelection(layerName);
+
+                return outGridLocation;
             }
         }
     }

@@ -37,11 +37,12 @@ namespace KaartfabriekUI
             this.VeldDataLocation = new KaartfabriekUI.UserControls.TextSelectControl();
             this.WorkingFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.btnReprojectMonsterdata = new System.Windows.Forms.Button();
-            this.btnReprojectVelddata = new System.Windows.Forms.Button();
-            this.BtnOpenProject = new System.Windows.Forms.Button();
+            this.BtnReprojectVelddata = new System.Windows.Forms.Button();
+            this.BtnOpenProjectFile = new System.Windows.Forms.Button();
+            this.BtnNewProjectFile = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.Voorbereiding = new System.Windows.Forms.GroupBox();
+            this.GroupBoxVoorbereiding = new System.Windows.Forms.GroupBox();
             this.GroupBoxVelddataKolommen = new System.Windows.Forms.GroupBox();
             this.CboTotalCount = new KaartfabriekUI.UserControls.ColumnSelectControl();
             this.CboCs137 = new KaartfabriekUI.UserControls.ColumnSelectControl();
@@ -61,7 +62,7 @@ namespace KaartfabriekUI
             this.LblVoortgang = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.Voorbereiding.SuspendLayout();
+            this.GroupBoxVoorbereiding.SuspendLayout();
             this.GroupBoxVelddataKolommen.SuspendLayout();
             this.GroupBoxPerceelsgrens.SuspendLayout();
             this.GroupBoxNuclideGrids.SuspendLayout();
@@ -79,12 +80,13 @@ namespace KaartfabriekUI
             this.BlankFileLocation.TabIndex = 2;
             this.BlankFileLocation.TextboxText = "";
             this.toolTip1.SetToolTip(this.BlankFileLocation, "Selecteer de locatie van de blank file");
+            this.BlankFileLocation.TextboxUpdated += new System.EventHandler(this.BlankFileLocation_TextboxUpdated);
             // 
             // MonsterDataLocation
             // 
             this.MonsterDataLocation.FileFilter = "csv files|*.csv";
             this.MonsterDataLocation.InitialDirectory = null;
-            this.MonsterDataLocation.Label = "Locatie van de monsterdata:";
+            this.MonsterDataLocation.Label = "Locatie van de monsterdata (monsterdata-RD.csv):";
             this.MonsterDataLocation.Location = new System.Drawing.Point(6, 122);
             this.MonsterDataLocation.Name = "MonsterDataLocation";
             this.MonsterDataLocation.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.File;
@@ -92,12 +94,13 @@ namespace KaartfabriekUI
             this.MonsterDataLocation.TabIndex = 2;
             this.MonsterDataLocation.TextboxText = "";
             this.toolTip1.SetToolTip(this.MonsterDataLocation, "Selecteer de locatie van de monsterdata");
+            this.MonsterDataLocation.TextboxUpdated += new System.EventHandler(this.MonsterDataLocation_TextboxUpdated);
             // 
             // VeldDataLocation
             // 
             this.VeldDataLocation.FileFilter = "csv files|*.csv";
             this.VeldDataLocation.InitialDirectory = null;
-            this.VeldDataLocation.Label = "Locatie van de velddata:";
+            this.VeldDataLocation.Label = "Locatie van de velddata (velddata-RD.csv):";
             this.VeldDataLocation.Location = new System.Drawing.Point(6, 72);
             this.VeldDataLocation.Name = "VeldDataLocation";
             this.VeldDataLocation.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.File;
@@ -105,12 +108,13 @@ namespace KaartfabriekUI
             this.VeldDataLocation.TabIndex = 1;
             this.VeldDataLocation.TextboxText = "";
             this.toolTip1.SetToolTip(this.VeldDataLocation, "Selecteer de locatie van de velddata");
+            this.VeldDataLocation.TextboxUpdated += new System.EventHandler(this.VeldDataLocation_TextboxUpdated);
             // 
             // WorkingFolder
             // 
             this.WorkingFolder.FileFilter = "csv files|*.csv";
             this.WorkingFolder.InitialDirectory = null;
-            this.WorkingFolder.Label = "Selecteer de werkfolder:";
+            this.WorkingFolder.Label = "Selecteer de werkfolder (klantnaam/datum meting/perceelnaam):";
             this.WorkingFolder.Location = new System.Drawing.Point(6, 22);
             this.WorkingFolder.Name = "WorkingFolder";
             this.WorkingFolder.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.Folder;
@@ -118,12 +122,15 @@ namespace KaartfabriekUI
             this.WorkingFolder.TabIndex = 0;
             this.WorkingFolder.TextboxText = "";
             this.toolTip1.SetToolTip(this.WorkingFolder, "Selecteer de locatie van de werkfolder");
+            this.WorkingFolder.TextboxUpdated += new System.EventHandler(this.WorkingFolder_TextboxUpdated);
             // 
             // btnReprojectMonsterdata
             // 
             this.btnReprojectMonsterdata.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnReprojectMonsterdata.AutoSize = true;
             this.btnReprojectMonsterdata.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnReprojectMonsterdata.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.btnReprojectMonsterdata.FlatAppearance.BorderSize = 2;
             this.btnReprojectMonsterdata.Image = ((System.Drawing.Image)(resources.GetObject("btnReprojectMonsterdata.Image")));
             this.btnReprojectMonsterdata.Location = new System.Drawing.Point(431, 136);
             this.btnReprojectMonsterdata.Name = "btnReprojectMonsterdata";
@@ -131,29 +138,46 @@ namespace KaartfabriekUI
             this.btnReprojectMonsterdata.TabIndex = 6;
             this.toolTip1.SetToolTip(this.btnReprojectMonsterdata, "Selecteer monsterdata en converteer naar RD");
             this.btnReprojectMonsterdata.UseVisualStyleBackColor = true;
+            this.btnReprojectMonsterdata.Click += new System.EventHandler(this.BtnReprojectMonsterdataClick);
             // 
-            // btnReprojectVelddata
+            // BtnReprojectVelddata
             // 
-            this.btnReprojectVelddata.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReprojectVelddata.AutoSize = true;
-            this.btnReprojectVelddata.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.btnReprojectVelddata.Image = ((System.Drawing.Image)(resources.GetObject("btnReprojectVelddata.Image")));
-            this.btnReprojectVelddata.Location = new System.Drawing.Point(431, 86);
-            this.btnReprojectVelddata.Name = "btnReprojectVelddata";
-            this.btnReprojectVelddata.Size = new System.Drawing.Size(30, 30);
-            this.btnReprojectVelddata.TabIndex = 7;
-            this.toolTip1.SetToolTip(this.btnReprojectVelddata, "Selecteer velddata en converteer nar RD");
-            this.btnReprojectVelddata.UseVisualStyleBackColor = true;
+            this.BtnReprojectVelddata.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnReprojectVelddata.AutoSize = true;
+            this.BtnReprojectVelddata.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BtnReprojectVelddata.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.BtnReprojectVelddata.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.BtnReprojectVelddata.FlatAppearance.BorderSize = 2;
+            this.BtnReprojectVelddata.Image = ((System.Drawing.Image)(resources.GetObject("BtnReprojectVelddata.Image")));
+            this.BtnReprojectVelddata.Location = new System.Drawing.Point(431, 86);
+            this.BtnReprojectVelddata.Name = "BtnReprojectVelddata";
+            this.BtnReprojectVelddata.Size = new System.Drawing.Size(30, 30);
+            this.BtnReprojectVelddata.TabIndex = 7;
+            this.toolTip1.SetToolTip(this.BtnReprojectVelddata, "Selecteer velddata en converteer nar RD");
+            this.BtnReprojectVelddata.UseVisualStyleBackColor = false;
+            this.BtnReprojectVelddata.Click += new System.EventHandler(this.BtnReprojectVelddataClick);
             // 
-            // BtnOpenProject
+            // BtnOpenProjectFile
             // 
-            this.BtnOpenProject.Location = new System.Drawing.Point(12, 12);
-            this.BtnOpenProject.Name = "BtnOpenProject";
-            this.BtnOpenProject.Size = new System.Drawing.Size(107, 33);
-            this.BtnOpenProject.TabIndex = 8;
-            this.BtnOpenProject.Text = "Open project";
-            this.toolTip1.SetToolTip(this.BtnOpenProject, "Open het project (*.json)");
-            this.BtnOpenProject.UseVisualStyleBackColor = true;
+            this.BtnOpenProjectFile.Location = new System.Drawing.Point(125, 12);
+            this.BtnOpenProjectFile.Name = "BtnOpenProjectFile";
+            this.BtnOpenProjectFile.Size = new System.Drawing.Size(107, 33);
+            this.BtnOpenProjectFile.TabIndex = 8;
+            this.BtnOpenProjectFile.Text = "Open project";
+            this.toolTip1.SetToolTip(this.BtnOpenProjectFile, "Open het project (*.json)");
+            this.BtnOpenProjectFile.UseVisualStyleBackColor = true;
+            this.BtnOpenProjectFile.Click += new System.EventHandler(this.BtnOpenProjectFileClick);
+            // 
+            // BtnNewProjectFile
+            // 
+            this.BtnNewProjectFile.Location = new System.Drawing.Point(12, 12);
+            this.BtnNewProjectFile.Name = "BtnNewProjectFile";
+            this.BtnNewProjectFile.Size = new System.Drawing.Size(107, 33);
+            this.BtnNewProjectFile.TabIndex = 9;
+            this.BtnNewProjectFile.Text = "Nieuw project";
+            this.toolTip1.SetToolTip(this.BtnNewProjectFile, "Open het project (*.json)");
+            this.BtnNewProjectFile.UseVisualStyleBackColor = true;
+            this.BtnNewProjectFile.Click += new System.EventHandler(this.BtnNewProjectFile_Click);
             // 
             // tabControl1
             // 
@@ -167,7 +191,7 @@ namespace KaartfabriekUI
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.Voorbereiding);
+            this.tabPage1.Controls.Add(this.GroupBoxVoorbereiding);
             this.tabPage1.Controls.Add(this.GroupBoxVelddataKolommen);
             this.tabPage1.Controls.Add(this.GroupBoxPerceelsgrens);
             this.tabPage1.Controls.Add(this.GroupBoxNuclideGrids);
@@ -179,19 +203,20 @@ namespace KaartfabriekUI
             this.tabPage1.Text = "Voorbereiding";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // Voorbereiding
+            // GroupBoxVoorbereiding
             // 
-            this.Voorbereiding.Controls.Add(this.btnReprojectVelddata);
-            this.Voorbereiding.Controls.Add(this.btnReprojectMonsterdata);
-            this.Voorbereiding.Controls.Add(this.MonsterDataLocation);
-            this.Voorbereiding.Controls.Add(this.VeldDataLocation);
-            this.Voorbereiding.Controls.Add(this.WorkingFolder);
-            this.Voorbereiding.Location = new System.Drawing.Point(6, 6);
-            this.Voorbereiding.Name = "Voorbereiding";
-            this.Voorbereiding.Size = new System.Drawing.Size(467, 174);
-            this.Voorbereiding.TabIndex = 8;
-            this.Voorbereiding.TabStop = false;
-            this.Voorbereiding.Text = "1. Voorbereiding";
+            this.GroupBoxVoorbereiding.Controls.Add(this.BtnReprojectVelddata);
+            this.GroupBoxVoorbereiding.Controls.Add(this.btnReprojectMonsterdata);
+            this.GroupBoxVoorbereiding.Controls.Add(this.MonsterDataLocation);
+            this.GroupBoxVoorbereiding.Controls.Add(this.VeldDataLocation);
+            this.GroupBoxVoorbereiding.Controls.Add(this.WorkingFolder);
+            this.GroupBoxVoorbereiding.Enabled = false;
+            this.GroupBoxVoorbereiding.Location = new System.Drawing.Point(6, 6);
+            this.GroupBoxVoorbereiding.Name = "GroupBoxVoorbereiding";
+            this.GroupBoxVoorbereiding.Size = new System.Drawing.Size(467, 174);
+            this.GroupBoxVoorbereiding.TabIndex = 8;
+            this.GroupBoxVoorbereiding.TabStop = false;
+            this.GroupBoxVoorbereiding.Text = "1. Voorbereiding";
             // 
             // GroupBoxVelddataKolommen
             // 
@@ -222,6 +247,7 @@ namespace KaartfabriekUI
             this.CboTotalCount.SelectedText = "";
             this.CboTotalCount.Size = new System.Drawing.Size(90, 44);
             this.CboTotalCount.TabIndex = 8;
+            this.CboTotalCount.ComboboxSelectedIndexChanged += new System.EventHandler(this.ComboboxSelectedIndexChanged);
             // 
             // CboCs137
             // 
@@ -233,6 +259,7 @@ namespace KaartfabriekUI
             this.CboCs137.SelectedText = "";
             this.CboCs137.Size = new System.Drawing.Size(90, 44);
             this.CboCs137.TabIndex = 7;
+            this.CboCs137.ComboboxSelectedIndexChanged += new System.EventHandler(this.ComboboxSelectedIndexChanged);
             // 
             // CboTh232
             // 
@@ -244,6 +271,7 @@ namespace KaartfabriekUI
             this.CboTh232.SelectedText = "";
             this.CboTh232.Size = new System.Drawing.Size(90, 44);
             this.CboTh232.TabIndex = 6;
+            this.CboTh232.ComboboxSelectedIndexChanged += new System.EventHandler(this.ComboboxSelectedIndexChanged);
             // 
             // CboU238
             // 
@@ -255,6 +283,7 @@ namespace KaartfabriekUI
             this.CboU238.SelectedText = "";
             this.CboU238.Size = new System.Drawing.Size(90, 44);
             this.CboU238.TabIndex = 5;
+            this.CboU238.ComboboxSelectedIndexChanged += new System.EventHandler(this.ComboboxSelectedIndexChanged);
             // 
             // CboK40
             // 
@@ -266,6 +295,7 @@ namespace KaartfabriekUI
             this.CboK40.SelectedText = "";
             this.CboK40.Size = new System.Drawing.Size(90, 44);
             this.CboK40.TabIndex = 4;
+            this.CboK40.ComboboxSelectedIndexChanged += new System.EventHandler(this.ComboboxSelectedIndexChanged);
             // 
             // CboAlt
             // 
@@ -277,6 +307,7 @@ namespace KaartfabriekUI
             this.CboAlt.SelectedText = "";
             this.CboAlt.Size = new System.Drawing.Size(90, 44);
             this.CboAlt.TabIndex = 3;
+            this.CboAlt.ComboboxSelectedIndexChanged += new System.EventHandler(this.ComboboxSelectedIndexChanged);
             // 
             // CboYcoord
             // 
@@ -288,6 +319,7 @@ namespace KaartfabriekUI
             this.CboYcoord.SelectedText = "";
             this.CboYcoord.Size = new System.Drawing.Size(90, 44);
             this.CboYcoord.TabIndex = 2;
+            this.CboYcoord.ComboboxSelectedIndexChanged += new System.EventHandler(this.ComboboxSelectedIndexChanged);
             // 
             // CboXcoord
             // 
@@ -299,6 +331,7 @@ namespace KaartfabriekUI
             this.CboXcoord.SelectedText = "";
             this.CboXcoord.Size = new System.Drawing.Size(90, 44);
             this.CboXcoord.TabIndex = 1;
+            this.CboXcoord.ComboboxSelectedIndexChanged += new System.EventHandler(this.ComboboxSelectedIndexChanged);
             // 
             // BtnReadColumns
             // 
@@ -308,6 +341,7 @@ namespace KaartfabriekUI
             this.BtnReadColumns.TabIndex = 0;
             this.BtnReadColumns.Text = "Lees kolommen uit velddata";
             this.BtnReadColumns.UseVisualStyleBackColor = true;
+            this.BtnReadColumns.Click += new System.EventHandler(this.BtnReadColumns_Click);
             // 
             // GroupBoxPerceelsgrens
             // 
@@ -330,6 +364,7 @@ namespace KaartfabriekUI
             this.BtnLoadVelddataInSurfer.TabIndex = 1;
             this.BtnLoadVelddataInSurfer.Text = "Open Surfer met de velddata om blank file te maken";
             this.BtnLoadVelddataInSurfer.UseVisualStyleBackColor = true;
+            this.BtnLoadVelddataInSurfer.Click += new System.EventHandler(this.BtnLoadVelddataInSurfer_Click);
             // 
             // label1
             // 
@@ -362,6 +397,7 @@ namespace KaartfabriekUI
             this.BtnMaakNuclideGrids.TabIndex = 0;
             this.BtnMaakNuclideGrids.Text = "Maak nuclide grids";
             this.BtnMaakNuclideGrids.UseVisualStyleBackColor = true;
+            this.BtnMaakNuclideGrids.Click += new System.EventHandler(this.BtnMaakNuclideGrids_Click);
             // 
             // tabPage2
             // 
@@ -383,7 +419,7 @@ namespace KaartfabriekUI
             this.LblVoortgang.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.LblVoortgang.Image = ((System.Drawing.Image)(resources.GetObject("LblVoortgang.Image")));
             this.LblVoortgang.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.LblVoortgang.Location = new System.Drawing.Point(508, 75);
+            this.LblVoortgang.Location = new System.Drawing.Point(508, 73);
             this.LblVoortgang.Name = "LblVoortgang";
             this.LblVoortgang.Size = new System.Drawing.Size(349, 621);
             this.LblVoortgang.TabIndex = 7;
@@ -394,7 +430,8 @@ namespace KaartfabriekUI
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(867, 703);
-            this.Controls.Add(this.BtnOpenProject);
+            this.Controls.Add(this.BtnNewProjectFile);
+            this.Controls.Add(this.BtnOpenProjectFile);
             this.Controls.Add(this.LblVoortgang);
             this.Controls.Add(this.tabControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -402,8 +439,8 @@ namespace KaartfabriekUI
             this.Text = "Kaartfabriek v2";
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            this.Voorbereiding.ResumeLayout(false);
-            this.Voorbereiding.PerformLayout();
+            this.GroupBoxVoorbereiding.ResumeLayout(false);
+            this.GroupBoxVoorbereiding.PerformLayout();
             this.GroupBoxVelddataKolommen.ResumeLayout(false);
             this.GroupBoxPerceelsgrens.ResumeLayout(false);
             this.GroupBoxPerceelsgrens.PerformLayout();
@@ -416,7 +453,7 @@ namespace KaartfabriekUI
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.GroupBox Voorbereiding;
+        private System.Windows.Forms.GroupBox GroupBoxVoorbereiding;
         private UserControls.TextSelectControl MonsterDataLocation;
         private UserControls.TextSelectControl VeldDataLocation;
         private UserControls.TextSelectControl WorkingFolder;
@@ -438,9 +475,10 @@ namespace KaartfabriekUI
         private System.Windows.Forms.Button BtnMaakNuclideGrids;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Label LblVoortgang;
-        private System.Windows.Forms.Button btnReprojectVelddata;
+        private System.Windows.Forms.Button BtnReprojectVelddata;
         private System.Windows.Forms.Button btnReprojectMonsterdata;
-        private System.Windows.Forms.Button BtnOpenProject;
+        private System.Windows.Forms.Button BtnOpenProjectFile;
+        private System.Windows.Forms.Button BtnNewProjectFile;
     }
 }
 

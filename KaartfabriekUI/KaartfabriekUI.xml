@@ -60,6 +60,12 @@
             Service for the GUI
             </summary>
         </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.#ctor(Shared.ProjectFile)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="projectFile"></param>
+        </member>
         <member name="M:KaartfabriekUI.Service.KaartfabriekService.OpenDataForBlanking(System.String,System.String,System.String,System.Int32,System.Int32,System.Int32)">
             <summary>
             Action to perform after clicking the button
@@ -119,6 +125,11 @@
         <member name="P:KaartfabriekUI.UserControls.ColumnSelectControl.Data">
             <summary>
             String with the possible columns, seperated by semicolon
+            </summary>
+        </member>
+        <member name="E:KaartfabriekUI.UserControls.ColumnSelectControl.ComboboxSelectedIndexChanged">
+            <summary>
+            Event raised when the textbox was changed
             </summary>
         </member>
         <member name="T:KaartfabriekUI.UserControls.ColumnSelectControl.ComboboxItem">

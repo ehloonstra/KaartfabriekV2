@@ -177,7 +177,7 @@ namespace SurferTools.Tests
         public void TestProjectFile()
         {
             // Create project
-            var project = new Project
+            var project = new ProjectFile
             {
                 WorkingFolder = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp",
                 SampleDataFileLocation =
@@ -188,37 +188,39 @@ namespace SurferTools.Tests
                 FieldDataFileLocationProjected = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\01 Lange Kamp\01 velddata-RD.csv",
                 FieldBorderLocation = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\01 Lange Kamp\Aan.bln",
                 FieldBorderLocationBuffered = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\01 Lange Kamp\Aan.buffered.bln",
-                ColumnIndexes = new ColumnIndexes { X = 1, Y = 2, Alt = 3, K40 = 16, Cs137 = 17, Th232 = 18, U238 = 19, Tc = 20 },
+                //ColumnIndexes = new ColumnIndexes { X = 1, Y = 2, Alt = 3, K40 = 16, Cs137 = 17, Th232 = 18, U238 = 19, Tc = 20 },
                 NuclideGridLocations = new NuclideGridLocations
                 {
-                    AltLocation = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Alt.grd",
-                    K40Location = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\K40.grd",
-                    Cs137Location = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Cs137.grd",
-                    Th232Location = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Th232.grd",
-                    U238Location = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\U238.grd",
-                    TcLocation = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\TC.grd"
+                    Alt = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Alt.grd",
+                    K40 = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\K40.grd",
+                    Cs137 = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Cs137.grd",
+                    Th232 = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Th232.grd",
+                    U238 = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\U238.grd",
+                    Tc = @"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\TC.grd"
                 }
             };
 
             // Check values
             project.WorkingFolder.ShouldBe(@"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp");
-            project.ColumnIndexes.K40.ShouldBe(16);
-            project.NuclideGridLocations.AltLocation.ShouldBe(@"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Alt.grd");
+            //project.ColumnIndexes.K40.ShouldBe(16);
+            project.NuclideGridLocations.Alt.ShouldBe(@"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Alt.grd");
             project.GridSettings.GridSpacing.ShouldBe(3.5f);
 
             // Write project file:
             var fileName = Path.Combine(Path.GetTempPath(), "project.json");
-            project.Save(fileName);
+            project.SaveAs(fileName);
             _output.WriteLine(fileName);
 
             // Read project file:
-            var newProject = Project.Load(fileName);
+            var newProject = ProjectFile.Load(fileName);
 
             // Check values
+            newProject.ProjectFileLocation.ShouldBe(fileName);
             newProject.WorkingFolder.ShouldBe(project.WorkingFolder);
-            newProject.ColumnIndexes.K40.ShouldBe(project.ColumnIndexes.K40);
-            newProject.NuclideGridLocations.AltLocation.ShouldBe(project.NuclideGridLocations.AltLocation);
+            //newProject.ColumnIndexes.K40.ShouldBe(project.ColumnIndexes.K40);
+            newProject.NuclideGridLocations.Alt.ShouldBe(project.NuclideGridLocations.Alt);
             newProject.GridSettings.GridSpacing.ShouldBe(project.GridSettings.GridSpacing);
+            //newProject.Save().ShouldBeTrue();
         }
 
         private void ListAllMethods(Type myType)

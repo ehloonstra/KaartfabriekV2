@@ -140,5 +140,10 @@ namespace KaartfabriekUI.UserControls
             /// </summary>
             File
         }
+
+        private void textbox_TextChanged(object sender, EventArgs e)
+        {
+            TextboxUpdated?.Invoke(sender, e);
+        }
     }
 }

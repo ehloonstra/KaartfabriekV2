@@ -50,6 +50,7 @@ namespace KaartfabriekUI.UserControls
             this.cboColumn.Name = "cboColumn";
             this.cboColumn.Size = new System.Drawing.Size(81, 23);
             this.cboColumn.TabIndex = 3;
+            this.cboColumn.SelectedIndexChanged += new System.EventHandler(this.cboColumn_SelectedIndexChanged);
             // 
             // ColumnSelectControl
             // 

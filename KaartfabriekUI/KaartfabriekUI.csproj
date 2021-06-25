@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\SurferTools\SurferTools.csproj" />
   </ItemGroup>
 

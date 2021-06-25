@@ -324,7 +324,7 @@ namespace SurferTools
 
                 // Line properties:
                 baseMapLayer.Line.ForeColor = srfColor.srfColorPurple;
-                baseMapLayer.Line.Width = 0.02;
+                baseMapLayer.Line.Width = 0.01;
 
                 baseMapLayer.CoordinateSystem = _epsgCode;
 
