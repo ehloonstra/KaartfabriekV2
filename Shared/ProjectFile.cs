@@ -118,38 +118,4 @@ namespace Shared
             Save();
         }
     }
-
-    public class ColumnIndexes
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Alt { get; set; }
-        public int Tc { get; set; }
-        public int K40 { get; set; }
-        public int U238 { get; set; }
-        public int Th232 { get; set; }
-        public int Cs137 { get; set; }
-    }
-
-    public class NuclideGridLocations
-    {
-        public string Alt { get; set; } = string.Empty;
-        public string Tc { get; set; } = string.Empty;
-        public string K40 { get; set; } = string.Empty;
-        public string U238 { get; set; } = string.Empty;
-        public string Th232 { get; set; } = string.Empty;
-        public string Cs137 { get; set; } = string.Empty;
-    }
-
-    public class GridSettings
-    {
-        public int SearchMinData { get; set; } = 8;
-        public int SearchMaxData { get; set; } = 64;
-        public int SearchRadius { get; set; } = 30; // in meters
-        public int SearchNumSectors { get; set; } = 1;
-        public int IdPower { get; set; } = 2;
-        public int IdSmoothing { get; set; } = 20;
-        public float GridSpacing { get; set; } = 3.5f; // in meters
-        public int Limits { get; set; } = 20; // in meters
-    }
 }

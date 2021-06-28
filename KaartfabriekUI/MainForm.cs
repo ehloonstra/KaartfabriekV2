@@ -76,7 +76,7 @@ namespace KaartfabriekUI
                 var service = new KaartfabriekService(_projectFile);
                 var result = service.OpenDataForBlanking(WorkingFolder.TextboxText, VeldDataLocation.TextboxText,
                     MonsterDataLocation.TextboxText,
-                    CboXcoord.SelectedIndex + 1, CboYcoord.SelectedIndex + 1, CboK40.SelectedIndex + 1);
+                    CboXcoord.SelectedIndex, CboYcoord.SelectedIndex, CboK40.SelectedIndex);
 
                 // Enable when success:
                 BlankFileLocation.Enabled = result;
@@ -154,9 +154,9 @@ namespace KaartfabriekUI
         {
             var service = new KaartfabriekService(_projectFile);
             service.CreateNuclideGrids(WorkingFolder.TextboxText, VeldDataLocation.TextboxText, BlankFileLocation.TextboxText,
-                CboXcoord.SelectedIndex + 1, CboYcoord.SelectedIndex + 1, CboAlt.SelectedIndex + 1,
-                CboK40.SelectedIndex + 1, CboU238.SelectedIndex + 1, CboTh232.SelectedIndex + 1,
-                CboCs137.SelectedIndex + 1, CboTotalCount.SelectedIndex + 1);
+                CboXcoord.SelectedIndex, CboYcoord.SelectedIndex, CboAlt.SelectedIndex,
+                CboK40.SelectedIndex, CboU238.SelectedIndex, CboTh232.SelectedIndex,
+                CboCs137.SelectedIndex, CboTotalCount.SelectedIndex);
         }
 
         private void BtnOpenProjectFileClick(object sender, EventArgs e)
@@ -234,6 +234,25 @@ namespace KaartfabriekUI
 
             if (File.Exists(_projectFile.FieldBorderLocation))
                 BlankFileLocation.TextboxText = _projectFile.FieldBorderLocation;
+
+            FillGridViewFormulas();
+        }
+
+        private void FillGridViewFormulas()
+        {
+            GridViewFormulas.Rows.Clear();
+
+            // TODO: Load formulas from application settings file
+
+            // chbox, Formula, output, gridA, gridB GridC, gridD, minimum, maximum, level
+
+            // OS
+            GridViewFormulas.Rows.Add(false, "5.23297521874561 -0.0235 * Cs137 -0.012 * K40", "OS", "Cs137", "K40", "", "", "", "", "Os 0-5.lvl");
+            // pH
+            GridViewFormulas.Rows.Add(true, "1.21876485586487 + 0.0299 * Th232 + 0.4333 * U238", "pH", "Th232", "U238", "", "", "5.5", "6.9", "Ph 4-7 0.5.lvl");
+            // K-getal:
+            GridViewFormulas.Rows.Add("true", "191.122454275834 -0.7771 * TC", "K-getal", "TC", "", "", "", "15", "29", "K-getal.lvl");
+            // TODO: Add more
         }
 
         private void BtnNewProjectFile_Click(object sender, EventArgs e)
@@ -319,6 +338,48 @@ namespace KaartfabriekUI
         private void ComboboxSelectedIndexChanged(object sender, EventArgs e)
         {
             CheckColumns();
+        }
+
+        private void GridViewFormulas_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            var row = GridViewFormulas.Rows[e.RowIndex];
+
+            // Open modal form:
+            var addEditFormulaForm = new AddEditFormula
+            {
+                // Send values to form:
+                // TODO: Get from project file:
+                GridNames = "Alt;Cs137;K40;TC;Th232;U238;CaCO3; K-getal; Ligging; Lutum; M0; M50; Mg; Mn; Monsterpunten; OS; P-Al; pH; PW; Stikstof; Zandfractie; Bodemclassificatie; Bulkdichtheid; Slemp; Veldcapaciteit; Waterdoorlatendheid; Waterretentie",
+
+                FormulaData = new FormulaData
+                {
+                    // chbox, Formula, output, gridA, gridB GridC, gridD, minimum, maximum, level
+                    Formula = row.Cells[1].Value.ToString(),
+                    Output = row.Cells[2].Value.ToString(),
+                    GridA = row.Cells[3].Value.ToString(),
+                    GridB = row.Cells[4].Value.ToString(),
+                    GridC = row.Cells[5].Value.ToString(),
+                    GridD = row.Cells[6].Value.ToString(),
+                    Minimum = row.Cells[7].Value.ToString(),
+                    Maximum = row.Cells[8].Value.ToString(),
+                    LevelFile = row.Cells[9].Value.ToString(),
+                }
+            };
+
+            if (addEditFormulaForm.ShowDialog(this) == DialogResult.OK)
+            {
+                // Get updated values from form:
+                var formulaData = addEditFormulaForm.FormulaData;
+                // Update grid view:
+                // chbox, Formula, output, gridA, gridB GridC, gridD, minimum, maximum, level
+                row.SetValues("true", formulaData.Formula, formulaData.Output, formulaData.GridA, formulaData.GridB, formulaData.GridC, formulaData.GridD, formulaData.Minimum, formulaData.Maximum, formulaData.LevelFile);
+
+                var gridNames = addEditFormulaForm.GridNames;
+                // TODO: Save to project:
+            }
+
+            // Clean up:
+            addEditFormulaForm.Dispose();
         }
     }
 }

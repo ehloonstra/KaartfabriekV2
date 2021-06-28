@@ -44,6 +44,8 @@ namespace KaartfabriekUI.UserControls
             // 
             // cboColumn
             // 
+            this.cboColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cboColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboColumn.FormattingEnabled = true;
             this.cboColumn.Location = new System.Drawing.Point(3, 17);

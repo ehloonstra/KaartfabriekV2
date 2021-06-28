@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
@@ -11,6 +12,8 @@ namespace KaartfabriekUI.UserControls
     public partial class ColumnSelectControl : UserControl
     {
         private string _data;
+        private string _presetValue;
+        private List<ComboboxItem> _cboItems;
 
         /// <inheritdoc />
         public ColumnSelectControl()
@@ -51,7 +54,15 @@ namespace KaartfabriekUI.UserControls
         /// Preselect this value in the combobox
         /// </summary>
         [Description("Preselect this value in the combobox"), Category("Data")]
-        public string PresetValue { get; set; }
+        public string PresetValue
+        {
+            get => _presetValue;
+            set
+            {
+                _presetValue = value;
+                PreSelect();
+            }
+        }
 
         /// <summary>
         /// String with the possible columns, seperated by semicolon
@@ -74,6 +85,16 @@ namespace KaartfabriekUI.UserControls
         [Description("Event raised when the combobox was changed")]
         public event EventHandler ComboboxSelectedIndexChanged;
 
+
+        /// <summary>
+        /// Reset the selection:
+        /// </summary>
+        public void Reset()
+        {
+            cboColumn.SelectedIndex = -1;
+        }
+
+
         private void cboColumn_SelectedIndexChanged(object sender, EventArgs e)
         {
             ComboboxSelectedIndexChanged?.Invoke(this, e);
@@ -84,21 +105,34 @@ namespace KaartfabriekUI.UserControls
             if (string.IsNullOrWhiteSpace(Data)) return;
             var columns = Data.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .ToList();
-            var cboItems = columns.Select((column, index) => new ComboboxItem
+            _cboItems = columns.Select((column, index) => new ComboboxItem
             {
-                Id = index,
+                Id = index + 1,
                 Value = column
             }).ToList();
 
-            cboColumn.DataSource = cboItems;
+            _cboItems.Insert(0, new ComboboxItem { Id = -1, Value = "" });
+
+            cboColumn.DataSource = _cboItems;
             cboColumn.DisplayMember = nameof(ComboboxItem.Value);
             cboColumn.ValueMember = nameof(ComboboxItem.Id);
 
+            if (string.IsNullOrEmpty(PresetValue)) return;
+
             // Preselect:
-            var item = cboItems.FirstOrDefault(x => x.Value.Trim().Equals(PresetValue.Trim()));
-            if (item is not null)
+            PreSelect();
+        }
+
+        private void PreSelect()
+        {
+            var item = _cboItems?.FirstOrDefault(x => x.Value.Trim().Equals(PresetValue.Trim()));
+            if (item != null)
             {
                 cboColumn.SelectedIndex = item.Id;
+            }
+            else
+            {
+                cboColumn.SelectedIndex = -1;
             }
         }
 
@@ -111,11 +145,11 @@ namespace KaartfabriekUI.UserControls
             /// The id of the item
             /// </summary>
             public int Id { get; set; }
-            
+
             /// <summary>
             /// The display value of the item
             /// </summary>
-            public string Value { get; set; }   
+            public string Value { get; set; }
         }
     }
 }

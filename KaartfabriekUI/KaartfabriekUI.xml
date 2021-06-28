@@ -4,6 +4,58 @@
         <name>KaartfabriekUI</name>
     </assembly>
     <members>
+        <member name="T:KaartfabriekUI.AddEditFormula">
+            <inheritdoc />
+        </member>
+        <member name="P:KaartfabriekUI.AddEditFormula.FormulaData">
+            <summary>
+            The formula data as a JSON string
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.AddEditFormula.GridNames">
+            <summary>
+            The possible names of the grids
+            </summary>
+        </member>
+        <member name="P:KaartfabriekUI.AddEditFormula.IsNewFormula">
+            <summary>
+            Is it a new formula?
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.AddEditFormula.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="F:KaartfabriekUI.AddEditFormula.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.AddEditFormula.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:KaartfabriekUI.AddEditFormula.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:KaartfabriekUI.GuiHelpers">
+            <summary>
+            Class with GUI helpers
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.GuiHelpers.InputBox(System.String,System.String,System.String@)">
+            <summary>
+            Input box to ask a simple question
+            </summary>
+            <param name="title"></param>
+            <param name="promptText"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
         <member name="T:KaartfabriekUI.MainForm">
             <summary>
             The main form
@@ -130,6 +182,11 @@
         <member name="E:KaartfabriekUI.UserControls.ColumnSelectControl.ComboboxSelectedIndexChanged">
             <summary>
             Event raised when the textbox was changed
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.UserControls.ColumnSelectControl.Reset">
+            <summary>
+            Reset the selection:
             </summary>
         </member>
         <member name="T:KaartfabriekUI.UserControls.ColumnSelectControl.ComboboxItem">
