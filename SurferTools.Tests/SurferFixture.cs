@@ -5,7 +5,7 @@ namespace SurferTools.Tests
 {
     public class SurferFixture: IDisposable
     {
-        internal SurferService SurferService = new(SurferConstants.Epsg28992, Path.GetTempPath());
+        internal SurferService SurferService = new(SurferConstants.GetProjectionName("EPSG:28992"), Path.GetTempPath());
         internal bool CloseSurferOnTestFinish = true;
 
         public SurferFixture()

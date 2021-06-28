@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using KaartfabriekUI.Service;
 using Shared;
@@ -26,11 +25,10 @@ namespace KaartfabriekUI
         private void BtnReprojectVelddataClick(object sender, EventArgs e)
         {
             var result = SelectFileToProject(@"Selecteer Velddata in LL");
-            if (File.Exists(result))
-            {
-                VeldDataLocation.TextboxText = result;
-                _projectFile.FieldDataFileLocationProjected = result;
-            }
+            if (!File.Exists(result)) return;
+
+            VeldDataLocation.TextboxText = result;
+            _projectFile.FieldDataFileLocationProjected = result;
         }
 
         private void BtnReprojectMonsterdataClick(object sender, EventArgs e)
@@ -64,7 +62,7 @@ namespace KaartfabriekUI
                 var result = ofd.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    return ProcessTools.ConvertLatLongToProjected(ofd.FileName, "EPSG:28992", "RD");
+                    return ProcessTools.ConvertLatLongToProjected(ofd.FileName, _projectFile.EpsgCode);
                 }
             }
 
@@ -205,7 +203,7 @@ namespace KaartfabriekUI
                 if (File.Exists(_projectFile.FieldDataFileLocation))
                 {
                     // TODO: Use EPSG-code from GUI:
-                    var fileName = ProcessTools.ConvertLatLongToProjected(_projectFile.FieldDataFileLocation, "EPSG:28992", "RD");
+                    var fileName = ProcessTools.ConvertLatLongToProjected(_projectFile.FieldDataFileLocation, _projectFile.EpsgCode);
                     if (File.Exists(fileName))
                     {
                         AddProgress("Velddata is geconverteerd naar RD");
@@ -224,7 +222,7 @@ namespace KaartfabriekUI
                 if (File.Exists(_projectFile.SampleDataFileLocation))
                 {
                     // TODO: Use EPSG-code from GUI:
-                    var fileName = ProcessTools.ConvertLatLongToProjected(_projectFile.SampleDataFileLocation, "EPSG:28992", "RD");
+                    var fileName = ProcessTools.ConvertLatLongToProjected(_projectFile.SampleDataFileLocation, _projectFile.EpsgCode);
                     if (File.Exists(fileName))
                     {
                         AddProgress("Monsterdata is geconverteerd naar RD");

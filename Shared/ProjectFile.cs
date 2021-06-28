@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -21,9 +20,7 @@ namespace Shared
         private string _fieldDataFileLocationProjected = string.Empty;
         private string _fieldBorderLocation = string.Empty;
         private string _fieldBorderLocationBuffered = string.Empty;
-        //private ColumnIndexes _columnIndexes = new();
-        private NuclideGridLocations _nuclideGridLocations = new();
-        private GridSettings _gridSettings = new();
+        private string _epsgCode;
 
         public string WorkingFolder
         {
@@ -40,50 +37,42 @@ namespace Shared
         public string SampleDataFileLocationProjected
         {
             get => _sampleDataFileLocationProjected;
-            set { _sampleDataFileLocationProjected = value; NotifyPropertyChanged();}
+            set { _sampleDataFileLocationProjected = value; NotifyPropertyChanged(); }
         }
 
         public string FieldDataFileLocation
         {
             get => _fieldDataFileLocation;
-            set { _fieldDataFileLocation = value; NotifyPropertyChanged();}
+            set { _fieldDataFileLocation = value; NotifyPropertyChanged(); }
         }
 
         public string FieldDataFileLocationProjected
         {
             get => _fieldDataFileLocationProjected;
-            set { _fieldDataFileLocationProjected = value; NotifyPropertyChanged();}
+            set { _fieldDataFileLocationProjected = value; NotifyPropertyChanged(); }
         }
 
         public string FieldBorderLocation
         {
             get => _fieldBorderLocation;
-            set { _fieldBorderLocation = value; NotifyPropertyChanged();}
+            set { _fieldBorderLocation = value; NotifyPropertyChanged(); }
         }
 
         public string FieldBorderLocationBuffered
         {
             get => _fieldBorderLocationBuffered;
-            set { _fieldBorderLocationBuffered = value; NotifyPropertyChanged();}
+            set { _fieldBorderLocationBuffered = value; NotifyPropertyChanged(); }
         }
 
-        //public ColumnIndexes ColumnIndexes
-        //{
-        //    get => _columnIndexes;
-        //    set { _columnIndexes = value; NotifyPropertyChanged();}
-        //}
-
-        public NuclideGridLocations NuclideGridLocations
+        public string EpsgCode
         {
-            get => _nuclideGridLocations;
-            set { _nuclideGridLocations = value; NotifyPropertyChanged();}
+            get => _epsgCode ?? "EPSG:28992";
+            set { _epsgCode = value; NotifyPropertyChanged(); }
         }
 
-        public GridSettings GridSettings
-        {
-            get => _gridSettings;
-            set { _gridSettings = value; NotifyPropertyChanged();}
-        }
+        public ColumnIndexes ColumnIndexes { get; set; }
+        public NuclideGridLocations NuclideGridLocations { get; set; }
+        public GridSettings GridSettings { get; set; }
 
         public static ProjectFile Load(string fileName)
         {

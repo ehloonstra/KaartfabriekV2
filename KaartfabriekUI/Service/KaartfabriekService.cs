@@ -36,8 +36,7 @@ namespace KaartfabriekUI.Service
         public bool OpenDataForBlanking(string workingFolder, string veldDataLocation, string monsterDataLocation,
             int colX, int colY, int colK40)
         {
-            // TODO: Make EPSG-code flexible:
-            var surferService = new SurferService(SurferConstants.Epsg28992, workingFolder);
+            var surferService = new SurferService(SurferConstants.GetProjectionName(_projectFile.EpsgCode), workingFolder);
 
             // Add Velddata:
             var mapFrameVelddata = surferService.AddPostMap(veldDataLocation, "Velddata", colX, colY);
@@ -96,8 +95,7 @@ namespace KaartfabriekUI.Service
         {
             // TODO: Check inputs
 
-            // TODO: Make EPSG-code flexible:
-            var surferService = new SurferService(SurferConstants.Epsg28992, workingFolder);
+            var surferService = new SurferService(SurferConstants.GetProjectionName(_projectFile.EpsgCode), workingFolder);
 
             var nuclideGridsFolder = Path.Combine(workingFolder, "nuclide grids");
             if (!Directory.Exists(nuclideGridsFolder)) Directory.CreateDirectory(nuclideGridsFolder);

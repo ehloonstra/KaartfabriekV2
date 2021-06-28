@@ -21,14 +21,13 @@ namespace SurferTools
         /// </summary>
         /// <param name="fileName">The file to process</param>
         /// <param name="epsgCode">The EPSG-code to project to</param>
-        /// <param name="label">The label which will be added to the new file name</param>
         /// <returns>The location of the new file</returns>
         /// <exception cref="NullReferenceException"></exception>
-        public static string ConvertLatLongToProjected(string fileName, string epsgCode, string label)
+        public static string ConvertLatLongToProjected(string fileName, string epsgCode)
         {
             var arguments = $@"-f CSV -lco GEOMETRY=AS_XY -lco SEPARATOR=SEMICOLON -lco STRING_QUOTING=IF_NEEDED -s_srs ""EPSG:4326"" -t_srs ""{epsgCode}"" -oo X_POSSIBLE_NAMES=lon -oo Y_POSSIBLE_NAMES=lat";
 
-            var newName = fileName.Replace(".csv", $"-{label}.csv");
+            var newName = fileName.Replace(".csv", $"-{epsgCode}.csv");
             if (File.Exists(newName)) File.Delete(newName);
 
             if (!ProcessOgr2Ogr($"{arguments} \"{newName}\" \"{fileName}\""))
