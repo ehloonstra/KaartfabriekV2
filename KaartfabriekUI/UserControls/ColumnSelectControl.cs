@@ -125,7 +125,9 @@ namespace KaartfabriekUI.UserControls
 
         private void PreSelect()
         {
-            var item = _cboItems?.FirstOrDefault(x => x.Value.Trim().Equals(PresetValue.Trim()));
+            if (string.IsNullOrWhiteSpace(PresetValue)) return;
+
+            var item = _cboItems?.FirstOrDefault(x => x.Value.Trim().ToLower().Equals(PresetValue.Trim().ToLower()));
             if (item != null)
             {
                 cboColumn.SelectedIndex = item.Id;

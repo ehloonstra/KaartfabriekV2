@@ -1,5 +1,5 @@
 ﻿
-namespace KaartfabriekUI
+namespace KaartfabriekUI.Forms
 {
     partial class AddEditFormula
     {
@@ -43,7 +43,6 @@ namespace KaartfabriekUI
             this.label3 = new System.Windows.Forms.Label();
             this.CboLevels = new KaartfabriekUI.UserControls.ColumnSelectControl();
             this.BtnSaveClose = new System.Windows.Forms.Button();
-            this.BtnAddFormula = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // CboOutput
@@ -82,6 +81,7 @@ namespace KaartfabriekUI
             this.CboGridB.SelectedText = "";
             this.CboGridB.Size = new System.Drawing.Size(200, 44);
             this.CboGridB.TabIndex = 2;
+            this.CboGridB.ComboboxSelectedIndexChanged += new System.EventHandler(this.CboGridB_ComboboxSelectedIndexChanged);
             // 
             // CboGridC
             // 
@@ -107,7 +107,6 @@ namespace KaartfabriekUI
             this.CboGridD.SelectedText = "";
             this.CboGridD.Size = new System.Drawing.Size(200, 44);
             this.CboGridD.TabIndex = 4;
-            this.CboGridD.ComboboxSelectedIndexChanged += new System.EventHandler(this.CboGridD_ComboboxSelectedIndexChanged);
             // 
             // TxtBoxFormule
             // 
@@ -185,17 +184,6 @@ namespace KaartfabriekUI
             this.BtnSaveClose.UseVisualStyleBackColor = true;
             this.BtnSaveClose.Click += new System.EventHandler(this.BtnSaveClose_Click);
             // 
-            // BtnAddFormula
-            // 
-            this.BtnAddFormula.AutoSize = true;
-            this.BtnAddFormula.Image = ((System.Drawing.Image)(resources.GetObject("BtnAddFormula.Image")));
-            this.BtnAddFormula.Location = new System.Drawing.Point(218, 26);
-            this.BtnAddFormula.Name = "BtnAddFormula";
-            this.BtnAddFormula.Size = new System.Drawing.Size(37, 30);
-            this.BtnAddFormula.TabIndex = 14;
-            this.BtnAddFormula.UseVisualStyleBackColor = true;
-            this.BtnAddFormula.Click += new System.EventHandler(this.BtnAddFormula_Click);
-            // 
             // AddEditFormula
             // 
             this.AcceptButton = this.BtnSaveClose;
@@ -203,7 +191,6 @@ namespace KaartfabriekUI
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(426, 363);
-            this.Controls.Add(this.BtnAddFormula);
             this.Controls.Add(this.BtnSaveClose);
             this.Controls.Add(this.CboLevels);
             this.Controls.Add(this.TxtBoxMaximum);
@@ -245,6 +232,5 @@ namespace KaartfabriekUI
         private System.Windows.Forms.Label label3;
         private UserControls.ColumnSelectControl CboLevels;
         private System.Windows.Forms.Button BtnSaveClose;
-        private System.Windows.Forms.Button BtnAddFormula;
     }
 }

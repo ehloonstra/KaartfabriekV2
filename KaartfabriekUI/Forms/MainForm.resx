@@ -90,10 +90,10 @@
   <metadata name="GridColEnable.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="GridColFormule.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="GridColOutput.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="GridColOutput.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="GridColFormule.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="Column2.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -117,6 +117,15 @@
   <metadata name="GridColLevelFile.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="BtnAddFormula.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAAMFJREFUSEtjoDdIAOL/JODLQCwBxEQDmAXngXg/AXwfiEFqrwMx0ZbALHAA8/CD
+        BiCG+YRoS8i1gGhLKLGAKEtIsaAAiEHxAMOPgRikF2QGTkCKBehAAYgHvwXdQFwBYWIAqlgACmtQHsAG
+        Bq8F85HwZyB+jsQHBRkMkG0BiI8Lg3wEA2RbANIIw6C0fhyJLwPEMADik2UBMhiakYwMLIDYAMLEAFSx
+        AB8YYRZsB2LkDEYMXg3ERFtACcZrAZUBAwMAQLmPzNoAcp0AAAAASUVORK5CYII=
+</value>
+  </data>
   <data name="LblVoortgang.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAMgAAACFCAYAAAAenrcsAAAABGdBTUEAALGPC/xhBQAAGzpJREFUeF7t

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -6,7 +7,7 @@ using KaartfabriekUI.Service;
 using Shared;
 using SurferTools;
 
-namespace KaartfabriekUI
+namespace KaartfabriekUI.Forms
 {
     /// <summary>
     /// The main form
@@ -73,22 +74,13 @@ namespace KaartfabriekUI
         {
             try
             {
-                var service = new KaartfabriekService(_projectFile);
+                var service = new KaartfabriekService(_projectFile, AddProgress);
                 var result = service.OpenDataForBlanking(WorkingFolder.TextboxText, VeldDataLocation.TextboxText,
                     MonsterDataLocation.TextboxText,
                     CboXcoord.SelectedIndex, CboYcoord.SelectedIndex, CboK40.SelectedIndex);
 
                 // Enable when success:
                 BlankFileLocation.Enabled = result;
-
-                // Save column indexes to project file:
-                //_projectFile.ColumnIndexes.X = CboXcoord.SelectedIndex + 1;
-                //_projectFile.ColumnIndexes.Y = CboYcoord.SelectedIndex + 1;
-                //_projectFile.ColumnIndexes.Alt = CboAlt.SelectedIndex + 1;
-                //_projectFile.ColumnIndexes.Cs137 = CboCs137.SelectedIndex + 1;
-                //_projectFile.ColumnIndexes.K40 = CboK40.SelectedIndex + 1;
-                //_projectFile.ColumnIndexes.Th232 = CboTh232.SelectedIndex + 1;
-                //_projectFile.ColumnIndexes.Tc = CboTotalCount.SelectedIndex + 1;
             }
             catch (Exception exception)
             {
@@ -152,7 +144,8 @@ namespace KaartfabriekUI
 
         private void BtnMaakNuclideGrids_Click(object sender, EventArgs e)
         {
-            var service = new KaartfabriekService(_projectFile);
+            var service = new KaartfabriekService(_projectFile, AddProgress);
+            AddProgress("De nuclide grids worden gemaakt.");
             service.CreateNuclideGrids(WorkingFolder.TextboxText, VeldDataLocation.TextboxText, BlankFileLocation.TextboxText,
                 CboXcoord.SelectedIndex, CboYcoord.SelectedIndex, CboAlt.SelectedIndex,
                 CboK40.SelectedIndex, CboU238.SelectedIndex, CboTh232.SelectedIndex,
@@ -166,6 +159,7 @@ namespace KaartfabriekUI
             {
                 CheckFileExists = true,
                 CheckPathExists = true,
+                FileName = "project.json",
                 DefaultExt = "json",
                 Filter = @"project v2 (.json)|*.json|All files (*.*)|*.*",
                 Multiselect = false,
@@ -192,7 +186,6 @@ namespace KaartfabriekUI
             if (Directory.Exists(_projectFile.WorkingFolder))
             {
                 WorkingFolder.TextboxText = _projectFile.WorkingFolder;
-                //WorkingFolder_TextboxUpdated(this, null);
             }
             if (File.Exists(_projectFile.FieldDataFileLocationProjected))
             {
@@ -242,17 +235,28 @@ namespace KaartfabriekUI
         {
             GridViewFormulas.Rows.Clear();
 
-            // TODO: Load formulas from application settings file
+            // Load formulas from project file:
+            List<FormulaData> formulas;
+            if (_projectFile.FormulaData.Any())
+            {
+                formulas = _projectFile.FormulaData;
+            }
+            else
+            {
+                // Get formulas from application setting:
+                var service = new KaartfabriekService(_projectFile, AddProgress);
+                formulas = service.GetDefaultFormulas();
+                // Save to project file:
+                _projectFile.FormulaData = formulas;
+                _projectFile.Save();
+            }
 
-            // chbox, Formula, output, gridA, gridB GridC, gridD, minimum, maximum, level
+            // chbox, output, Formula, gridA, gridB GridC, gridD, minimum, maximum, level
 
-            // OS
-            GridViewFormulas.Rows.Add(false, "5.23297521874561 -0.0235 * Cs137 -0.012 * K40", "OS", "Cs137", "K40", "", "", "", "", "Os 0-5.lvl");
-            // pH
-            GridViewFormulas.Rows.Add(true, "1.21876485586487 + 0.0299 * Th232 + 0.4333 * U238", "pH", "Th232", "U238", "", "", "5.5", "6.9", "Ph 4-7 0.5.lvl");
-            // K-getal:
-            GridViewFormulas.Rows.Add("true", "191.122454275834 -0.7771 * TC", "K-getal", "TC", "", "", "", "15", "29", "K-getal.lvl");
-            // TODO: Add more
+            foreach (var formula in formulas)
+            {
+                GridViewFormulas.Rows.Add(formula.ToParams(false));
+            }
         }
 
         private void BtnNewProjectFile_Click(object sender, EventArgs e)
@@ -281,7 +285,11 @@ namespace KaartfabriekUI
             AddProgress("Een nieuw projectbestand is aangemaakt.", true);
         }
 
-        private void AddProgress(string text, bool clear = false)
+        private void AddProgress(string text)
+        {
+            AddProgress(text, false);
+        }
+        private void AddProgress(string text, bool clear)
         {
             if (clear) LblVoortgang.Text = string.Empty;
 
@@ -340,30 +348,46 @@ namespace KaartfabriekUI
             CheckColumns();
         }
 
+        private void GridViewFormulas_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex >= 0) return;
+
+            // Clicked on the header
+            if (e.ColumnIndex != 0) return;
+            // Clicked on the checkbox header, toggle all checkboxes:
+            ToggleCheckboxes();
+        }
+
+        private void ToggleCheckboxes()
+        {
+            // Get value of first row:
+            if (GridViewFormulas.Rows[0].Cells[0] is not DataGridViewCheckBoxCell cell) return;
+            
+            GridViewFormulas.ClearSelection();
+
+            var currentValue = Convert.ToBoolean(cell.Value);
+            
+            // Loop:
+            foreach (DataGridViewRow row in GridViewFormulas.Rows)
+            {
+                row.Cells[0].Value = !currentValue;
+            }
+
+            // TODO: The checkbox on first row is only changed after the user selects another row, not sure why this is happening.
+        }
+
         private void GridViewFormulas_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            if (e.RowIndex < 0) return; // Clicked on the header
+
             var row = GridViewFormulas.Rows[e.RowIndex];
 
             // Open modal form:
             var addEditFormulaForm = new AddEditFormula
             {
                 // Send values to form:
-                // TODO: Get from project file:
-                GridNames = "Alt;Cs137;K40;TC;Th232;U238;CaCO3; K-getal; Ligging; Lutum; M0; M50; Mg; Mn; Monsterpunten; OS; P-Al; pH; PW; Stikstof; Zandfractie; Bodemclassificatie; Bulkdichtheid; Slemp; Veldcapaciteit; Waterdoorlatendheid; Waterretentie",
-
-                FormulaData = new FormulaData
-                {
-                    // chbox, Formula, output, gridA, gridB GridC, gridD, minimum, maximum, level
-                    Formula = row.Cells[1].Value.ToString(),
-                    Output = row.Cells[2].Value.ToString(),
-                    GridA = row.Cells[3].Value.ToString(),
-                    GridB = row.Cells[4].Value.ToString(),
-                    GridC = row.Cells[5].Value.ToString(),
-                    GridD = row.Cells[6].Value.ToString(),
-                    Minimum = row.Cells[7].Value.ToString(),
-                    Maximum = row.Cells[8].Value.ToString(),
-                    LevelFile = row.Cells[9].Value.ToString(),
-                }
+                GridNames = _projectFile.GridNames,
+                FormulaData = Row2Formula(row)
             };
 
             if (addEditFormulaForm.ShowDialog(this) == DialogResult.OK)
@@ -371,15 +395,114 @@ namespace KaartfabriekUI
                 // Get updated values from form:
                 var formulaData = addEditFormulaForm.FormulaData;
                 // Update grid view:
-                // chbox, Formula, output, gridA, gridB GridC, gridD, minimum, maximum, level
-                row.SetValues("true", formulaData.Formula, formulaData.Output, formulaData.GridA, formulaData.GridB, formulaData.GridC, formulaData.GridD, formulaData.Minimum, formulaData.Maximum, formulaData.LevelFile);
+                // chbox, output, Formula, gridA, gridB GridC, gridD, minimum, maximum, level
+                row.SetValues(formulaData.ToParams(true));
 
-                var gridNames = addEditFormulaForm.GridNames;
-                // TODO: Save to project:
+                // Save to project:
+                _projectFile.GridNames = addEditFormulaForm.GridNames;
+
+                // Save formulas to project:
+                SaveFormulasToProjectFile();
             }
 
             // Clean up:
             addEditFormulaForm.Dispose();
+        }
+
+        private void SaveFormulasToProjectFile()
+        {
+            if (_projectFile.FormulaData is null)
+            {
+                _projectFile.FormulaData = new List<FormulaData>(GridViewFormulas.Rows.Count);
+            }
+            else
+            {
+                _projectFile.FormulaData.Clear();
+            }
+
+            var formulas = (from DataGridViewRow row in GridViewFormulas.Rows select Row2Formula(row))
+                .ToList();
+            _projectFile.FormulaData = formulas;
+            _projectFile.Save();
+        }
+
+        private static FormulaData Row2Formula(DataGridViewRow row)
+        {
+            return new(
+                row.Cells[1].Value.ToString(),
+                row.Cells[2].Value.ToString(),
+                row.Cells[3].Value.ToString(),
+                row.Cells[4].Value.ToString(),
+                row.Cells[5].Value.ToString(),
+                row.Cells[6].Value.ToString(),
+                row.Cells[7].Value.ToString(),
+                row.Cells[8].Value.ToString(),
+                row.Cells[9].Value.ToString()
+            );
+        }
+
+        private void BtnAddFormula_Click(object sender, EventArgs e)
+        {
+            var value = string.Empty;
+            if (GuiHelpers.InputBox("Geef de naam van het nieuwe output bestand op.", "De naam van het nieuwe output bestand",
+                ref value) != DialogResult.OK) return;
+
+            // Check if not already exist:
+            var names = _projectFile.GridNames.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList();
+            if (!names.Contains(value))
+            {
+                // Add to combobox list:
+                _projectFile.GridNames = $"{_projectFile.GridNames};{value}";
+            }
+
+            // Open modal form:
+            var addEditFormulaForm = new AddEditFormula
+            {
+                // Send values to form:
+                GridNames = _projectFile.GridNames,
+                FormulaData = new FormulaData { Output = value }
+            };
+
+            if (addEditFormulaForm.ShowDialog(this) == DialogResult.OK)
+            {
+                // Get updated values from form:
+                var formulaData = addEditFormulaForm.FormulaData;
+                // Update grid view:
+                // chbox, output, Formula, gridA, gridB GridC, gridD, minimum, maximum, level
+                GridViewFormulas.Rows.Add(formulaData.ToParams(true));
+
+                // Save to project:
+                _projectFile.GridNames = addEditFormulaForm.GridNames;
+
+                // Save formulas to project:
+                SaveFormulasToProjectFile();
+            }
+
+            // Clean up:
+            addEditFormulaForm.Dispose();
+        }
+
+        private void BtnCreateSoilMaps_Click(object sender, EventArgs e)
+        {
+            // Get selected formulas:
+            var selectedFormulas = (from DataGridViewRow row in GridViewFormulas.Rows
+                let cell = row.Cells[0] as DataGridViewCheckBoxCell
+                where cell?.Value != null
+                where Convert.ToBoolean(cell.Value)
+                select Row2Formula(row)).ToList();
+
+            if (!selectedFormulas.Any())
+            {
+                const string msg = "Vink eerst 1 of meerdere formules aan";
+                AddProgress(msg);
+                MessageBox.Show(msg);
+                return;
+            }
+
+            var service = new KaartfabriekService(_projectFile, AddProgress);
+            service.CreateSoilMaps(selectedFormulas);
+            AddProgress("De geselecteerde grid zijn berekend.");
         }
     }
 }

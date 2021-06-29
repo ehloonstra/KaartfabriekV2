@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -21,6 +22,7 @@ namespace Shared
         private string _fieldBorderLocation = string.Empty;
         private string _fieldBorderLocationBuffered = string.Empty;
         private string _epsgCode;
+        private string _gridNames;
 
         public string WorkingFolder
         {
@@ -70,9 +72,16 @@ namespace Shared
             set { _epsgCode = value; NotifyPropertyChanged(); }
         }
 
+        public string GridNames
+        {
+            get => _gridNames ?? "Alt;Cs137;K40;TC;Th232;U238;CaCO3; K-getal; Ligging; Lutum; M0; M50; Mg; Mn; Monsterpunten; OS; P-Al; pH; PW; Stikstof; Zandfractie; Bodemclassificatie; Bulkdichtheid; Slemp; Veldcapaciteit; Waterdoorlatendheid; Waterretentie";
+            set { _gridNames = value; NotifyPropertyChanged(); }
+        }
+
         public ColumnIndexes ColumnIndexes { get; set; }
         public NuclideGridLocations NuclideGridLocations { get; set; }
         public GridSettings GridSettings { get; set; }
+        public List<FormulaData> FormulaData { get; set; }
 
         public static ProjectFile Load(string fileName)
         {
@@ -90,18 +99,15 @@ namespace Shared
 
         public bool SaveAs(string fileName)
         {
-            var jsonString = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(fileName, jsonString);
-
             ProjectFileLocation = fileName;
-            return File.Exists(fileName);
+            return Save();
         }
 
         public bool Save()
         {
             if (!File.Exists(ProjectFileLocation)) return false;
 
-            var jsonString = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+            var jsonString = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
             File.WriteAllText(ProjectFileLocation, jsonString);
 
             return File.Exists(ProjectFileLocation);

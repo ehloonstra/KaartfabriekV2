@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using Shared;
 using Surfer;
 
 namespace SurferTools
@@ -10,6 +12,8 @@ namespace SurferTools
     public class SurferService
     {
         private readonly string _epsgCode;
+        private readonly string _workingFolder;
+        private readonly Action<string> _addProgress;
         private IPlotDocument3 _activePlotDocument;
         private Application _surferApp;
 
@@ -21,9 +25,12 @@ namespace SurferTools
         /// </summary>
         /// <param name="epsgCode">The epsg code for all layers</param>
         /// <param name="workingFolder">The working folder</param>
-        public SurferService(string epsgCode, string workingFolder)
+        /// <param name="addProgress"></param>
+        public SurferService(string epsgCode, string workingFolder, Action<string> addProgress)
         {
             _epsgCode = epsgCode;
+            _workingFolder = workingFolder;
+            _addProgress = addProgress;
             GetSurferObject();
             _surferApp.DefaultFilePath = workingFolder;
         }
@@ -278,6 +285,8 @@ namespace SurferTools
                 if (mapFrame.Overlays.Item(1) is not IPostLayer2 postMapLayer)
                     throw new Exception("Cannot get postMapLayer");
 
+                _addProgress($"De PostMap {layerName} is toegevoegd.");
+
                 // Change its name
                 postMapLayer.Name = layerName;
 
@@ -317,6 +326,9 @@ namespace SurferTools
 
             try
             {
+                if (!File.Exists(sfLocation))
+                    throw new FileNotFoundException("Could not find shapefile", sfLocation);
+
                 var mapFrame = _activePlotDocument.Shapes.AddBaseMap(sfLocation);
                 // Get the added layer:
                 if (mapFrame.Overlays.Item(1) is not IBaseLayer baseMapLayer)
@@ -452,6 +464,8 @@ namespace SurferTools
 
                 // Force reload:
                 postMapLayer.DataFile = postMapLayer.DataFile;
+
+                _addProgress($"De kleuren zijn toegepast op de PostMap {postMapLayer.Name}");
             }
             catch (Exception e)
             {
@@ -468,16 +482,15 @@ namespace SurferTools
         /// Enable the labels for the monsterdata Post map
         /// </summary>
         /// <param name="postMapLayer"></param>
-        /// <param name="labColumn"></param>
-        public void SetLabelMonsterdataPostmap(IPostLayer2 postMapLayer, int labColumn)
+        /// <param name="labelColumn"></param>
+        public void SetLabelMonsterdataPostmap(IPostLayer2 postMapLayer, int labelColumn)
         {
-            postMapLayer.LabCol = labColumn;
+            postMapLayer.LabCol = labelColumn;
         }
 
-        private static void LogException(Exception exception, string msg)
+        private void LogException(Exception exception, string msg)
         {
-            Console.WriteLine(msg);
-            Console.WriteLine(exception.Message);
+            _addProgress(msg);
             var innerEx = exception.InnerException;
             while (innerEx is not null)
             {
@@ -530,7 +543,7 @@ namespace SurferTools
             bufferedPolygon.Name = "Buffer Polygon";
             bufferedPolygon.Line.ForeColorRGBA.Color = srfColor.srfColorForestGreen;
             bufferedPolygon.SetZOrder(SrfZOrder.srfZOToFront);
-            
+
             // Save buffered polygon:
             DeselectAll();
             bufferedPolygon.Selected = true;
@@ -595,6 +608,48 @@ namespace SurferTools
                 previousWidths = 0d;
                 mapOnRow = 0;
             }
+        }
+
+        /// <summary>
+        /// Calculate a new grid based on the formula data
+        /// </summary>
+        /// <param name="formula"></param>
+        public void CalcGrid(FormulaData formula)
+        {
+            // TODO: Check for special formulas like Bodemclassificatie, Waterretentie, etc.
+
+            var gridMathInput = new List<IGridMathInput>();
+
+            if (!string.IsNullOrEmpty(formula.GridA))
+                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(formula.GridA), formula.GridA));
+
+            if (!string.IsNullOrEmpty(formula.GridB))
+                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(formula.GridB), formula.GridB));
+
+            if (!string.IsNullOrEmpty(formula.GridC))
+                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(formula.GridC), formula.GridC));
+
+            if (!string.IsNullOrEmpty(formula.GridD))
+                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(formula.GridD), formula.GridD));
+
+            var outputFolder = Path.Combine(_workingFolder, SurferConstants.BodemkaartenGridsFolder);
+            if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
+
+            var outGrid = Path.Combine(outputFolder, $"{formula.Output}.grd");
+            _surferApp.GridMath3(formula.Formula, gridMathInput.ToArray(), outGrid);
+        }
+
+        private string GetFullPath(string gridName)
+        {
+            // First check in the nuclide grids folder:
+            var fullPath = Path.Combine(_workingFolder, SurferConstants.NuclideGridsFolder, $"{gridName}.grd");
+            if (File.Exists(fullPath)) return fullPath;
+
+            // Next try the results folder:
+            fullPath = Path.Combine(_workingFolder, SurferConstants.BodemkaartenGridsFolder, $"{gridName}.grd");
+            if (File.Exists(fullPath)) return fullPath;
+
+            throw new Exception("Cannot find grid for GridMath with name " + gridName);
         }
     }
 }

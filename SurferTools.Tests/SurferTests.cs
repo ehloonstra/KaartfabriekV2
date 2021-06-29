@@ -8,39 +8,44 @@ using Shouldly;
 using Surfer;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace SurferTools.Tests
 {
-    public class SurferTests : IClassFixture<SurferFixture>
+    public class SurferTests
     {
         private readonly ITestOutputHelper _output;
-        private readonly SurferFixture _fixture;
         private readonly string _csvFileLocation;
+        private SurferService _surferService;
 
-        public SurferTests(ITestOutputHelper output, SurferFixture fixture)
+        public SurferTests(ITestOutputHelper output)
         {
             _output = output;
-            _fixture = fixture;
+
             _csvFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, @"TestData\01 velddata-RD.csv");
+            _surferService = new SurferService("EPSG:28992", Path.GetTempPath(), AddProgress);
             _output.WriteLine("In ctor SurferTests");
+        }
+
+        private void AddProgress(string text)
+        {
+            _output.WriteLine(text);
         }
 
         [Fact]
         public async Task ShowHideSurfer()
         {
             // Show Surfer
-            var retVal = _fixture.SurferService.ShowHideSurfer(true);
+            var retVal = _surferService.ShowHideSurfer(true);
             retVal.ShouldBeTrue("Surfer is not visible");
-            _fixture.SurferService.IsVisible.ShouldBeTrue("Surfer is not visible");
+            _surferService.IsVisible.ShouldBeTrue("Surfer is not visible");
 
             // Wait 5 seconds:
             await Task.Delay(5_000);
 
             // Hide Surfer
-            retVal = _fixture.SurferService.ShowHideSurfer(false);
+            retVal = _surferService.ShowHideSurfer(false);
             retVal.ShouldBeFalse("Surfer is still visible");
-            _fixture.SurferService.IsVisible.ShouldBeFalse("Surfer is still visible");
+            _surferService.IsVisible.ShouldBeFalse("Surfer is still visible");
 
             _output.WriteLine("ShowHideSurfer was successfull");
         }
@@ -48,14 +53,12 @@ namespace SurferTools.Tests
         [Fact]
         public void InverseDistanceGridding()
         {
-            _fixture.CloseSurferOnTestFinish = false;
-
             // Create the grid:
             var newGridFilename = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(_csvFileLocation) + ".grd");
             if (File.Exists(newGridFilename)) File.Delete(newGridFilename);
 
             // TODO: add limits:
-            var retVal = _fixture.SurferService.InverseDistanceGridding(_csvFileLocation, newGridFilename, 1, 2, 16, null);
+            var retVal = _surferService.InverseDistanceGridding(_csvFileLocation, newGridFilename, 1, 2, 16, null);
             retVal.ShouldBeTrue("Gridding was not successful");
             File.Exists(newGridFilename).ShouldBeTrue("New grid file doesn't exists");
 
@@ -67,14 +70,12 @@ namespace SurferTools.Tests
         [Fact]
         public void AddPostMap()
         {
-            _fixture.CloseSurferOnTestFinish = false;
-
-            var mapFrame = _fixture.SurferService.AddPostMap(_csvFileLocation, "Velddata");
+            var mapFrame = _surferService.AddPostMap(_csvFileLocation, "Velddata");
             mapFrame.ShouldNotBeNull("Map frame is null");
 
             if (mapFrame is not IMapFrame3 mapFrame3)
                 throw new Exception("Cannot get mapFrame3");
-            _fixture.SurferService.SetColoringVelddataPostmap(mapFrame3.Overlays.Item(1) as IPostLayer2, 16);
+            _surferService.SetColoringVelddataPostmap(mapFrame3.Overlays.Item(1) as IPostLayer2, 16);
             // Trying to force a refresh
 
         }
@@ -286,7 +287,7 @@ namespace SurferTools.Tests
         [Fact]
         public void GetSurferSamplesLocation()
         {
-            var result = _fixture.SurferService.GetSurferSamplesLocation();
+            var result = _surferService.GetSurferSamplesLocation();
             result.ShouldBe(@"D:\Program Files\Golden Software\Surfer\Samples");
         }
     }

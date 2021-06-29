@@ -1,5 +1,5 @@
 ﻿
-namespace KaartfabriekUI
+namespace KaartfabriekUI.Forms
 {
     partial class MainForm
     {
@@ -61,16 +61,8 @@ namespace KaartfabriekUI
             this.TabPageUitvoer = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.GridViewFormulas = new System.Windows.Forms.DataGridView();
-            this.GridColEnable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.GridColFormule = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.GridColOutput = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.GridColLevelFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.BtnCreateSoilMaps = new System.Windows.Forms.Button();
+            this.BtnAddFormula = new System.Windows.Forms.Button();
             this.TabPageInstellingen = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -82,6 +74,16 @@ namespace KaartfabriekUI
             this.LevelFilesFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.LblVoortgang = new System.Windows.Forms.Label();
+            this.GridColEnable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.GridColOutput = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GridColFormule = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GridColLevelFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
             this.GroupBoxVoorbereiding.SuspendLayout();
@@ -91,6 +93,7 @@ namespace KaartfabriekUI
             this.TabPageUitvoer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GridViewFormulas)).BeginInit();
             this.TabPageInstellingen.SuspendLayout();
@@ -472,8 +475,14 @@ namespace KaartfabriekUI
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.GridViewFormulas);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.BtnCreateSoilMaps);
+            this.splitContainer1.Panel2.Controls.Add(this.BtnAddFormula);
+            this.splitContainer1.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
             this.splitContainer1.Size = new System.Drawing.Size(798, 611);
-            this.splitContainer1.SplitterDistance = 561;
+            this.splitContainer1.SplitterDistance = 555;
             this.splitContainer1.TabIndex = 1;
             // 
             // GridViewFormulas
@@ -485,8 +494,8 @@ namespace KaartfabriekUI
             this.GridViewFormulas.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GridViewFormulas.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.GridColEnable,
-            this.GridColFormule,
             this.GridColOutput,
+            this.GridColFormule,
             this.Column2,
             this.Column3,
             this.Column4,
@@ -505,85 +514,33 @@ namespace KaartfabriekUI
             this.GridViewFormulas.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.GridViewFormulas.RowTemplate.Height = 25;
             this.GridViewFormulas.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.GridViewFormulas.Size = new System.Drawing.Size(798, 561);
+            this.GridViewFormulas.Size = new System.Drawing.Size(798, 555);
             this.GridViewFormulas.TabIndex = 1;
+            this.GridViewFormulas.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.GridViewFormulas_CellMouseClick);
             this.GridViewFormulas.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.GridViewFormulas_CellMouseDoubleClick);
             // 
-            // GridColEnable
+            // BtnCreateSoilMaps
             // 
-            this.GridColEnable.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.GridColEnable.FillWeight = 10F;
-            this.GridColEnable.Frozen = true;
-            this.GridColEnable.HeaderText = "";
-            this.GridColEnable.Name = "GridColEnable";
-            this.GridColEnable.Width = 5;
+            this.BtnCreateSoilMaps.Location = new System.Drawing.Point(142, 6);
+            this.BtnCreateSoilMaps.Name = "BtnCreateSoilMaps";
+            this.BtnCreateSoilMaps.Size = new System.Drawing.Size(224, 38);
+            this.BtnCreateSoilMaps.TabIndex = 16;
+            this.BtnCreateSoilMaps.Text = "Maak de bodemkaarten";
+            this.BtnCreateSoilMaps.UseVisualStyleBackColor = true;
+            this.BtnCreateSoilMaps.Click += new System.EventHandler(this.BtnCreateSoilMaps_Click);
             // 
-            // GridColFormule
+            // BtnAddFormula
             // 
-            this.GridColFormule.Frozen = true;
-            this.GridColFormule.HeaderText = "Formule";
-            this.GridColFormule.Name = "GridColFormule";
-            this.GridColFormule.ReadOnly = true;
-            // 
-            // GridColOutput
-            // 
-            this.GridColOutput.Frozen = true;
-            this.GridColOutput.HeaderText = "Output";
-            this.GridColOutput.Name = "GridColOutput";
-            this.GridColOutput.ReadOnly = true;
-            this.GridColOutput.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // Column2
-            // 
-            this.Column2.HeaderText = "GridA";
-            this.Column2.Name = "Column2";
-            this.Column2.ReadOnly = true;
-            this.Column2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Column2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Column3
-            // 
-            this.Column3.HeaderText = "GridB";
-            this.Column3.Name = "Column3";
-            this.Column3.ReadOnly = true;
-            this.Column3.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Column3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Column4
-            // 
-            this.Column4.HeaderText = "GridC";
-            this.Column4.Name = "Column4";
-            this.Column4.ReadOnly = true;
-            this.Column4.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Column4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Column5
-            // 
-            this.Column5.HeaderText = "GridD";
-            this.Column5.Name = "Column5";
-            this.Column5.ReadOnly = true;
-            this.Column5.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Column6
-            // 
-            this.Column6.HeaderText = "Minimum";
-            this.Column6.Name = "Column6";
-            this.Column6.ReadOnly = true;
-            // 
-            // Column7
-            // 
-            this.Column7.HeaderText = "Maximum";
-            this.Column7.Name = "Column7";
-            this.Column7.ReadOnly = true;
-            // 
-            // GridColLevelFile
-            // 
-            this.GridColLevelFile.HeaderText = "Level file";
-            this.GridColLevelFile.Name = "GridColLevelFile";
-            this.GridColLevelFile.ReadOnly = true;
-            this.GridColLevelFile.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.GridColLevelFile.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.BtnAddFormula.AutoSize = true;
+            this.BtnAddFormula.Image = ((System.Drawing.Image)(resources.GetObject("BtnAddFormula.Image")));
+            this.BtnAddFormula.Location = new System.Drawing.Point(10, 6);
+            this.BtnAddFormula.Name = "BtnAddFormula";
+            this.BtnAddFormula.Size = new System.Drawing.Size(126, 38);
+            this.BtnAddFormula.TabIndex = 15;
+            this.BtnAddFormula.Text = "Nieuwe formule";
+            this.BtnAddFormula.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.BtnAddFormula.UseVisualStyleBackColor = true;
+            this.BtnAddFormula.Click += new System.EventHandler(this.BtnAddFormula_Click);
             // 
             // TabPageInstellingen
             // 
@@ -726,6 +683,95 @@ namespace KaartfabriekUI
             this.LblVoortgang.TabIndex = 7;
             this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
             // 
+            // GridColEnable
+            // 
+            this.GridColEnable.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.GridColEnable.FalseValue = "false";
+            this.GridColEnable.FillWeight = 10F;
+            this.GridColEnable.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.GridColEnable.Frozen = true;
+            this.GridColEnable.HeaderText = "√";
+            this.GridColEnable.Name = "GridColEnable";
+            this.GridColEnable.ToolTipText = "Klik om de checkboxen te wisselen";
+            this.GridColEnable.TrueValue = "true";
+            this.GridColEnable.Width = 21;
+            // 
+            // GridColOutput
+            // 
+            this.GridColOutput.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.GridColOutput.Frozen = true;
+            this.GridColOutput.HeaderText = "Output";
+            this.GridColOutput.Name = "GridColOutput";
+            this.GridColOutput.ReadOnly = true;
+            this.GridColOutput.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.GridColOutput.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.GridColOutput.Width = 51;
+            // 
+            // GridColFormule
+            // 
+            this.GridColFormule.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.GridColFormule.HeaderText = "Formule";
+            this.GridColFormule.Name = "GridColFormule";
+            this.GridColFormule.ReadOnly = true;
+            this.GridColFormule.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.GridColFormule.Width = 57;
+            // 
+            // Column2
+            // 
+            this.Column2.HeaderText = "GridA";
+            this.Column2.Name = "Column2";
+            this.Column2.ReadOnly = true;
+            this.Column2.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Column2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Column3
+            // 
+            this.Column3.HeaderText = "GridB";
+            this.Column3.Name = "Column3";
+            this.Column3.ReadOnly = true;
+            this.Column3.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Column3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Column4
+            // 
+            this.Column4.HeaderText = "GridC";
+            this.Column4.Name = "Column4";
+            this.Column4.ReadOnly = true;
+            this.Column4.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Column4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Column5
+            // 
+            this.Column5.HeaderText = "GridD";
+            this.Column5.Name = "Column5";
+            this.Column5.ReadOnly = true;
+            this.Column5.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Column6
+            // 
+            this.Column6.HeaderText = "Minimum";
+            this.Column6.Name = "Column6";
+            this.Column6.ReadOnly = true;
+            this.Column6.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Column7
+            // 
+            this.Column7.HeaderText = "Maximum";
+            this.Column7.Name = "Column7";
+            this.Column7.ReadOnly = true;
+            this.Column7.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // GridColLevelFile
+            // 
+            this.GridColLevelFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.GridColLevelFile.HeaderText = "Level file";
+            this.GridColLevelFile.Name = "GridColLevelFile";
+            this.GridColLevelFile.ReadOnly = true;
+            this.GridColLevelFile.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.GridColLevelFile.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.GridColLevelFile.Width = 59;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -749,6 +795,8 @@ namespace KaartfabriekUI
             this.GroupBoxNuclideGrids.ResumeLayout(false);
             this.TabPageUitvoer.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.GridViewFormulas)).EndInit();
@@ -802,9 +850,11 @@ namespace KaartfabriekUI
         private UserControls.TextSelectControl SurferTemplateLocation;
         private UserControls.TextSelectControl LevelFilesFolder;
         private UserControls.TextSelectControl GdalFolder;
+        private System.Windows.Forms.Button BtnAddFormula;
+        private System.Windows.Forms.Button BtnCreateSoilMaps;
         private System.Windows.Forms.DataGridViewCheckBoxColumn GridColEnable;
-        private System.Windows.Forms.DataGridViewTextBoxColumn GridColFormule;
         private System.Windows.Forms.DataGridViewTextBoxColumn GridColOutput;
+        private System.Windows.Forms.DataGridViewTextBoxColumn GridColFormule;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column4;

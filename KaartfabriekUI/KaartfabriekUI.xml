@@ -4,42 +4,67 @@
         <name>KaartfabriekUI</name>
     </assembly>
     <members>
-        <member name="T:KaartfabriekUI.AddEditFormula">
+        <member name="T:KaartfabriekUI.Forms.AddEditFormula">
             <inheritdoc />
         </member>
-        <member name="P:KaartfabriekUI.AddEditFormula.FormulaData">
+        <member name="P:KaartfabriekUI.Forms.AddEditFormula.FormulaData">
             <summary>
             The formula data as a JSON string
             </summary>
         </member>
-        <member name="P:KaartfabriekUI.AddEditFormula.GridNames">
+        <member name="P:KaartfabriekUI.Forms.AddEditFormula.GridNames">
             <summary>
             The possible names of the grids
             </summary>
         </member>
-        <member name="P:KaartfabriekUI.AddEditFormula.IsNewFormula">
+        <member name="P:KaartfabriekUI.Forms.AddEditFormula.IsNewFormula">
             <summary>
             Is it a new formula?
             </summary>
         </member>
-        <member name="M:KaartfabriekUI.AddEditFormula.#ctor">
+        <member name="M:KaartfabriekUI.Forms.AddEditFormula.#ctor">
             <inheritdoc />
         </member>
-        <member name="F:KaartfabriekUI.AddEditFormula.components">
+        <member name="F:KaartfabriekUI.Forms.AddEditFormula.components">
             <summary>
             Required designer variable.
             </summary>
         </member>
-        <member name="M:KaartfabriekUI.AddEditFormula.Dispose(System.Boolean)">
+        <member name="M:KaartfabriekUI.Forms.AddEditFormula.Dispose(System.Boolean)">
             <summary>
             Clean up any resources being used.
             </summary>
             <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         </member>
-        <member name="M:KaartfabriekUI.AddEditFormula.InitializeComponent">
+        <member name="M:KaartfabriekUI.Forms.AddEditFormula.InitializeComponent">
             <summary>
             Required method for Designer support - do not modify
             the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:KaartfabriekUI.Forms.MainForm">
+            <summary>
+            The main form
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.Forms.MainForm.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="F:KaartfabriekUI.Forms.MainForm.components">
+            <summary>
+             Required designer variable.
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.Forms.MainForm.Dispose(System.Boolean)">
+            <summary>
+             Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:KaartfabriekUI.Forms.MainForm.InitializeComponent">
+            <summary>
+             Required method for Designer support - do not modify
+             the contents of this method with the code editor.
             </summary>
         </member>
         <member name="T:KaartfabriekUI.GuiHelpers">
@@ -55,31 +80,6 @@
             <param name="promptText"></param>
             <param name="value"></param>
             <returns></returns>
-        </member>
-        <member name="T:KaartfabriekUI.MainForm">
-            <summary>
-            The main form
-            </summary>
-        </member>
-        <member name="M:KaartfabriekUI.MainForm.#ctor">
-            <inheritdoc />
-        </member>
-        <member name="F:KaartfabriekUI.MainForm.components">
-            <summary>
-             Required designer variable.
-            </summary>
-        </member>
-        <member name="M:KaartfabriekUI.MainForm.Dispose(System.Boolean)">
-            <summary>
-             Clean up any resources being used.
-            </summary>
-            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        </member>
-        <member name="M:KaartfabriekUI.MainForm.InitializeComponent">
-            <summary>
-             Required method for Designer support - do not modify
-             the contents of this method with the code editor.
-            </summary>
         </member>
         <member name="T:KaartfabriekUI.Program">
             <summary>
@@ -112,11 +112,12 @@
             Service for the GUI
             </summary>
         </member>
-        <member name="M:KaartfabriekUI.Service.KaartfabriekService.#ctor(Shared.ProjectFile)">
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.#ctor(Shared.ProjectFile,System.Action{System.String})">
             <summary>
             Constructor
             </summary>
             <param name="projectFile"></param>
+            <param name="addProgress">To log the progress in the form</param>
         </member>
         <member name="M:KaartfabriekUI.Service.KaartfabriekService.OpenDataForBlanking(System.String,System.String,System.String,System.Int32,System.Int32,System.Int32)">
             <summary>
@@ -145,6 +146,18 @@
             <param name="colTh232"></param>
             <param name="colCs137"></param>
             <param name="colTc"></param>
+        </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.GetDefaultFormulas">
+            <summary>
+            Get the default formulas from the application settings
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateSoilMaps(System.Collections.Generic.List{Shared.FormulaData})">
+            <summary>
+            Calculate the new grids and add them as contour file to the template plot document
+            </summary>
+            <param name="selectedFormulas"></param>
         </member>
         <member name="T:KaartfabriekUI.UserControls.ColumnSelectControl">
             <summary>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Shared;
 
-namespace KaartfabriekUI
+namespace KaartfabriekUI.Forms
 {
     /// <inheritdoc />
     public partial class AddEditFormula : Form
@@ -30,7 +30,7 @@ namespace KaartfabriekUI
             InitializeComponent();
         }
 
-        private void BtnSaveClose_Click(object sender, System.EventArgs e)
+        private void BtnSaveClose_Click(object sender, EventArgs e)
         {
             // Save form data to object:
             FormulaData.Formula = TxtBoxFormule.Text;
@@ -49,6 +49,10 @@ namespace KaartfabriekUI
 
         private void AddEditFormula_Load(object sender, EventArgs e)
         {
+            if (IsNewFormula)
+            {
+                
+            }
             // Load data for the comboboxes:
             SetLevelFiles();
             SetGridComboxes();
@@ -83,69 +87,37 @@ namespace KaartfabriekUI
             CboLevels.Data = string.Join(';', data);
         }
 
-        private void BtnAddFormula_Click(object sender, EventArgs e)
-        {
-            var value = string.Empty;
-            if (GuiHelpers.InputBox("Geef de naam van het nieuwe output bestand op.", "De naam van het nieuwe output bestand",
-                ref value) != DialogResult.OK) return;
-
-            IsNewFormula = true;
-
-            CboOutput.PresetValue = value;
-
-            // Check if not already exist:
-            var names = GridNames.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .ToList();
-            if (!names.Contains(value))
-            {
-                // Add to combobox list:
-                GridNames = $"{GridNames};{value}";
-                // Reset combo box:
-                CboOutput.Data = GridNames;
-            }
-
-            // Maak overige forms leeg:
-            CboGridA.Reset();
-
-        }
-
         private void CboOutput_ComboboxSelectedIndexChanged(object sender, EventArgs e)
         {
             // Enable next combobox: 
-            CboGridA.PresetValue = FormulaData.GridA;
             CboGridA.Enabled = !string.IsNullOrWhiteSpace(CboOutput.SelectedText);
-
         }
 
         private void CboGridA_ComboboxSelectedIndexChanged(object sender, EventArgs e)
         {
             // Enable next combobox: 
-            CboGridB.PresetValue = FormulaData.GridB;
-            CboGridB.Enabled = !string.IsNullOrWhiteSpace(CboGridA.SelectedText);
-            TxtBoxFormule.Enabled = !string.IsNullOrWhiteSpace(CboGridA.SelectedText);
-            CboLevels.Enabled = true;
+            var enabled = !string.IsNullOrWhiteSpace(CboGridA.SelectedText);
+            CboGridB.Enabled = enabled;
+            TxtBoxFormule.Enabled = enabled;
+        }
+        private void TxtBoxFormule_TextChanged(object sender, EventArgs e)
+        {
+            var enabled = TxtBoxFormule.Text.Trim() != string.Empty;
+            TxtBoxMinimum.Enabled = enabled;
+            TxtBoxMaximum.Enabled = enabled;
+            CboLevels.Enabled = enabled;
+            BtnSaveClose.Enabled = enabled;
+        }
+        private void CboGridB_ComboboxSelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Enable next combobox: 
+            CboGridC.Enabled = !string.IsNullOrWhiteSpace(CboGridB.SelectedText);
         }
 
         private void CboGridC_ComboboxSelectedIndexChanged(object sender, EventArgs e)
         {
             // Enable next combobox: 
-            CboGridC.PresetValue = FormulaData.GridC;
-            CboGridC.Enabled = !string.IsNullOrWhiteSpace(CboGridB.SelectedText);
-        }
-
-        private void CboGridD_ComboboxSelectedIndexChanged(object sender, EventArgs e)
-        {
-            // Enable next combobox: 
-            CboGridD.PresetValue = FormulaData.GridD;
             CboGridD.Enabled = !string.IsNullOrWhiteSpace(CboGridC.SelectedText);
-        }
-
-        private void TxtBoxFormule_TextChanged(object sender, EventArgs e)
-        {
-            var result = TxtBoxFormule.Text.Trim() != string.Empty;
-            TxtBoxMinimum.Enabled = result;
-            TxtBoxMaximum.Enabled = result;
-            BtnSaveClose.Enabled = result;
         }
     }
 }
