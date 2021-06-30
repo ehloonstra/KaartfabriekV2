@@ -237,7 +237,7 @@ namespace KaartfabriekUI.Forms
 
             // Load formulas from project file:
             List<FormulaData> formulas;
-            if (_projectFile.FormulaData.Any())
+            if (_projectFile.FormulaData is not null && _projectFile.FormulaData.Any())
             {
                 formulas = _projectFile.FormulaData;
             }

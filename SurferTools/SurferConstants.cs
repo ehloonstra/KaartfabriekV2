@@ -26,8 +26,6 @@ namespace SurferTools
             throw new Exception("Unknown projection: " + epsgCode);
 #endif
         }
-
-        
     }
 }
 

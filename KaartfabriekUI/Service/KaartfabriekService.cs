@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.IO;
 using System.Windows.Forms;
 using Shared;
@@ -163,6 +162,8 @@ namespace KaartfabriekUI.Service
                 var cs137Grid = CreateNuclideGrid("Cs137.grd", "Cs-137", colCs137);
                 var tcGrid = CreateNuclideGrid("TC.grd", "TC", colTc);
 
+                _projectFile.NuclideGridLocations ??= new NuclideGridLocations();
+
                 _projectFile.NuclideGridLocations.Alt = altGrid;
                 _projectFile.NuclideGridLocations.K40 = k40Grid;
                 _projectFile.NuclideGridLocations.U238 = u238Grid;
@@ -250,12 +251,12 @@ namespace KaartfabriekUI.Service
             // If application settings has no formulas, use these hard-coded ones:
             var retVal = new List<FormulaData>
         {
-            new("Lutum", "0.7*Th232-4", "Th232", "", "", "", "", "", "Lutum 0-10.lvl"),
-            new("Zandfractie", "-0.8*(Th232 + U238) + 103", "Th232", "U238", "", "", "", "", "Zandfractie 75-100.lvl"),
+            new(FormulaConstants.Lutum, "0.7*Th232-4", "Th232", "", "", "", "", "", "Lutum 0-10.lvl"),
+            new(FormulaConstants.Zandfractie, "-0.8*(Th232 + U238) + 103", "Th232", "U238", "", "", "", "", "Zandfractie 75-100.lvl"),
             new("Leem", "100-Zandfractie", "Zandfractie", "", "", "", "", "", "Leem 0 30 Oud.lvl"),
             new("M0", "-0.5*K40+250", "K40", "", "", "", "", "", "M0 0-130.lvl"),
-            new("M50", "-0.36709706918763*K40+235", "K40", "", "", "", "", "", "M50 150 250.lvl"),
-            new("OS", "5.23297521874561 -0.0235 * Cs137 -0.012 * K40", "Cs137", "K40", "", "", "", "", "OS 0-5.lvl"),
+            new(FormulaConstants.M50, "-0.36709706918763*K40+235", "K40", "", "", "", "", "", "M50 150 250.lvl"),
+            new(FormulaConstants.Os, "5.23297521874561 -0.0235 * Cs137 -0.012 * K40", "Cs137", "K40", "", "", "", "", "OS 0-5.lvl"),
             new("pH", "1.21876485586487 + 0.0299 * Th232 + 0.4333 * U238", "Th232", "U238", "", "", "5.5", "6.9",
                 "Ph 4-7 0.25.lvl"),
             new("K-getal", "191.122454275834 -0.7771 * TC", "TC", "", "", "", "15", "29", "K-getal.lvl"),
@@ -265,13 +266,15 @@ namespace KaartfabriekUI.Service
                 "Mg 0-125 25.lvl"),
             new("Stikstof", "4067.52188017669 -13.2469 * TC+60", "TC", "", "", "", "1040", "1290",
                 "Bgr 0-2000 200.lvl"),
-            new("Bulkdichtheid", "Bulkdichtheid", "", "", "", "", "", "", "Bulkdichtheid.lvl"),
-            new("Waterretentie", "Waterretentie", "", "", "", "", "", "", "Waterretentie 20-30.lvl"),
-            new("Veldcapaciteit", "Veldcapaciteit", "", "", "", "", "", "", "Veldcapaciteit 0.3-0.38 0.1.lvl"),
-            new("Waterdoorlatendheid", "Waterdoorlatendheid", "", "", "", "", "", "", "Waterdoorlatendheid 0-50 5.lvl"),
-            new("Bodemclassificatie", "Bodemclassificatie Niet-Eolisch", "", "", "", "", "", "",
-                "Bodemclassificatie Niet-Eolisch.lvl"),
-            new("Slemp", "Slemp", "", "", "", "", "", "", "Slemp.lvl"),
+
+            new(FormulaConstants.Bulkdichtheid, FormulaConstants.Bulkdichtheid, "", "", "", "", "", "", "Bulkdichtheid.lvl"),
+            new(FormulaConstants.Waterretentie, FormulaConstants.Waterretentie, "", "", "", "", "", "", "Waterretentie 20-30.lvl"),
+            new(FormulaConstants.Veldcapaciteit, FormulaConstants.Veldcapaciteit, "", "", "", "", "", "", "Veldcapaciteit 0.3-0.38 0.1.lvl"),
+            new(FormulaConstants.Waterdoorlatendheid, FormulaConstants.Waterdoorlatendheid, "", "", "", "", "", "", "Waterdoorlatendheid 0-50 5.lvl"),
+            new(FormulaConstants.BodemclassificatieNietEolisch, FormulaConstants.BodemclassificatieNietEolisch, "", "", "", "", "", "", "Bodemclassificatie Niet-Eolisch.lvl"),
+            new(FormulaConstants.BodemclassificatieEolisch, FormulaConstants.BodemclassificatieEolisch, "", "", "", "", "", "", "Bodemclassificatie Eolisch.lvl"),
+            new(FormulaConstants.Slemp, FormulaConstants.Slemp, "", "", "", "", "", "", "Slemp.lvl"),
+
             new("Monsterpunten", "TC", "TC", "", "", "", "", "", "Tc 200 250.lvl"),
             new("Ligging", "Alt", "Alt", "", "", "", "", "", "Ligging 2-7.lvl")
         };
@@ -295,10 +298,9 @@ namespace KaartfabriekUI.Service
             {
                 try
                 {
-                    if (surferService.CalcGrid(formula))
-                        _addProgress($"{formula.Output} is berekend.");
-                    else
-                        _addProgress($"Er ging iets niet goed bij het berekenen van {formula.Output}.");
+                    _addProgress(surferService.CalcGrid(formula)
+                        ? $"{formula.Output} is berekend."
+                        : $"Er ging iets niet goed bij het berekenen van {formula.Output}.");
                 }
                 catch (Exception e)
                 {

@@ -27,7 +27,7 @@ namespace SurferTools
         {
             var arguments = $@"-f CSV -lco GEOMETRY=AS_XY -lco SEPARATOR=SEMICOLON -lco STRING_QUOTING=IF_NEEDED -s_srs ""EPSG:4326"" -t_srs ""{epsgCode}"" -oo X_POSSIBLE_NAMES=lon -oo Y_POSSIBLE_NAMES=lat";
 
-            var newName = fileName.Replace(".csv", $"-{epsgCode}.csv");
+            var newName = fileName.Replace(".csv", $"-{epsgCode.Replace(":", "")}.csv");
             if (File.Exists(newName)) File.Delete(newName);
 
             if (!ProcessOgr2Ogr($"{arguments} \"{newName}\" \"{fileName}\""))

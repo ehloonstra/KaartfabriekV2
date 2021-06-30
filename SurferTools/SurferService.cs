@@ -613,26 +613,45 @@ namespace SurferTools
         /// <param name="formula"></param>
         public bool CalcGrid(FormulaData formula)
         {
-            // TODO: Check for special formulas like Bodemclassificatie, Waterretentie, etc.
-
-            var gridMathInput = new List<IGridMathInput>();
-
-            if (!string.IsNullOrEmpty(formula.GridA))
-                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(formula.GridA), formula.GridA));
-
-            if (!string.IsNullOrEmpty(formula.GridB))
-                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(formula.GridB), formula.GridB));
-
-            if (!string.IsNullOrEmpty(formula.GridC))
-                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(formula.GridC), formula.GridC));
-
-            if (!string.IsNullOrEmpty(formula.GridD))
-                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(formula.GridD), formula.GridD));
-
             var outputFolder = Path.Combine(_workingFolder, SurferConstants.BodemkaartenGridsFolder);
             if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
 
             var outGrid = Path.Combine(outputFolder, $"{formula.Output}.grd");
+
+            //  Check for special formulas like Bodemclassificatie, Waterretentie, etc.
+            var specialCalculations = new SpecialCalculations(_workingFolder, _surferApp, _addProgress);
+            switch (formula.Formula)
+            {
+                case FormulaConstants.BodemclassificatieEolisch:
+                    return specialCalculations.CalculateBodemclassificatie(outGrid,true);
+                case FormulaConstants.BodemclassificatieNietEolisch:
+                    return specialCalculations.CalculateBodemclassificatie(outGrid,false);
+                case FormulaConstants.Bulkdichtheid:
+                    return specialCalculations.CalculateBulkdichtheid(outGrid);
+                case FormulaConstants.Slemp:
+                    return specialCalculations.CalculateSlemp(outGrid);
+                case FormulaConstants.Veldcapaciteit:
+                    return specialCalculations.CalculateVeldcapaciteit(outGrid);
+                case FormulaConstants.Waterdoorlatendheid:
+                    return specialCalculations.CalculateWaterdoorlatendheid(outGrid);
+                case FormulaConstants.Waterretentie:
+                    return specialCalculations.CalculateWaterretentie(outGrid);
+            }
+
+            var gridMathInput = new List<IGridMathInput>();
+
+            if (!string.IsNullOrEmpty(formula.GridA))
+                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(_workingFolder, formula.GridA), formula.GridA));
+
+            if (!string.IsNullOrEmpty(formula.GridB))
+                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(_workingFolder, formula.GridB), formula.GridB));
+
+            if (!string.IsNullOrEmpty(formula.GridC))
+                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(_workingFolder, formula.GridC), formula.GridC));
+
+            if (!string.IsNullOrEmpty(formula.GridD))
+                gridMathInput.Add(_surferApp.NewGridMathInput(GetFullPath(_workingFolder, formula.GridD), formula.GridD));
+
             _surferApp.GridMath3(formula.Formula, gridMathInput.ToArray(), outGrid);
 
             LimitGrid(outGrid, formula.Minimum, formula.Maximum);
@@ -685,14 +704,21 @@ namespace SurferTools
             File.Move(tmpOutGrid, inGrid, true);
         }
 
-        private string GetFullPath(string gridName)
+        /// <summary>
+        /// Look for the grid file in several folders
+        /// </summary>
+        /// <param name="workingFolder"></param>
+        /// <param name="gridName"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static string GetFullPath(string workingFolder, string gridName)
         {
             // First check in the nuclide grids folder:
-            var fullPath = Path.Combine(_workingFolder, SurferConstants.NuclideGridsFolder, $"{gridName}.grd");
+            var fullPath = Path.Combine(workingFolder, SurferConstants.NuclideGridsFolder, $"{gridName}.grd");
             if (File.Exists(fullPath)) return fullPath;
 
             // Next try the results folder:
-            fullPath = Path.Combine(_workingFolder, SurferConstants.BodemkaartenGridsFolder, $"{gridName}.grd");
+            fullPath = Path.Combine(workingFolder, SurferConstants.BodemkaartenGridsFolder, $"{gridName}.grd");
             if (File.Exists(fullPath)) return fullPath;
 
             throw new Exception("Cannot find grid for GridMath with name " + gridName);
