@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Shared;
+using SurferTools;
 
 namespace KaartfabriekUI.Forms
 {
@@ -118,6 +119,12 @@ namespace KaartfabriekUI.Forms
         {
             // Enable next combobox: 
             CboGridD.Enabled = !string.IsNullOrWhiteSpace(CboGridC.SelectedText);
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            // Navigate to the URL.
+            ProcessTools.OpenUrl("http://surferhelp.goldensoftware.com/wtopics/mathematical_functions.htm");
         }
     }
 }

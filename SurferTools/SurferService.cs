@@ -15,10 +15,7 @@ namespace SurferTools
         private readonly string _workingFolder;
         private readonly Action<string> _addProgress;
         private IPlotDocument3 _activePlotDocument;
-        private Application _surferApp;
-
-        private const string OutGridOptions = "UseDefaults=1, ForgetOptions=1, SaveRefInfoAsInternal=1, SaveRefInfoAsGSIREF=1";
-
+        private IApplication5 _surferApp;
 
         /// <summary>
         /// Constructor 
@@ -161,7 +158,7 @@ namespace SurferTools
                     SearchMaxEmpty: Math.Max(1, searchNumSectors - 1), SearchMaxData: searchMaxData,
                     xSize: gridSpacing, ySize: gridSpacing,
                     xMin: limits.Xmin, yMin: limits.Ymin, xMax: limits.Xmax, yMax: limits.Ymax,
-                    OutGridOptions: OutGridOptions,
+                    OutGridOptions: SurferConstants.OutGridOptions,
                     ShowReport: false);
             }
             catch (Exception e)
@@ -193,7 +190,7 @@ namespace SurferTools
 
                 return _surferApp.GridAssignNoData(InGrid: gridFileLocation, NoDataFile: blankFileLocation,
                     Side: SrfNoDataPolygonSide.srfNoDataPolyMixed,
-                    OutGrid: outputFileLocation, OutGridOptions: OutGridOptions);
+                    OutGrid: outputFileLocation, OutGridOptions: SurferConstants.OutGridOptions);
             }
             catch (Exception e)
             {
@@ -614,7 +611,7 @@ namespace SurferTools
         /// Calculate a new grid based on the formula data
         /// </summary>
         /// <param name="formula"></param>
-        public void CalcGrid(FormulaData formula)
+        public bool CalcGrid(FormulaData formula)
         {
             // TODO: Check for special formulas like Bodemclassificatie, Waterretentie, etc.
 
@@ -637,6 +634,55 @@ namespace SurferTools
 
             var outGrid = Path.Combine(outputFolder, $"{formula.Output}.grd");
             _surferApp.GridMath3(formula.Formula, gridMathInput.ToArray(), outGrid);
+
+            LimitGrid(outGrid, formula.Minimum, formula.Maximum);
+
+
+            // TODO: Add coordinate system
+
+            return File.Exists(outGrid);
+        }
+
+        private void LimitGrid(string inGrid, string mimimumString, string maximumString)
+        {
+            var limitsSet = false;
+            var formula = string.Empty;
+            if (!string.IsNullOrEmpty(mimimumString) && string.IsNullOrEmpty(maximumString))
+            {
+                // Minimum is set, maximum not
+                var minimum = mimimumString.Replace(',', '.');
+                limitsSet = true;
+                formula = $"IF(A<{minimum},{minimum},A)";
+            }
+            if (string.IsNullOrEmpty(mimimumString) && !string.IsNullOrEmpty(maximumString))
+            {
+                // Maximum is set, minimum is not
+                var maximum = maximumString.Replace(',', '.');
+                limitsSet = true;
+                formula = $"IF(A>{maximum},{maximum},A)";
+            }
+
+            if (!string.IsNullOrEmpty(mimimumString) && !string.IsNullOrEmpty(maximumString))
+            {
+                // Maximum AND minimum are set
+                var maximum = maximumString.Replace(',', '.');
+                var minimum = mimimumString.Replace(',', '.');
+                limitsSet = true;
+                formula = $"IF(A<{minimum},{minimum},IF(A>{maximum},{maximum},A))";
+            }
+
+            if (!limitsSet) return;
+
+            _addProgress("Limiting het grid.");
+            var tmpOutGrid = Path.ChangeExtension(inGrid, ".limited.grd");
+            var gridMathInput = new List<IGridMathInput>(1) { _surferApp.NewGridMathInput(inGrid, "A") };
+            _surferApp.GridMath3(formula, gridMathInput.ToArray(), tmpOutGrid);
+
+            if (!File.Exists(tmpOutGrid)) return;
+
+            _addProgress("Limited grid is aangemaakt");
+            // Move new file:
+            File.Move(tmpOutGrid, inGrid, true);
         }
 
         private string GetFullPath(string gridName)

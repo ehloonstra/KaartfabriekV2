@@ -43,6 +43,7 @@ namespace KaartfabriekUI.Forms
             this.label3 = new System.Windows.Forms.Label();
             this.CboLevels = new KaartfabriekUI.UserControls.ColumnSelectControl();
             this.BtnSaveClose = new System.Windows.Forms.Button();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // CboOutput
@@ -184,6 +185,19 @@ namespace KaartfabriekUI.Forms
             this.BtnSaveClose.UseVisualStyleBackColor = true;
             this.BtnSaveClose.Click += new System.EventHandler(this.BtnSaveClose_Click);
             // 
+            // linkLabel1
+            // 
+            this.linkLabel1.ActiveLinkColor = System.Drawing.Color.Blue;
+            this.linkLabel1.AutoSize = true;
+            this.linkLabel1.Location = new System.Drawing.Point(218, 32);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(191, 15);
+            this.linkLabel1.TabIndex = 14;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "Mathematical Functions in Surfer »";
+            this.linkLabel1.VisitedLinkColor = System.Drawing.Color.Blue;
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
             // AddEditFormula
             // 
             this.AcceptButton = this.BtnSaveClose;
@@ -191,6 +205,7 @@ namespace KaartfabriekUI.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(426, 363);
+            this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.BtnSaveClose);
             this.Controls.Add(this.CboLevels);
             this.Controls.Add(this.TxtBoxMaximum);
@@ -232,5 +247,6 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.Label label3;
         private UserControls.ColumnSelectControl CboLevels;
         private System.Windows.Forms.Button BtnSaveClose;
+        private System.Windows.Forms.LinkLabel linkLabel1;
     }
 }

@@ -88,6 +88,15 @@ namespace SurferTools
             return newName;            
         }
 
+        /// <summary>
+        /// Open the url in the active browser
+        /// </summary>
+        /// <param name="url"></param>
+        public static void OpenUrl(string url)
+        {
+            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+        }
+
         private static bool ProcessOgr2Ogr(string arguments)
         {
             return StartProcess(OgrLocation, arguments);
