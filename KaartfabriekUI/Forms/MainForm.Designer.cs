@@ -58,22 +58,22 @@ namespace KaartfabriekUI.Forms
             this.label1 = new System.Windows.Forms.Label();
             this.GroupBoxNuclideGrids = new System.Windows.Forms.GroupBox();
             this.BtnMaakNuclideGrids = new System.Windows.Forms.Button();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.BtnTemplateCreate = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.TxtTemplateNummer = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.TxtTemplateOmvang = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.TxtTemplatePerceel = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.TxtTemplateNaam = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.SurferTemplateLocation = new KaartfabriekUI.UserControls.TextSelectControl();
             this.TabPageUitvoer = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.GridViewFormulas = new System.Windows.Forms.DataGridView();
-            this.BtnCreateSoilMaps = new System.Windows.Forms.Button();
-            this.BtnAddFormula = new System.Windows.Forms.Button();
-            this.TabPageInstellingen = new System.Windows.Forms.TabPage();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.SurferTemplateLocation = new KaartfabriekUI.UserControls.TextSelectControl();
-            this.LevelFilesFolder = new KaartfabriekUI.UserControls.TextSelectControl();
-            this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
-            this.LblVoortgang = new System.Windows.Forms.Label();
             this.GridColEnable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.GridColOutput = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.GridColFormule = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -84,12 +84,26 @@ namespace KaartfabriekUI.Forms
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.GridColLevelFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.BtnCreateSoilMaps = new System.Windows.Forms.Button();
+            this.BtnAddFormula = new System.Windows.Forms.Button();
+            this.TabPageInstellingen = new System.Windows.Forms.TabPage();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.LevelFilesFolder = new KaartfabriekUI.UserControls.TextSelectControl();
+            this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
+            this.LblVoortgang = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
             this.GroupBoxVoorbereiding.SuspendLayout();
             this.GroupBoxVelddataKolommen.SuspendLayout();
             this.GroupBoxPerceelsgrens.SuspendLayout();
             this.GroupBoxNuclideGrids.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.TabPageUitvoer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -97,7 +111,7 @@ namespace KaartfabriekUI.Forms
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GridViewFormulas)).BeginInit();
             this.TabPageInstellingen.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -226,6 +240,7 @@ namespace KaartfabriekUI.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.TabPageVoorbereiding);
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.TabPageUitvoer);
             this.tabControl1.Controls.Add(this.TabPageInstellingen);
             this.tabControl1.Location = new System.Drawing.Point(12, 51);
@@ -452,6 +467,136 @@ namespace KaartfabriekUI.Forms
             this.BtnMaakNuclideGrids.UseVisualStyleBackColor = true;
             this.BtnMaakNuclideGrids.Click += new System.EventHandler(this.BtnMaakNuclideGrids_Click);
             // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.BtnTemplateCreate);
+            this.tabPage1.Controls.Add(this.groupBox2);
+            this.tabPage1.Location = new System.Drawing.Point(4, 24);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(804, 617);
+            this.tabPage1.TabIndex = 3;
+            this.tabPage1.Text = "Template";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // BtnTemplateCreate
+            // 
+            this.BtnTemplateCreate.Location = new System.Drawing.Point(12, 227);
+            this.BtnTemplateCreate.Name = "BtnTemplateCreate";
+            this.BtnTemplateCreate.Size = new System.Drawing.Size(739, 33);
+            this.BtnTemplateCreate.TabIndex = 3;
+            this.BtnTemplateCreate.Text = "Maak template";
+            this.BtnTemplateCreate.UseVisualStyleBackColor = true;
+            this.BtnTemplateCreate.Click += new System.EventHandler(this.BtnTemplateCreate_Click);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.TxtTemplateNummer);
+            this.groupBox2.Controls.Add(this.label10);
+            this.groupBox2.Controls.Add(this.label5);
+            this.groupBox2.Controls.Add(this.TxtTemplateOmvang);
+            this.groupBox2.Controls.Add(this.label4);
+            this.groupBox2.Controls.Add(this.TxtTemplatePerceel);
+            this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.Controls.Add(this.TxtTemplateNaam);
+            this.groupBox2.Controls.Add(this.label2);
+            this.groupBox2.Controls.Add(this.SurferTemplateLocation);
+            this.groupBox2.Location = new System.Drawing.Point(6, 6);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(782, 204);
+            this.groupBox2.TabIndex = 2;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Template gegevens";
+            // 
+            // TxtTemplateNummer
+            // 
+            this.TxtTemplateNummer.Location = new System.Drawing.Point(74, 166);
+            this.TxtTemplateNummer.Name = "TxtTemplateNummer";
+            this.TxtTemplateNummer.Size = new System.Drawing.Size(78, 23);
+            this.TxtTemplateNummer.TabIndex = 13;
+            // 
+            // label10
+            // 
+            this.label10.Location = new System.Drawing.Point(6, 169);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(62, 15);
+            this.label10.TabIndex = 12;
+            this.label10.Text = "Perceelnr.:";
+            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(132, 139);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(20, 15);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "ha";
+            // 
+            // TxtTemplateOmvang
+            // 
+            this.TxtTemplateOmvang.Location = new System.Drawing.Point(74, 136);
+            this.TxtTemplateOmvang.Name = "TxtTemplateOmvang";
+            this.TxtTemplateOmvang.Size = new System.Drawing.Size(52, 23);
+            this.TxtTemplateOmvang.TabIndex = 10;
+            // 
+            // label4
+            // 
+            this.label4.Location = new System.Drawing.Point(6, 139);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(62, 15);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "Omvang:";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // TxtTemplatePerceel
+            // 
+            this.TxtTemplatePerceel.Location = new System.Drawing.Point(74, 107);
+            this.TxtTemplatePerceel.Name = "TxtTemplatePerceel";
+            this.TxtTemplatePerceel.Size = new System.Drawing.Size(671, 23);
+            this.TxtTemplatePerceel.TabIndex = 8;
+            // 
+            // label3
+            // 
+            this.label3.Location = new System.Drawing.Point(6, 110);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(62, 15);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Perceel:";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // TxtTemplateNaam
+            // 
+            this.TxtTemplateNaam.Location = new System.Drawing.Point(74, 78);
+            this.TxtTemplateNaam.Name = "TxtTemplateNaam";
+            this.TxtTemplateNaam.Size = new System.Drawing.Size(665, 23);
+            this.TxtTemplateNaam.TabIndex = 6;
+            // 
+            // label2
+            // 
+            this.label2.Location = new System.Drawing.Point(6, 81);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(62, 23);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "Naam:";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // SurferTemplateLocation
+            // 
+            this.SurferTemplateLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SurferTemplateLocation.FileFilter = "Surfer files|*.srf";
+            this.SurferTemplateLocation.InitialDirectory = null;
+            this.SurferTemplateLocation.Label = "Locatie van de basis Surfer template:";
+            this.SurferTemplateLocation.Location = new System.Drawing.Point(6, 22);
+            this.SurferTemplateLocation.Name = "SurferTemplateLocation";
+            this.SurferTemplateLocation.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.File;
+            this.SurferTemplateLocation.Size = new System.Drawing.Size(770, 44);
+            this.SurferTemplateLocation.TabIndex = 4;
+            this.SurferTemplateLocation.TextboxText = "D:\\dev\\TopX\\Loonstra\\Projecten\\Basis template.srf";
+            // 
             // TabPageUitvoer
             // 
             this.TabPageUitvoer.Controls.Add(this.splitContainer1);
@@ -518,170 +663,6 @@ namespace KaartfabriekUI.Forms
             this.GridViewFormulas.TabIndex = 1;
             this.GridViewFormulas.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.GridViewFormulas_CellMouseClick);
             this.GridViewFormulas.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.GridViewFormulas_CellMouseDoubleClick);
-            // 
-            // BtnCreateSoilMaps
-            // 
-            this.BtnCreateSoilMaps.Location = new System.Drawing.Point(142, 6);
-            this.BtnCreateSoilMaps.Name = "BtnCreateSoilMaps";
-            this.BtnCreateSoilMaps.Size = new System.Drawing.Size(224, 38);
-            this.BtnCreateSoilMaps.TabIndex = 16;
-            this.BtnCreateSoilMaps.Text = "Maak de bodemkaarten";
-            this.BtnCreateSoilMaps.UseVisualStyleBackColor = true;
-            this.BtnCreateSoilMaps.Click += new System.EventHandler(this.BtnCreateSoilMaps_Click);
-            // 
-            // BtnAddFormula
-            // 
-            this.BtnAddFormula.AutoSize = true;
-            this.BtnAddFormula.Image = ((System.Drawing.Image)(resources.GetObject("BtnAddFormula.Image")));
-            this.BtnAddFormula.Location = new System.Drawing.Point(10, 6);
-            this.BtnAddFormula.Name = "BtnAddFormula";
-            this.BtnAddFormula.Size = new System.Drawing.Size(126, 38);
-            this.BtnAddFormula.TabIndex = 15;
-            this.BtnAddFormula.Text = "Nieuwe formule";
-            this.BtnAddFormula.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.BtnAddFormula.UseVisualStyleBackColor = true;
-            this.BtnAddFormula.Click += new System.EventHandler(this.BtnAddFormula_Click);
-            // 
-            // TabPageInstellingen
-            // 
-            this.TabPageInstellingen.Controls.Add(this.groupBox2);
-            this.TabPageInstellingen.Controls.Add(this.groupBox1);
-            this.TabPageInstellingen.Location = new System.Drawing.Point(4, 24);
-            this.TabPageInstellingen.Name = "TabPageInstellingen";
-            this.TabPageInstellingen.Size = new System.Drawing.Size(804, 617);
-            this.TabPageInstellingen.TabIndex = 2;
-            this.TabPageInstellingen.Text = "Instellingen";
-            this.TabPageInstellingen.UseVisualStyleBackColor = true;
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.label5);
-            this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Location = new System.Drawing.Point(13, 346);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(782, 268);
-            this.groupBox2.TabIndex = 1;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Project instellingen";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label5.Location = new System.Drawing.Point(16, 151);
-            this.label5.Name = "label5";
-            this.label5.Padding = new System.Windows.Forms.Padding(5);
-            this.label5.Size = new System.Drawing.Size(153, 27);
-            this.label5.TabIndex = 3;
-            this.label5.Text = "NAW + Perceelsgegevens";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label4.Location = new System.Drawing.Point(16, 110);
-            this.label4.Name = "label4";
-            this.label4.Padding = new System.Windows.Forms.Padding(5);
-            this.label4.Size = new System.Drawing.Size(139, 27);
-            this.label4.TabIndex = 2;
-            this.label4.Text = "TODO: Grondwatertrap";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label3.Location = new System.Drawing.Point(16, 70);
-            this.label3.Name = "label3";
-            this.label3.Padding = new System.Windows.Forms.Padding(5);
-            this.label3.Size = new System.Drawing.Size(114, 27);
-            this.label3.TabIndex = 1;
-            this.label3.Text = "TODO: EPGS Code";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label2.Location = new System.Drawing.Point(16, 34);
-            this.label2.Name = "label2";
-            this.label2.Padding = new System.Windows.Forms.Padding(5);
-            this.label2.Size = new System.Drawing.Size(122, 27);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "TODO: Grid settings";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.SurferTemplateLocation);
-            this.groupBox1.Controls.Add(this.LevelFilesFolder);
-            this.groupBox1.Controls.Add(this.GdalFolder);
-            this.groupBox1.Location = new System.Drawing.Point(13, 14);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(782, 313);
-            this.groupBox1.TabIndex = 0;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Algemene instellingen";
-            // 
-            // SurferTemplateLocation
-            // 
-            this.SurferTemplateLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.SurferTemplateLocation.FileFilter = "Surfer files|*.srf";
-            this.SurferTemplateLocation.InitialDirectory = null;
-            this.SurferTemplateLocation.Label = "Locatie van de Surfer template:";
-            this.SurferTemplateLocation.Location = new System.Drawing.Point(6, 122);
-            this.SurferTemplateLocation.Name = "SurferTemplateLocation";
-            this.SurferTemplateLocation.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.File;
-            this.SurferTemplateLocation.Size = new System.Drawing.Size(770, 44);
-            this.SurferTemplateLocation.TabIndex = 2;
-            this.SurferTemplateLocation.TextboxText = "";
-            // 
-            // LevelFilesFolder
-            // 
-            this.LevelFilesFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.LevelFilesFolder.FileFilter = "csv files|*.csv";
-            this.LevelFilesFolder.InitialDirectory = null;
-            this.LevelFilesFolder.Label = "Locatie van de level files";
-            this.LevelFilesFolder.Location = new System.Drawing.Point(6, 72);
-            this.LevelFilesFolder.Name = "LevelFilesFolder";
-            this.LevelFilesFolder.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.Folder;
-            this.LevelFilesFolder.Size = new System.Drawing.Size(770, 44);
-            this.LevelFilesFolder.TabIndex = 1;
-            this.LevelFilesFolder.TextboxText = "";
-            // 
-            // GdalFolder
-            // 
-            this.GdalFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.GdalFolder.FileFilter = "csv files|*.csv";
-            this.GdalFolder.InitialDirectory = null;
-            this.GdalFolder.Label = "Locatie van de GDAL binaries:";
-            this.GdalFolder.Location = new System.Drawing.Point(6, 22);
-            this.GdalFolder.Name = "GdalFolder";
-            this.GdalFolder.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.Folder;
-            this.GdalFolder.Size = new System.Drawing.Size(770, 44);
-            this.GdalFolder.TabIndex = 0;
-            this.GdalFolder.TextboxText = "";
-            // 
-            // LblVoortgang
-            // 
-            this.LblVoortgang.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblVoortgang.AutoEllipsis = true;
-            this.LblVoortgang.BackColor = System.Drawing.Color.Transparent;
-            this.LblVoortgang.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.LblVoortgang.Image = ((System.Drawing.Image)(resources.GetObject("LblVoortgang.Image")));
-            this.LblVoortgang.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.LblVoortgang.Location = new System.Drawing.Point(830, 73);
-            this.LblVoortgang.Name = "LblVoortgang";
-            this.LblVoortgang.Size = new System.Drawing.Size(374, 621);
-            this.LblVoortgang.TabIndex = 7;
-            this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
             // 
             // GridColEnable
             // 
@@ -772,6 +753,155 @@ namespace KaartfabriekUI.Forms
             this.GridColLevelFile.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.GridColLevelFile.Width = 59;
             // 
+            // BtnCreateSoilMaps
+            // 
+            this.BtnCreateSoilMaps.Location = new System.Drawing.Point(142, 6);
+            this.BtnCreateSoilMaps.Name = "BtnCreateSoilMaps";
+            this.BtnCreateSoilMaps.Size = new System.Drawing.Size(224, 38);
+            this.BtnCreateSoilMaps.TabIndex = 16;
+            this.BtnCreateSoilMaps.Text = "Maak de bodemkaarten";
+            this.BtnCreateSoilMaps.UseVisualStyleBackColor = true;
+            this.BtnCreateSoilMaps.Click += new System.EventHandler(this.BtnCreateSoilMaps_Click);
+            // 
+            // BtnAddFormula
+            // 
+            this.BtnAddFormula.AutoSize = true;
+            this.BtnAddFormula.Image = ((System.Drawing.Image)(resources.GetObject("BtnAddFormula.Image")));
+            this.BtnAddFormula.Location = new System.Drawing.Point(10, 6);
+            this.BtnAddFormula.Name = "BtnAddFormula";
+            this.BtnAddFormula.Size = new System.Drawing.Size(126, 38);
+            this.BtnAddFormula.TabIndex = 15;
+            this.BtnAddFormula.Text = "Nieuwe formule";
+            this.BtnAddFormula.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.BtnAddFormula.UseVisualStyleBackColor = true;
+            this.BtnAddFormula.Click += new System.EventHandler(this.BtnAddFormula_Click);
+            // 
+            // TabPageInstellingen
+            // 
+            this.TabPageInstellingen.Controls.Add(this.groupBox3);
+            this.TabPageInstellingen.Controls.Add(this.groupBox1);
+            this.TabPageInstellingen.Location = new System.Drawing.Point(4, 24);
+            this.TabPageInstellingen.Name = "TabPageInstellingen";
+            this.TabPageInstellingen.Size = new System.Drawing.Size(804, 617);
+            this.TabPageInstellingen.TabIndex = 2;
+            this.TabPageInstellingen.Text = "Instellingen";
+            this.TabPageInstellingen.UseVisualStyleBackColor = true;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this.label6);
+            this.groupBox3.Controls.Add(this.label7);
+            this.groupBox3.Controls.Add(this.label8);
+            this.groupBox3.Controls.Add(this.label9);
+            this.groupBox3.Location = new System.Drawing.Point(13, 212);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(782, 268);
+            this.groupBox3.TabIndex = 3;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Project instellingen";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label6.Location = new System.Drawing.Point(16, 151);
+            this.label6.Name = "label6";
+            this.label6.Padding = new System.Windows.Forms.Padding(5);
+            this.label6.Size = new System.Drawing.Size(153, 27);
+            this.label6.TabIndex = 3;
+            this.label6.Text = "NAW + Perceelsgegevens";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label7.Location = new System.Drawing.Point(16, 110);
+            this.label7.Name = "label7";
+            this.label7.Padding = new System.Windows.Forms.Padding(5);
+            this.label7.Size = new System.Drawing.Size(139, 27);
+            this.label7.TabIndex = 2;
+            this.label7.Text = "TODO: Grondwatertrap";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label8.Location = new System.Drawing.Point(16, 70);
+            this.label8.Name = "label8";
+            this.label8.Padding = new System.Windows.Forms.Padding(5);
+            this.label8.Size = new System.Drawing.Size(114, 27);
+            this.label8.TabIndex = 1;
+            this.label8.Text = "TODO: EPGS Code";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label9.Location = new System.Drawing.Point(16, 34);
+            this.label9.Name = "label9";
+            this.label9.Padding = new System.Windows.Forms.Padding(5);
+            this.label9.Size = new System.Drawing.Size(122, 27);
+            this.label9.TabIndex = 0;
+            this.label9.Text = "TODO: Grid settings";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.LevelFilesFolder);
+            this.groupBox1.Controls.Add(this.GdalFolder);
+            this.groupBox1.Location = new System.Drawing.Point(13, 14);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(782, 192);
+            this.groupBox1.TabIndex = 0;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Algemene instellingen";
+            // 
+            // LevelFilesFolder
+            // 
+            this.LevelFilesFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.LevelFilesFolder.FileFilter = "csv files|*.csv";
+            this.LevelFilesFolder.InitialDirectory = null;
+            this.LevelFilesFolder.Label = "Locatie van de level files";
+            this.LevelFilesFolder.Location = new System.Drawing.Point(6, 72);
+            this.LevelFilesFolder.Name = "LevelFilesFolder";
+            this.LevelFilesFolder.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.Folder;
+            this.LevelFilesFolder.Size = new System.Drawing.Size(770, 44);
+            this.LevelFilesFolder.TabIndex = 1;
+            this.LevelFilesFolder.TextboxText = "";
+            // 
+            // GdalFolder
+            // 
+            this.GdalFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.GdalFolder.FileFilter = "csv files|*.csv";
+            this.GdalFolder.InitialDirectory = null;
+            this.GdalFolder.Label = "Locatie van de GDAL binaries:";
+            this.GdalFolder.Location = new System.Drawing.Point(6, 22);
+            this.GdalFolder.Name = "GdalFolder";
+            this.GdalFolder.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.Folder;
+            this.GdalFolder.Size = new System.Drawing.Size(770, 44);
+            this.GdalFolder.TabIndex = 0;
+            this.GdalFolder.TextboxText = "";
+            // 
+            // LblVoortgang
+            // 
+            this.LblVoortgang.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.LblVoortgang.AutoEllipsis = true;
+            this.LblVoortgang.BackColor = System.Drawing.Color.Transparent;
+            this.LblVoortgang.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.LblVoortgang.Image = ((System.Drawing.Image)(resources.GetObject("LblVoortgang.Image")));
+            this.LblVoortgang.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.LblVoortgang.Location = new System.Drawing.Point(830, 73);
+            this.LblVoortgang.Name = "LblVoortgang";
+            this.LblVoortgang.Size = new System.Drawing.Size(374, 621);
+            this.LblVoortgang.TabIndex = 7;
+            this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -793,6 +923,9 @@ namespace KaartfabriekUI.Forms
             this.GroupBoxPerceelsgrens.ResumeLayout(false);
             this.GroupBoxPerceelsgrens.PerformLayout();
             this.GroupBoxNuclideGrids.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.TabPageUitvoer.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -801,8 +934,8 @@ namespace KaartfabriekUI.Forms
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.GridViewFormulas)).EndInit();
             this.TabPageInstellingen.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -840,14 +973,8 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.Button BtnNewProjectFile;
         private System.Windows.Forms.TabPage TabPageInstellingen;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.DataGridView GridViewFormulas;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private UserControls.TextSelectControl SurferTemplateLocation;
         private UserControls.TextSelectControl LevelFilesFolder;
         private UserControls.TextSelectControl GdalFolder;
         private System.Windows.Forms.Button BtnAddFormula;
@@ -862,6 +989,24 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
         private System.Windows.Forms.DataGridViewTextBoxColumn GridColLevelFile;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.Button BtnTemplateCreate;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.TextBox TxtTemplateNummer;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox TxtTemplateOmvang;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox TxtTemplatePerceel;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox TxtTemplateNaam;
+        private System.Windows.Forms.Label label2;
+        private UserControls.TextSelectControl SurferTemplateLocation;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
     }
 }
 

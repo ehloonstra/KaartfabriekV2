@@ -61,10 +61,10 @@ namespace SurferTools
             };
 
             // ReSharper disable once ConvertToConstant.Local
-            var formuleKlei = $"1 / (0.6117 + (0.003601 * {FormulaConstants.Lutum}) + (0.002172 * ({FormulaConstants.Os} ^ 2)) + (0.01715 * Log10({FormulaConstants.Os})))";
+            var formuleKlei = $"1 / (0.6117 + (0.003601 * {FormulaConstants.Lutum}) + (0.002172 * ({FormulaConstants.Os} ^ 2)) + (0.01715 * ln({FormulaConstants.Os})))";
             // ReSharper disable once ConvertToConstant.Local
             var formuleZand =
-                $"1 / (-7.58 + (0.01791 * {FormulaConstants.Os}) + (0.0326 * 1) - (0.00338 * {FormulaConstants.M50}) + (0.00003937 * ((100-{FormulaConstants.Zandfractie}) ^ 2)) + (157.7 * ({FormulaConstants.M50} ^ -1)) + (1.522 * Log10({FormulaConstants.M50})))";
+                $"1 / (-7.58 + (0.01791 * {FormulaConstants.Os}) + (0.0326 * 1) - (0.00338 * {FormulaConstants.M50}) + (0.00003937 * ((100-{FormulaConstants.Zandfractie}) ^ 2)) + (157.7 * ({FormulaConstants.M50} ^ -1)) + (1.522 * ln({FormulaConstants.M50})))";
 
             var formula = $"IF({FormulaConstants.Lutum}>=8,{formuleKlei},{formuleZand})";
             DeleteFile(outGrid);

@@ -89,7 +89,7 @@ namespace KaartfabriekUI.Service
             surferService.MakeMapFrameFit(mergedMapFrame);
 
             // Save result:
-            surferService.SavePlotDocument(Path.Combine(workingFolder, "DataForBlanking.srf"));
+            surferService.SaveAsPlotDocument(Path.Combine(workingFolder, "DataForBlanking.srf"));
 
             _addProgress("Het plot document met de AAN en Luchtfoto data wordt getoond.");
 
@@ -178,7 +178,7 @@ namespace KaartfabriekUI.Service
 
                 // Show maps nicely on plot (resize, align horizontally
                 surferService.AlignNuclideGrids();
-                surferService.SavePlotDocument(Path.Combine(nuclideGridsFolder, "nuclideGrids.srf"));
+                surferService.SaveAsPlotDocument(Path.Combine(nuclideGridsFolder, "nuclideGrids.srf"));
                 _addProgress("Alle nuclide grids zijn geplaatst op het plot.");
             }
             catch (Exception e)
@@ -307,6 +307,64 @@ namespace KaartfabriekUI.Service
                     _addProgress($"Kan {formula.Output} niet berekenen. Error: {e.Message}");
                     // Swallow: throw;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Create the template, which will be used for all soil maps
+        /// </summary>
+        /// <param name="surferTemplateLocation">The location of the base template</param>
+        public void CreateTemplate(string surferTemplateLocation)
+        {
+            _addProgress("Het maken van de template is gestart.");
+            var surferService = new SurferService(SurferConstants.GetProjectionName(_projectFile.EpsgCode),
+                _projectFile.WorkingFolder, _addProgress, false);
+
+            try
+            {
+                // Open template and save to working folder:
+                surferService.OpenSrf(surferTemplateLocation);
+
+                // TODO: Move to helper class:
+                var folder = Path.Combine(_projectFile.WorkingFolder,
+                    SurferConstants.BodemkaartenResultaatSurferFolder);
+                if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+
+                // Copy base template to project:
+                surferService.SaveAsPlotDocument(Path.Combine(folder, "Template.srf"));
+
+                // Change Perceelnr:
+                surferService.ChangeText("Perceelnr", _projectFile.ParcelData.Number);
+                // Change Perceelgegevens:
+                var pData = _projectFile.ParcelData;
+                var value = string.Format("Naam: {1}{0}{0}Perceel: {2}{0}{0}Omvang: {3} ha{0}{0}Projectie: x",
+                    Environment.NewLine, pData.Customer, pData.Name, pData.Size);
+                surferService.ChangeText("Perceelgegevens", value);
+
+                const string mapName = "Template";
+                // Change grid
+                surferService.ChangeGridSource(mapName, _projectFile.NuclideGridLocations.Tc);
+
+                // Add blank file
+                surferService.AddBlankFile(mapName, _projectFile.FieldBorderLocation);
+
+                // Add sample data:
+                surferService.AddSamplePoints(mapName, _projectFile.SampleDataFileLocationProjected);
+
+                // Size frame to look good
+                surferService.SizeMapFrameForTemplate(mapName);
+
+                // Save changes:
+                surferService.SavePlotDocument();
+            }
+            catch (Exception e)
+            {
+                _addProgress("Error in CreateTemplate. Message: " + e.Message);
+            }
+            finally
+            {
+                // Show surfer:
+                surferService.ShowHideSurfer(true);
             }
         }
     }

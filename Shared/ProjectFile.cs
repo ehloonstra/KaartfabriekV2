@@ -81,6 +81,7 @@ namespace Shared
         // public ColumnIndexes ColumnIndexes { get; set; }
         public NuclideGridLocations NuclideGridLocations { get; set; } = new();
         public GridSettings GridSettings { get; set; }
+        public ParcelData ParcelData  { get; set; } = new();
         public List<FormulaData> FormulaData { get; set; } = new();
 
         public static ProjectFile Load(string fileName)

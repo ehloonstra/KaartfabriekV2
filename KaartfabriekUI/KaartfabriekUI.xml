@@ -159,6 +159,12 @@
             </summary>
             <param name="selectedFormulas"></param>
         </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateTemplate(System.String)">
+            <summary>
+            Create the template, which will be used for all soil maps
+            </summary>
+            <param name="surferTemplateLocation">The location of the base template</param>
+        </member>
         <member name="T:KaartfabriekUI.UserControls.ColumnSelectControl">
             <summary>
             User control to select the column

@@ -228,6 +228,15 @@ namespace KaartfabriekUI.Forms
             if (File.Exists(_projectFile.FieldBorderLocation))
                 BlankFileLocation.TextboxText = _projectFile.FieldBorderLocation;
 
+            var pData = _projectFile.ParcelData;
+            if (pData is not null)
+            {
+                TxtTemplateNaam.Text = pData.Customer;
+                TxtTemplatePerceel.Text = pData.Name;
+                TxtTemplateOmvang.Text = pData.Size;
+                TxtTemplateNummer.Text = pData.Number;
+            }
+
             FillGridViewFormulas();
         }
 
@@ -503,6 +512,19 @@ namespace KaartfabriekUI.Forms
             var service = new KaartfabriekService(_projectFile, AddProgress);
             service.CreateSoilMaps(selectedFormulas);
             AddProgress("De geselecteerde grid zijn berekend.");
+        }
+
+        private void BtnTemplateCreate_Click(object sender, EventArgs e)
+        {
+            _projectFile.ParcelData.Customer = TxtTemplateNaam.Text;
+            _projectFile.ParcelData.Name = TxtTemplatePerceel.Text;
+            _projectFile.ParcelData.Size = TxtTemplateOmvang.Text;
+            _projectFile.ParcelData.Number = TxtTemplateNummer.Text;
+            _projectFile.Save();
+
+            var service = new KaartfabriekService(_projectFile, AddProgress);
+            service.CreateTemplate(SurferTemplateLocation.TextboxText);
+            AddProgress("De template is aangemaakt.");
         }
     }
 }

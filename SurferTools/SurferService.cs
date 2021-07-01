@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using Shared;
 using Surfer;
@@ -23,23 +24,24 @@ namespace SurferTools
         /// <param name="epsgCode">The epsg code for all layers</param>
         /// <param name="workingFolder">The working folder</param>
         /// <param name="addProgress"></param>
-        public SurferService(string epsgCode, string workingFolder, Action<string> addProgress)
+        /// <param name="addPlotDocument"></param>
+        public SurferService(string epsgCode, string workingFolder, Action<string> addProgress, bool addPlotDocument = true)
         {
             _epsgCode = epsgCode;
             _workingFolder = workingFolder;
             _addProgress = addProgress;
-            GetSurferObject();
+            GetSurferObject(addPlotDocument);
             _surferApp.DefaultFilePath = workingFolder;
         }
 
-        private void GetSurferObject()
+        private void GetSurferObject(bool addPlotDocument)
         {
             var obj = ComTools.GetActiveObject("Surfer.Application");
             if (obj is null)
             {
                 // Surfer is not loaded, create new instance
                 _surferApp = new Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
-                _activePlotDocument = AddPlotDocument();
+                if (addPlotDocument) _activePlotDocument = AddPlotDocument();
             }
             else
             {
@@ -56,7 +58,17 @@ namespace SurferTools
         /// </summary>
         /// <param name="visible">If its value is set to 'true', the surfer application window is visible and if its value is set to 'false', the application window is hidden.</param>
         /// <returns>The application window visibility</returns>
-        public bool ShowHideSurfer(bool visible) => _surferApp.Visible = visible;
+        public bool ShowHideSurfer(bool visible)
+        {
+            if (visible)
+            {
+                _surferApp.ActiveWindow.Zoom(SrfZoomTypes.srfZoomFitToWindow);
+                _surferApp.ScreenUpdating = true;
+            }
+
+            _surferApp.Visible = visible;
+            return _surferApp.Visible;
+        }
 
         /// <summary>
         /// Get the application window visibility
@@ -107,13 +119,22 @@ namespace SurferTools
         }
 
         /// <summary>
-        /// Save the plot document to disk
+        /// Save the active plot document to disk
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns>True on success, false otherwise</returns>
-        public bool SavePlotDocument(string fileName)
+        public bool SaveAsPlotDocument(string fileName)
         {
             return _activePlotDocument.SaveAs(fileName, "", SrfSaveFormat.srfSaveFormatSrf15);
+        }
+
+        /// <summary>
+        /// Save the active plot document
+        /// </summary>
+        /// <returns></returns>
+        public bool SavePlotDocument()
+        {
+            return _activePlotDocument.Save();
         }
 
         /// <summary>
@@ -424,17 +445,46 @@ namespace SurferTools
         /// Make the map frame fit nicely on the page
         /// </summary>
         /// <param name="mapFrame"></param>
-        public void MakeMapFrameFit(IMapFrame mapFrame)
+        /// <param name="endWidth"></param>
+        /// <param name="startHeight"></param>
+        public double MakeMapFrameFit(IMapFrame mapFrame, double endWidth = 0d, double startHeight = 0d)
         {
             // Make it fit on the page:
             var pageSetup = _activePlotDocument.PageSetup;
-            var ratioHeight = (pageSetup.Height - pageSetup.TopMargin - pageSetup.BottomMargin) / mapFrame.Height;
-            var ratioWidth = (pageSetup.Width - pageSetup.LeftMargin - pageSetup.RightMargin) / mapFrame.Width;
+
+            mapFrame.Axes.Item("Bottom Axis").ShowLabels = false;
+            mapFrame.Axes.Item("Bottom Axis").MajorTickType = SrfTickType.srfTickNone;
+
+            double ratioWidth;
+            if (endWidth == 0d)
+            {
+                ratioWidth = (pageSetup.Width - pageSetup.LeftMargin - pageSetup.RightMargin) / mapFrame.Width;
+            }
+            else
+            {
+                ratioWidth = endWidth - pageSetup.LeftMargin / mapFrame.Width;
+            }
+
+            mapFrame.Axes.Item("Left Axis").ShowLabels = false;
+            double ratioHeight;
+            if (startHeight == 0d)
+            {
+                ratioHeight = (pageSetup.Height - pageSetup.TopMargin - pageSetup.BottomMargin) / mapFrame.Height;
+            }
+            else
+            {
+                ratioHeight = (pageSetup.Height - pageSetup.TopMargin - startHeight) / mapFrame.Height;
+            }
             var ratio = Math.Min(ratioHeight, ratioWidth);
             mapFrame.Height *= ratio;
             mapFrame.Width *= ratio;
             mapFrame.Top = pageSetup.Height - pageSetup.TopMargin;
+            mapFrame.Axes.Item("Left Axis").ShowLabels = true;
             mapFrame.Left = pageSetup.LeftMargin;
+            mapFrame.Axes.Item("Bottom Axis").ShowLabels = true;
+            mapFrame.Axes.Item("Bottom Axis").MajorTickType = SrfTickType.srfTickOut;
+
+            return ratio;
         }
 
         /// <summary>
@@ -483,6 +533,7 @@ namespace SurferTools
         public void SetLabelMonsterdataPostmap(IPostLayer2 postMapLayer, int labelColumn)
         {
             postMapLayer.LabCol = labelColumn;
+            postMapLayer.Symbol.Index = 12;
         }
 
         private void LogException(Exception exception, string msg)
@@ -623,9 +674,9 @@ namespace SurferTools
             switch (formula.Formula)
             {
                 case FormulaConstants.BodemclassificatieEolisch:
-                    return specialCalculations.CalculateBodemclassificatie(outGrid,true);
+                    return specialCalculations.CalculateBodemclassificatie(outGrid, true);
                 case FormulaConstants.BodemclassificatieNietEolisch:
-                    return specialCalculations.CalculateBodemclassificatie(outGrid,false);
+                    return specialCalculations.CalculateBodemclassificatie(outGrid, false);
                 case FormulaConstants.Bulkdichtheid:
                     return specialCalculations.CalculateBulkdichtheid(outGrid);
                 case FormulaConstants.Slemp:
@@ -722,6 +773,187 @@ namespace SurferTools
             if (File.Exists(fullPath)) return fullPath;
 
             throw new Exception("Cannot find grid for GridMath with name " + gridName);
+        }
+
+
+        /// <summary>
+        /// Open the .srf file
+        /// </summary>
+        /// <param name="fileLocation"></param>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="Exception"></exception>
+        public void OpenSrf(string fileLocation)
+        {
+            if (!File.Exists(fileLocation))
+                throw new FileNotFoundException("Could not find the .srf file to open.", fileLocation);
+
+            if (_surferApp.Documents.Open2(fileLocation) is not IPlotDocument3 plot)
+                throw new Exception("Could not open .srf file");
+
+            plot.Activate();
+            _activePlotDocument = plot;
+        }
+
+        /// <summary>
+        /// Change the text in the active plot document
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="value"></param>
+        /// <exception cref="Exception"></exception>
+        public void ChangeText(string label, string value)
+        {
+            if (_activePlotDocument.Shapes.Item(label) is not IText text)
+                throw new Exception("Could not find text with name " + label);
+
+            text.Text = value;
+        }
+
+        /// <summary>
+        /// Change the grid source
+        /// </summary>
+        /// <param name="mapName"></param>
+        /// <param name="newGridLocation"></param>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="Exception"></exception>
+        public void ChangeGridSource(string mapName, string newGridLocation)
+        {
+            if (!File.Exists(newGridLocation))
+                throw new FileNotFoundException("Cannot find new grid", newGridLocation);
+
+            if (_activePlotDocument.Shapes.Item(mapName) is not IMapFrame3 mapFrame)
+                throw new Exception("Could not find map with name " + mapName);
+
+            if (mapFrame.Overlays.Item(1) is not IContourLayer contourLayer)
+                throw new Exception("Cannot get contourLayer");
+
+            contourLayer.GridFile = newGridLocation;
+            contourLayer.CoordinateSystem = _epsgCode;
+        }
+
+        /// <summary>
+        /// Add the blank file to an existing map frame
+        /// </summary>
+        /// <param name="mapName"></param>
+        /// <param name="blankFileLocation"></param>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="Exception"></exception>
+        public void AddBlankFile(string mapName, string blankFileLocation)
+        {
+            if (!File.Exists(blankFileLocation))
+                throw new FileNotFoundException("Cannot find blank file", blankFileLocation);
+
+            if (_activePlotDocument.Shapes.Item(mapName) is not IMapFrame3 mapFrame)
+                throw new Exception("Could not find map with name " + mapName);
+
+            if (_activePlotDocument.Shapes is not IShapes7 shapes)
+                throw new Exception("Could not get shapes");
+
+            var baseLayer = shapes.AddBaseLayer(mapFrame, blankFileLocation);
+            if (baseLayer is null)
+                throw new Exception("Could not get blank file layer");
+
+            // Line properties:
+            baseLayer.Line.ForeColor = srfColor.srfColorPurple;
+            baseLayer.Line.Width = 0.01;
+
+            baseLayer.CoordinateSystem = _epsgCode;
+        }
+
+        /// <summary>
+        /// Add sample points to existing map frame
+        /// </summary>
+        /// <param name="mapName"></param>
+        /// <param name="sampleDataLocation"></param>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="Exception"></exception>
+        public void AddSamplePoints(string mapName, string sampleDataLocation)
+        {
+            if (!File.Exists(sampleDataLocation))
+                throw new FileNotFoundException("Cannot find sample data file", sampleDataLocation);
+
+            if (_activePlotDocument.Shapes.Item(mapName) is not IMapFrame3 mapFrame)
+                throw new Exception("Could not find map with name " + mapName);
+
+            if (_activePlotDocument.Shapes is not IShapes7 shapes)
+                throw new Exception("Could not get shapes");
+
+            if (shapes.AddPostLayer(mapFrame, sampleDataLocation) is not IPostLayer2 postLayer)
+                throw new Exception("Could not add sample data");
+
+            postLayer.Name = "Monster data";
+            postLayer.CoordinateSystem = _epsgCode;
+            SetLabelMonsterdataPostmap(postLayer, 3);
+        }
+
+        /// <summary>
+        /// Size the map frame to fit it nicely in the template
+        /// </summary>
+        /// <param name="mapName"></param>
+        /// <exception cref="Exception"></exception>
+        public void SizeMapFrameForTemplate(string mapName)
+        {
+            if (_activePlotDocument.Shapes.Item(mapName) is not IMapFrame3 mapFrame)
+                throw new Exception("Could not find map with name " + mapName);
+
+            if (_activePlotDocument.Shapes is not IShapes7 shapes)
+                throw new Exception("Could not get shapes");
+
+            if (shapes.Item("Dimensions") is not IComposite2 groupDimensions)
+                throw new Exception("Could not get shape Dimensions");
+
+            if (groupDimensions.Shapes.Item("dimTop") is not IShape dimTop)
+                throw new Exception("Could not find dimTop");
+
+            if (groupDimensions.Shapes.Item("dimBottom") is not IShape dimBottom)
+                throw new Exception("Could not find dimBottom");
+
+            var ratio = MakeMapFrameFit(mapFrame, dimTop.Left, dimBottom.Top);
+
+            // Center map:
+            mapFrame.Left += (dimTop.Left - mapFrame.Left - mapFrame.Width) / 2;
+            // mapFrame.Top -= (dimTop.Top - dimBottom.Top - mapFrame.Height) / 2;
+
+            // Check if map needs to be enlarged:
+            //object.SetScale( Minimum, Maximum, MajorInterval, FirstMajorTick, LastMajorTick, Cross1, Cross2 )
+            // Dit moet in coordinaten niet in page units.
+            // Rekening houden met de verschaling (ratio)!
+
+            ////controleren of niet al maximaal hoog is:
+            //if ((dimTop.Top - mapFrame.Top) > 0.001)
+            //{
+            //    mapFrame.Axes.Item("Top Axis").SetScale(Cross1: mapFrame.Axes.Item("Top Axis").Cross1 +
+            //                                                    (dimTop.Top - mapFrame.Top) * mapFrame.xMapPerPU /
+            //                                                    ratio);
+            //    mapFrame.Axes.Item("Bottom Axis").SetScale Cross1:= oAxis("Bottom Axis").Cross1 - ((_
+            //        .top - .Height - dimDimensions.bottom) * _
+            //        .xMapPerPU / dScale)
+            //}
+
+            var pageSetup = _activePlotDocument.PageSetup;
+
+            var xMin = mapFrame.Axes.Item("Left Axis").Cross1 - mapFrame.Left * mapFrame.yMapPerPU;
+            xMin = Math.Round(xMin / 10, MidpointRounding.ToZero) * 10; // 162870
+            mapFrame.Axes.Item("Left Axis").SetScale(Cross1: xMin);
+
+            var xMax = mapFrame.Axes.Item("Right Axis").Cross1 + ((dimTop.Left - mapFrame.Width + mapFrame.Left + pageSetup.LeftMargin) * mapFrame.yMapPerPU); // 163600
+            mapFrame.Axes.Item("Right Axis").SetScale(Cross1: xMax);
+
+            // Enlarge top and bottom axes:
+            mapFrame.Axes.Item("Top Axis").SetScale(Minimum: xMin, FirstMajorTick: xMin, Maximum: xMax, LastMajorTick: xMax);
+            mapFrame.Axes.Item("Bottom Axis").SetScale(Minimum: xMin, FirstMajorTick: xMin, Maximum: xMax, LastMajorTick: xMax);
+
+            // Set limits of Map frame:
+            mapFrame.SetLimits(mapFrame.Axes.Item("Bottom Axis").Minimum, mapFrame.Axes.Item("Bottom Axis").Maximum,
+                mapFrame.Axes.Item("Left Axis").Minimum, mapFrame.Axes.Item("Left Axis").Maximum);
+
+            // Reset left:
+            mapFrame.Left = pageSetup.LeftMargin;
+
+            // The map scale is not properly scaled:
+            if (shapes.Item("Map Scale") is not IScaleBar3 mapScale)
+                throw new Exception("Could not get Map Scale");
+            mapScale.LabelFont.Size = 8;
+
         }
     }
 }
