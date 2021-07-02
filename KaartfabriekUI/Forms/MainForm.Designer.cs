@@ -95,6 +95,7 @@ namespace KaartfabriekUI.Forms
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.LevelFilesFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
+            this.panelVoortgang = new System.Windows.Forms.Panel();
             this.LblVoortgang = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
@@ -113,6 +114,7 @@ namespace KaartfabriekUI.Forms
             this.TabPageInstellingen.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.panelVoortgang.SuspendLayout();
             this.SuspendLayout();
             // 
             // BlankFileLocation
@@ -437,6 +439,7 @@ namespace KaartfabriekUI.Forms
             this.label1.AutoSize = true;
             this.label1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label1.Location = new System.Drawing.Point(6, 19);
+            this.label1.Margin = new System.Windows.Forms.Padding(3);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(364, 47);
             this.label1.TabIndex = 0;
@@ -887,29 +890,43 @@ namespace KaartfabriekUI.Forms
             this.GdalFolder.TabIndex = 0;
             this.GdalFolder.TextboxText = "";
             // 
+            // panelVoortgang
+            // 
+            this.panelVoortgang.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelVoortgang.AutoScroll = true;
+            this.panelVoortgang.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelVoortgang.Controls.Add(this.LblVoortgang);
+            this.panelVoortgang.Location = new System.Drawing.Point(830, 75);
+            this.panelVoortgang.Name = "panelVoortgang";
+            this.panelVoortgang.Size = new System.Drawing.Size(374, 621);
+            this.panelVoortgang.TabIndex = 10;
+            // 
             // LblVoortgang
             // 
-            this.LblVoortgang.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.LblVoortgang.AutoEllipsis = true;
+            this.LblVoortgang.AutoSize = true;
             this.LblVoortgang.BackColor = System.Drawing.Color.Transparent;
-            this.LblVoortgang.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.LblVoortgang.Image = ((System.Drawing.Image)(resources.GetObject("LblVoortgang.Image")));
+            this.LblVoortgang.Image = global::KaartfabriekUI.Properties.Resources.logolevdw200_50_;
             this.LblVoortgang.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.LblVoortgang.Location = new System.Drawing.Point(830, 73);
+            this.LblVoortgang.Location = new System.Drawing.Point(0, 0);
+            this.LblVoortgang.Margin = new System.Windows.Forms.Padding(3);
+            this.LblVoortgang.MaximumSize = new System.Drawing.Size(350, 0);
+            this.LblVoortgang.MinimumSize = new System.Drawing.Size(350, 600);
             this.LblVoortgang.Name = "LblVoortgang";
-            this.LblVoortgang.Size = new System.Drawing.Size(374, 621);
-            this.LblVoortgang.TabIndex = 7;
+            this.LblVoortgang.Size = new System.Drawing.Size(350, 600);
+            this.LblVoortgang.TabIndex = 8;
             this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
+            this.LblVoortgang.DoubleClick += new System.EventHandler(this.LblVoortgang_DoubleClick);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1214, 703);
+            this.Controls.Add(this.panelVoortgang);
             this.Controls.Add(this.BtnNewProjectFile);
             this.Controls.Add(this.BtnOpenProjectFile);
-            this.Controls.Add(this.LblVoortgang);
             this.Controls.Add(this.tabControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(844, 742);
@@ -937,6 +954,8 @@ namespace KaartfabriekUI.Forms
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox1.ResumeLayout(false);
+            this.panelVoortgang.ResumeLayout(false);
+            this.panelVoortgang.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -966,7 +985,6 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.GroupBox GroupBoxNuclideGrids;
         private System.Windows.Forms.Button BtnMaakNuclideGrids;
         private System.Windows.Forms.TabPage TabPageUitvoer;
-        private System.Windows.Forms.Label LblVoortgang;
         private System.Windows.Forms.Button BtnReprojectVelddata;
         private System.Windows.Forms.Button btnReprojectMonsterdata;
         private System.Windows.Forms.Button BtnOpenProjectFile;
@@ -974,7 +992,6 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.TabPage TabPageInstellingen;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.DataGridView GridViewFormulas;
         private UserControls.TextSelectControl LevelFilesFolder;
         private UserControls.TextSelectControl GdalFolder;
         private System.Windows.Forms.Button BtnAddFormula;
@@ -1007,6 +1024,9 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.DataGridView GridViewFormulas;
+        private System.Windows.Forms.Panel panelVoortgang;
+        private System.Windows.Forms.Label LblVoortgang;
     }
 }
 

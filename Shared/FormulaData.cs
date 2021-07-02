@@ -12,9 +12,12 @@
         public string Maximum { get; set; }
         public string LevelFile { get; set; }
 
+        public int RowIndex;
+
         public FormulaData() { }
 
-        public FormulaData(string output, string formula, string gridA, string gridB, string gridC, string gridD, string minimum, string maximum, string levelFile)
+        public FormulaData(string output, string formula, string gridA, string gridB, string gridC, string gridD,
+            string minimum, string maximum, string levelFile, int rowIndex = -1 )
         {
             Output = output;
             Formula = formula;
@@ -25,13 +28,16 @@
             Minimum = minimum;
             Maximum = maximum;
             LevelFile = levelFile;
+            RowIndex = rowIndex;
         }
 
-        public object[] ToParams(bool IsCheckboxChecked)
+      
+
+        public object[] ToParams(bool isCheckboxChecked)
         {
             return new object[]
             {
-                IsCheckboxChecked, Output, Formula, GridA, GridB, GridC, GridD, Minimum, Maximum, LevelFile
+                isCheckboxChecked, Output, Formula, GridA, GridB, GridC, GridD, Minimum, Maximum, LevelFile
             };
         }
     }

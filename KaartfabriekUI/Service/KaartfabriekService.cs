@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using Shared;
@@ -117,7 +118,7 @@ namespace KaartfabriekUI.Service
             // TODO: Check inputs
 
             var surferService = new SurferService(SurferConstants.GetProjectionName(_projectFile.EpsgCode), workingFolder,
-                _addProgress);
+                _addProgress, false);
 
             var nuclideGridsFolder = Path.Combine(workingFolder, SurferConstants.NuclideGridsFolder);
             if (!Directory.Exists(nuclideGridsFolder)) Directory.CreateDirectory(nuclideGridsFolder);
@@ -288,25 +289,69 @@ namespace KaartfabriekUI.Service
         /// Calculate the new grids and add them as contour file to the template plot document
         /// </summary>
         /// <param name="selectedFormulas"></param>
-        public void CreateSoilMaps(List<FormulaData> selectedFormulas)
+        /// <param name="colorRow"></param>
+        public void CreateSoilMaps(List<FormulaData> selectedFormulas, Action<int, Color> colorRow)
         {
             _addProgress("Het maken van de bodembestanden is gestart.");
             var surferService = new SurferService(SurferConstants.GetProjectionName(_projectFile.EpsgCode),
-                _projectFile.WorkingFolder, _addProgress);
+                _projectFile.WorkingFolder, _addProgress, false);
 
-            foreach (var formula in selectedFormulas)
+            try
             {
-                try
+                surferService.ScreenUpdating = false;
+
+                // Check if template exists:
+                var templateLocation = Path.Combine(_projectFile.WorkingFolder,
+                    SurferConstants.BodemkaartenResultaatSurferFolder, SurferConstants.TemplateName);
+                if (!File.Exists(templateLocation))
+                    throw new FileNotFoundException($"Kan {SurferConstants.TemplateName} niet vinden.", templateLocation);
+
+                foreach (var formula in selectedFormulas)
                 {
-                    _addProgress(surferService.CalcGrid(formula)
-                        ? $"{formula.Output} is berekend."
-                        : $"Er ging iets niet goed bij het berekenen van {formula.Output}.");
+                    try
+                    {
+                        colorRow(formula.RowIndex, Color.Blue);
+                        if (!surferService.CalcGrid(formula))
+                        {
+                            _addProgress($"Er ging iets niet goed bij het berekenen van {formula.Output}.");
+                            continue;
+                        }
+
+                        _addProgress($"{formula.Output} is berekend.");
+                        // Open template:
+                        surferService.OpenSrf(templateLocation);
+                        surferService.SaveAsPlotDocument(Path.Combine(_projectFile.WorkingFolder,
+                            SurferConstants.BodemkaartenResultaatSurferFolder, $"{formula.Output}.srf"));
+                        // Change grid
+                        var statistics = surferService.ChangeGridSource(SurferConstants.TemplateMapName,
+                            Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
+                                $"{formula.Output}.grd"),
+                            Path.Combine(@"D:\dev\TopX\Loonstra\TSC Tools\Kaartfabriek\Steven", formula.LevelFile));
+
+                        // Change text:
+                        if (statistics is not null)
+                        {
+                            var mean = Math.Round(statistics.Mean, 1, MidpointRounding.AwayFromZero);
+                            surferService.ChangeText("Gemiddelde", $"Gemiddelde: {mean}");
+                        }
+
+                        surferService.SetSoilMapData(formula.Output);
+
+                        surferService.SavePlotDocument();
+                        colorRow(formula.RowIndex, Color.DarkGreen);
+                    }
+                    catch (Exception e)
+                    {
+                        _addProgress($"Er ging wat fout bij het maken van {formula.Output}. Error: {e.Message}");
+                        colorRow(formula.RowIndex, Color.DarkRed);
+                        // Swallow: throw;
+                    }
+
                 }
-                catch (Exception e)
-                {
-                    _addProgress($"Kan {formula.Output} niet berekenen. Error: {e.Message}");
-                    // Swallow: throw;
-                }
+            }
+            finally
+            {
+                surferService.ShowHideSurfer(true);
             }
         }
 
@@ -322,16 +367,14 @@ namespace KaartfabriekUI.Service
 
             try
             {
-                // Open template and save to working folder:
+                // Open template:
                 surferService.OpenSrf(surferTemplateLocation);
 
-                // TODO: Move to helper class:
-                var folder = Path.Combine(_projectFile.WorkingFolder,
-                    SurferConstants.BodemkaartenResultaatSurferFolder);
-                if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+                var folder = Helpers.CheckFolder(Path.Combine(_projectFile.WorkingFolder,
+                    SurferConstants.BodemkaartenResultaatSurferFolder));
 
                 // Copy base template to project:
-                surferService.SaveAsPlotDocument(Path.Combine(folder, "Template.srf"));
+                surferService.SaveAsPlotDocument(Path.Combine(folder, SurferConstants.TemplateName));
 
                 // Change Perceelnr:
                 surferService.ChangeText("Perceelnr", _projectFile.ParcelData.Number);
@@ -341,18 +384,18 @@ namespace KaartfabriekUI.Service
                     Environment.NewLine, pData.Customer, pData.Name, pData.Size);
                 surferService.ChangeText("Perceelgegevens", value);
 
-                const string mapName = "Template";
+
                 // Change grid
-                surferService.ChangeGridSource(mapName, _projectFile.NuclideGridLocations.Tc);
+                surferService.ChangeGridSource(SurferConstants.TemplateMapName, _projectFile.NuclideGridLocations.Tc);
 
                 // Add blank file
-                surferService.AddBlankFile(mapName, _projectFile.FieldBorderLocation);
+                surferService.AddBlankFile(SurferConstants.TemplateMapName, _projectFile.FieldBorderLocation);
 
                 // Add sample data:
-                surferService.AddSamplePoints(mapName, _projectFile.SampleDataFileLocationProjected);
+                surferService.AddSamplePoints(SurferConstants.TemplateMapName, _projectFile.SampleDataFileLocationProjected);
 
                 // Size frame to look good
-                surferService.SizeMapFrameForTemplate(mapName);
+                surferService.SizeMapFrameForTemplate(SurferConstants.TemplateMapName);
 
                 // Save changes:
                 surferService.SavePlotDocument();

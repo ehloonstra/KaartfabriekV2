@@ -94,7 +94,16 @@ namespace SurferTools
         /// <param name="url"></param>
         public static void OpenUrl(string url)
         {
-            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+            OpenFile(url);
+        }
+
+        /// <summary>
+        /// Open the file with the registered application
+        /// </summary>
+        /// <param name="fileLocation"></param>
+        public static void OpenFile(string fileLocation)
+        {
+            Process.Start(new ProcessStartInfo { FileName = fileLocation, UseShellExecute = true });
         }
 
         private static bool ProcessOgr2Ogr(string arguments)

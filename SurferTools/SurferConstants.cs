@@ -15,6 +15,8 @@ namespace SurferTools
         public static string BodemkaartenResultaatPowerPointFolder = Path.Combine(BodemkaartenResultaatFolder, "PowerPoint");
 
         public const string OutGridOptions = "UseDefaults=1, ForgetOptions=1, SaveRefInfoAsInternal=1, SaveRefInfoAsGSIREF2=1";
+        public const string TemplateName = "Template.srf";
+        public const string TemplateMapName = "Template";
 
         public static string GetProjectionName(string epsgCode)
         {

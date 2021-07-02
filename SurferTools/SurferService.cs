@@ -30,8 +30,18 @@ namespace SurferTools
             _epsgCode = epsgCode;
             _workingFolder = workingFolder;
             _addProgress = addProgress;
+
             GetSurferObject(addPlotDocument);
             _surferApp.DefaultFilePath = workingFolder;
+        }
+
+        /// <summary>
+        /// Screen updating
+        /// </summary>
+        public bool ScreenUpdating
+        {
+            get => _surferApp.ScreenUpdating;
+            set => _surferApp.ScreenUpdating = value;
         }
 
         private void GetSurferObject(bool addPlotDocument)
@@ -45,11 +55,11 @@ namespace SurferTools
             }
             else
             {
-                _surferApp = obj as Application;
-                if (_surferApp != null)
-                {
+                _surferApp = obj as IApplication5;
+                if (_surferApp == null) return;
+
+                if (addPlotDocument)
                     _activePlotDocument = _surferApp.ActiveDocument ?? AddPlotDocument();
-                }
             }
         }
 
@@ -170,7 +180,7 @@ namespace SurferTools
             _surferApp.ScreenUpdating = false;
             try
             {
-                return _surferApp.GridData6(DataFile: csvFileLocation, OutGrid: newGridFilename,
+                var retVal = _surferApp.GridData6(DataFile: csvFileLocation, OutGrid: newGridFilename,
                     SearchEnable: true, SearchNumSectors: searchNumSectors, SearchRad1: searchRadius,
                     SearchRad2: searchRadius,
                     xCol: colX, yCol: colY, zCol: colZ,
@@ -181,6 +191,11 @@ namespace SurferTools
                     xMin: limits.Xmin, yMin: limits.Ymin, xMax: limits.Xmax, yMax: limits.Ymax,
                     OutGridOptions: SurferConstants.OutGridOptions,
                     ShowReport: false);
+
+                if (!retVal) return false;
+                AddCoordinateSystemToGrid(newGridFilename);
+
+                return true;
             }
             catch (Exception e)
             {
@@ -228,12 +243,13 @@ namespace SurferTools
         /// <param name="showColorScale"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public IMapFrame AddContour(string gridFileLocation, string layerName, bool showColorScale)
+        public IMapFrame3 AddContour(string gridFileLocation, string layerName, bool showColorScale)
         {
             _surferApp.ScreenUpdating = false;
             try
             {
-                var mapFrame = _activePlotDocument.Shapes.AddContourMap(gridFileLocation);
+                if (_activePlotDocument.Shapes.AddContourMap(gridFileLocation) is not IMapFrame3 mapFrame)
+                    throw new Exception("Cannot add contourLayer");
 
                 // Get the added layer:
                 if (mapFrame.Overlays.Item(1) is not IContourLayer contourLayer)
@@ -291,13 +307,14 @@ namespace SurferTools
         /// <param name="xCol"></param>
         /// <param name="yCol"></param>
         /// <returns>Returns a MapFrame object.</returns>
-        public IMapFrame AddPostMap(string csvFileLocation, string layerName, int xCol = 1, int yCol = 2)
+        public IMapFrame3 AddPostMap(string csvFileLocation, string layerName, int xCol = 1, int yCol = 2)
         {
             _surferApp.ScreenUpdating = false;
 
             try
             {
-                var mapFrame = _activePlotDocument.Shapes.AddPostMap2(csvFileLocation, xCol, yCol);
+                if (_activePlotDocument.Shapes.AddPostMap2(csvFileLocation, xCol, yCol) is not IMapFrame3 mapFrame)
+                    throw new Exception("Cannot add postMapLayer");
 
                 // Get the added layer:
                 if (mapFrame.Overlays.Item(1) is not IPostLayer2 postMapLayer)
@@ -338,7 +355,7 @@ namespace SurferTools
         /// </summary>
         /// <param name="sfLocation">The location of the shapefile</param>
         /// <returns>The new map frame</returns>
-        public IMapFrame AddShapefile(string sfLocation)
+        public IMapFrame3 AddShapefile(string sfLocation)
         {
             _surferApp.ScreenUpdating = false;
 
@@ -347,7 +364,9 @@ namespace SurferTools
                 if (!File.Exists(sfLocation))
                     throw new FileNotFoundException("Could not find shapefile", sfLocation);
 
-                var mapFrame = _activePlotDocument.Shapes.AddBaseMap(sfLocation);
+                if (_activePlotDocument.Shapes.AddBaseMap(sfLocation) is not IMapFrame3 mapFrame)
+                    throw new Exception("Cannot add BaseMapLayer");
+
                 // Get the added layer:
                 if (mapFrame.Overlays.Item(1) is not IBaseLayer baseMapLayer)
                     throw new Exception("Cannot get BaseMapLayer");
@@ -377,13 +396,15 @@ namespace SurferTools
         /// </summary>
         /// <param name="imageLocation"></param>
         /// <returns></returns>
-        public IMapFrame AddGeoreferencedImage(string imageLocation)
+        public IMapFrame3 AddGeoreferencedImage(string imageLocation)
         {
             _surferApp.ScreenUpdating = false;
 
             try
             {
-                var mapFrame = _activePlotDocument.Shapes.AddBaseMap(imageLocation);
+                if (_activePlotDocument.Shapes.AddBaseMap(imageLocation) is not IMapFrame3 mapFrame)
+                    throw new Exception("Cannot add BaseMapLayer");
+
                 return mapFrame;
             }
             catch (Exception e)
@@ -402,7 +423,7 @@ namespace SurferTools
         /// </summary>
         /// <param name="mapFrames">The list of map frames</param>
         /// <returns>The new map frame</returns>
-        public IMapFrame MergeMapFrames(params IMapFrame[] mapFrames)
+        public IMapFrame MergeMapFrames(params IMapFrame3[] mapFrames)
         {
             _surferApp.ScreenUpdating = false;
             try
@@ -411,6 +432,7 @@ namespace SurferTools
                 foreach (var mapFrame in mapFrames)
                 {
                     mapFrame.Selected = true;
+                    mapFrame.CoordinateSystem = _epsgCode;
                 }
 
                 var newMapFrame = _activePlotDocument.Selection.OverlayMaps();
@@ -707,10 +729,30 @@ namespace SurferTools
 
             LimitGrid(outGrid, formula.Minimum, formula.Maximum);
 
-
-            // TODO: Add coordinate system
+            // Add coordinate system
+            AddCoordinateSystemToGrid(outGrid);
 
             return File.Exists(outGrid);
+        }
+
+        private void AddCoordinateSystemToGrid(string gridLocation)
+        {
+            if (!File.Exists(gridLocation)) return;
+
+            try
+            {
+                if (_surferApp.NewGrid() is not IGrid3 grid) return;
+
+                // Set coordinate system:
+                grid.LoadFile2(gridLocation);
+                grid.CoordinateSystem = _epsgCode;
+                grid.SaveFile2(gridLocation, Options: SurferConstants.OutGridOptions);
+                // TODO: Shouldn't close?
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in AddCoordinateSystemToGrid", e);
+            }
         }
 
         private void LimitGrid(string inGrid, string mimimumString, string maximumString)
@@ -813,9 +855,11 @@ namespace SurferTools
         /// </summary>
         /// <param name="mapName"></param>
         /// <param name="newGridLocation"></param>
+        /// <param name="lvlFile"></param>
+        /// <returns>The grid statistics</returns>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="Exception"></exception>
-        public void ChangeGridSource(string mapName, string newGridLocation)
+        public IGridStatistics ChangeGridSource(string mapName, string newGridLocation, string lvlFile = "")
         {
             if (!File.Exists(newGridLocation))
                 throw new FileNotFoundException("Cannot find new grid", newGridLocation);
@@ -823,11 +867,26 @@ namespace SurferTools
             if (_activePlotDocument.Shapes.Item(mapName) is not IMapFrame3 mapFrame)
                 throw new Exception("Could not find map with name " + mapName);
 
-            if (mapFrame.Overlays.Item(1) is not IContourLayer contourLayer)
+            if (mapFrame.Overlays.Item("Contours") is not IContourLayer contourLayer)
                 throw new Exception("Cannot get contourLayer");
 
-            contourLayer.GridFile = newGridLocation;
+            try
+            {
+                contourLayer.GridFile = newGridLocation;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in changing grid source. Possibly horizontal planar", e);
+            }
+
             contourLayer.CoordinateSystem = _epsgCode;
+
+            if (File.Exists(lvlFile))
+            {
+                contourLayer.Levels.LoadFile(lvlFile);
+            }
+
+            return (contourLayer.Grid as IGrid3)?.Statistics();
         }
 
         /// <summary>
@@ -907,7 +966,7 @@ namespace SurferTools
             if (groupDimensions.Shapes.Item("dimBottom") is not IShape dimBottom)
                 throw new Exception("Could not find dimBottom");
 
-            var ratio = MakeMapFrameFit(mapFrame, dimTop.Left, dimBottom.Top);
+            MakeMapFrameFit(mapFrame, dimTop.Left, dimBottom.Top);
 
             // Center map:
             mapFrame.Left += (dimTop.Left - mapFrame.Left - mapFrame.Width) / 2;
@@ -954,6 +1013,54 @@ namespace SurferTools
                 throw new Exception("Could not get Map Scale");
             mapScale.LabelFont.Size = 8;
 
+            // Remove Dimensions:
+            groupDimensions.Delete();
+        }
+
+        /// <summary>
+        /// Set the soil map data
+        /// </summary>
+        /// <param name="formulaOutput"></param>
+        /// <exception cref="Exception"></exception>
+        public void SetSoilMapData(string formulaOutput)
+        {
+            if (_activePlotDocument.Shapes is not IShapes7 shapes)
+                throw new Exception("Could not get shapes");
+
+            if (shapes.Item("Teksten") is not IComposite2 groupTeksten)
+                throw new Exception("Could not get group Teksten");
+
+            var soilMapName = formulaOutput;
+
+            try
+            {
+                // Throws an exception when not found:
+                if (groupTeksten.Shapes.Item(formulaOutput) is IComposite2 groupOutput)
+                {
+                    // Make group visible:
+                    groupOutput.Visible = true;
+
+                    // Get header from group
+                    const string label = "Header";
+                    if (groupOutput.Shapes.Item(label) is not IText header)
+                        throw new Exception("Could not find text with name " + label);
+                    header.Visible = false;
+                    // Use the text from the template:
+                    soilMapName = header.Text;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                // Swallow throw;
+            }
+
+            // Set type of map: Lutum, Zandfractie, etc:
+            const string label2 = "Perceelgegevens";
+            if (_activePlotDocument.Shapes.Item(label2) is not IText text)
+                throw new Exception("Could not find text with name " + label2);
+
+            text.Text = text.Text.Replace("Projectie: x", $"Projectie: {soilMapName}");
         }
     }
 }

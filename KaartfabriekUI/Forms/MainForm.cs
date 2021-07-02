@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -302,7 +303,7 @@ namespace KaartfabriekUI.Forms
         {
             if (clear) LblVoortgang.Text = string.Empty;
 
-            LblVoortgang.Text += text + Environment.NewLine;
+            LblVoortgang.Text += $@"{text}{Environment.NewLine}";
         }
 
         private void WorkingFolder_TextboxUpdated(object sender, EventArgs e)
@@ -371,18 +372,18 @@ namespace KaartfabriekUI.Forms
         {
             // Get value of first row:
             if (GridViewFormulas.Rows[0].Cells[0] is not DataGridViewCheckBoxCell cell) return;
-            
+
             GridViewFormulas.ClearSelection();
 
             var currentValue = Convert.ToBoolean(cell.Value);
-            
+
             // Loop:
             foreach (DataGridViewRow row in GridViewFormulas.Rows)
             {
                 row.Cells[0].Value = !currentValue;
             }
 
-            // TODO: The checkbox on first row is only changed after the user selects another row, not sure why this is happening.
+            GridViewFormulas.RefreshEdit();
         }
 
         private void GridViewFormulas_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -446,7 +447,8 @@ namespace KaartfabriekUI.Forms
                 row.Cells[6].Value.ToString(),
                 row.Cells[7].Value.ToString(),
                 row.Cells[8].Value.ToString(),
-                row.Cells[9].Value.ToString()
+                row.Cells[9].Value.ToString(),
+                row.Index
             );
         }
 
@@ -496,10 +498,10 @@ namespace KaartfabriekUI.Forms
         {
             // Get selected formulas:
             var selectedFormulas = (from DataGridViewRow row in GridViewFormulas.Rows
-                let cell = row.Cells[0] as DataGridViewCheckBoxCell
-                where cell?.Value != null
-                where Convert.ToBoolean(cell.Value)
-                select Row2Formula(row)).ToList();
+                                    let cell = row.Cells[0] as DataGridViewCheckBoxCell
+                                    where cell?.Value != null
+                                    where Convert.ToBoolean(cell.Value)
+                                    select Row2Formula(row)).ToList();
 
             if (!selectedFormulas.Any())
             {
@@ -510,8 +512,14 @@ namespace KaartfabriekUI.Forms
             }
 
             var service = new KaartfabriekService(_projectFile, AddProgress);
-            service.CreateSoilMaps(selectedFormulas);
-            AddProgress("De geselecteerde grid zijn berekend.");
+            GridViewFormulas.ClearSelection();
+            service.CreateSoilMaps(selectedFormulas, ColorRow);
+            AddProgress("De geselecteerde grids zijn berekend.");
+        }
+
+        private void ColorRow(int rowIndex, Color color)
+        {
+            GridViewFormulas.Rows[rowIndex].DefaultCellStyle.BackColor = color;
         }
 
         private void BtnTemplateCreate_Click(object sender, EventArgs e)
@@ -526,5 +534,15 @@ namespace KaartfabriekUI.Forms
             service.CreateTemplate(SurferTemplateLocation.TextboxText);
             AddProgress("De template is aangemaakt.");
         }
+
+        private void LblVoortgang_DoubleClick(object sender, EventArgs e)
+        {
+            // Create temp file and open it in Notepad:
+            var fileLocation = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetTempFileName(), ".txt"));
+            var header = $"Kaartfabriek logging.{Environment.NewLine}Datum: {DateTime.UtcNow:f}{Environment.NewLine}Werkfolder: {_projectFile.WorkingFolder}{Environment.NewLine}";
+            File.WriteAllText(fileLocation, $"{header}{Environment.NewLine}{LblVoortgang.Text}");
+            ProcessTools.OpenFile(fileLocation);
+        }
+
     }
 }

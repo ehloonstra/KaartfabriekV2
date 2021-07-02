@@ -107,6 +107,23 @@
               resource lookups using this strongly typed resource class.
             </summary>
         </member>
+        <member name="P:KaartfabriekUI.Properties.Resources.logolevdw200_50_">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="T:KaartfabriekUI.Service.Helpers">
+            <summary>
+            Static class with helper methods
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.Service.Helpers.CheckFolder(System.String)">
+            <summary>
+            Check if the folder exists, create it if not
+            </summary>
+            <param name="folder"></param>
+            <returns>The folder</returns>
+        </member>
         <member name="T:KaartfabriekUI.Service.KaartfabriekService">
             <summary>
             Service for the GUI
@@ -153,11 +170,12 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateSoilMaps(System.Collections.Generic.List{Shared.FormulaData})">
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateSoilMaps(System.Collections.Generic.List{Shared.FormulaData},System.Action{System.Int32,System.Drawing.Color})">
             <summary>
             Calculate the new grids and add them as contour file to the template plot document
             </summary>
             <param name="selectedFormulas"></param>
+            <param name="colorRow"></param>
         </member>
         <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateTemplate(System.String)">
             <summary>
