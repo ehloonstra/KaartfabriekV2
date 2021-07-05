@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 using Surfer;
 
 namespace SurferTools
@@ -93,6 +94,11 @@ namespace SurferTools
         public bool CalculateWaterretentie(string outGrid)
         {
             // OS, Lutum, Zandfactie, M50, Bulkdichtheid
+            return false;
+        }
+
+        public bool ShowMonsterpuntenMap(string outGrid)
+        {
             return false;
         }
 

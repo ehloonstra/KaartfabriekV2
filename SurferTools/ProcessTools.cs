@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using Shared;
 
 namespace SurferTools
 {
@@ -10,11 +11,34 @@ namespace SurferTools
     /// </summary>
     public class ProcessTools
     {
-        const string OgrLocation = @"D:\dev\MapWindow\MapWinGIS\git\support\GDAL_SDK\v142\bin\x64\ogr2ogr"; // TODO: Make flexible
-        const string GdalTranslateLocation = @"D:\dev\MapWindow\MapWinGIS\git\support\GDAL_SDK\v142\bin\x64\gdal_translate"; // TODO: Make flexible
+        private string _gdalFolderLocation;
 
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private string GetGdalTranslateLocation()
+        {
+            if (!string.IsNullOrEmpty(_gdalFolderLocation))
+                return Path.Combine(_gdalFolderLocation, "gdal_translate");
+            // Read from application settings:
+            var settings = ApplicationSettings.Load();
+            if (!Directory.Exists(settings.GdalLocation))
+                throw new DirectoryNotFoundException("Cannot find GDAL folder");
+            _gdalFolderLocation = settings.GdalLocation;
+            return Path.Combine(_gdalFolderLocation, "gdal_translate");
+        }
+
+        private string GetOgr2OgrLocation()
+        {
+            if (!string.IsNullOrEmpty(_gdalFolderLocation))
+                return Path.Combine(_gdalFolderLocation, "ogr2ogr");
+            // Read from application settings:
+            var settings = ApplicationSettings.Load();
+            if (!Directory.Exists(settings.GdalLocation))
+                throw new DirectoryNotFoundException("Cannot find GDAL folder");
+            _gdalFolderLocation = settings.GdalLocation;
+            return Path.Combine(_gdalFolderLocation, "ogr2ogr");
+        }
 
         /// <summary>
         /// Reproject a CSV file to a projected coordinate system
@@ -23,7 +47,7 @@ namespace SurferTools
         /// <param name="epsgCode">The EPSG-code to project to</param>
         /// <returns>The location of the new file</returns>
         /// <exception cref="NullReferenceException"></exception>
-        public static string ConvertLatLongToProjected(string fileName, string epsgCode)
+        public string ConvertLatLongToProjected(string fileName, string epsgCode)
         {
             var arguments = $@"-f CSV -lco GEOMETRY=AS_XY -lco SEPARATOR=SEMICOLON -lco STRING_QUOTING=IF_NEEDED -s_srs ""EPSG:4326"" -t_srs ""{epsgCode}"" -oo X_POSSIBLE_NAMES=lon -oo Y_POSSIBLE_NAMES=lat";
 
@@ -42,7 +66,7 @@ namespace SurferTools
         /// <param name="limits">The boundingbox</param>
         /// <param name="workingFolder">The working folder</param>
         /// <returns>The location of the new shapefile</returns>
-        public static string GetAanData(Limits limits, string workingFolder)
+        public string GetAanData(Limits limits, string workingFolder)
         {
             var arguments = $@"""WFS:https://geodata.nationaalgeoregister.nl/aan/wfs?service=WFS&request=GetFeature&version=2.0.0&typename=aan:aan&srsname=EPSG:28992&outputFormat=application/json&bbox={limits.Xmin},{limits.Ymin},{limits.Xmax},{limits.Ymax},EPSG:28992"" -f ""ESRI Shapefile"" -a_srs ""EPSG:28992""";
 
@@ -58,9 +82,9 @@ namespace SurferTools
             if (!ProcessOgr2Ogr($"\"{newName}\" {arguments}"))
                 throw new Exception("ProcessOgr2Ogr failed");
 
-            return newName;            
-        }        
-        
+            return newName;
+        }
+
         /// <summary>
         /// Get the luchtfoto as JPEG from PDOK
         /// </summary>
@@ -68,7 +92,7 @@ namespace SurferTools
         /// <param name="workingFolder"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static string GetLuchtfotoImage(Limits limits, string workingFolder)
+        public string GetLuchtfotoImage(Limits limits, string workingFolder)
         {
             var newName = Path.Combine(workingFolder, "Luchtfoto.jpg");
             if (File.Exists(newName))
@@ -85,7 +109,7 @@ namespace SurferTools
             if (!ProcessGdalTranslate($"{jpgSettings} {wmsSettings} \"{newName}\""))
                 throw new Exception("ProcessGdalTranslate failed");
 
-            return newName;            
+            return newName;
         }
 
         /// <summary>
@@ -106,14 +130,16 @@ namespace SurferTools
             Process.Start(new ProcessStartInfo { FileName = fileLocation, UseShellExecute = true });
         }
 
-        private static bool ProcessOgr2Ogr(string arguments)
+        private bool ProcessOgr2Ogr(string arguments)
         {
-            return StartProcess(OgrLocation, arguments);
+            var ogrLocation = GetOgr2OgrLocation();
+            return StartProcess(ogrLocation, arguments);
         }
 
-        private static bool ProcessGdalTranslate(string arguments)
+        private bool ProcessGdalTranslate(string arguments)
         {
-            return StartProcess(GdalTranslateLocation, arguments);
+            var gdalTranslateLocation = GetGdalTranslateLocation();
+            return StartProcess(gdalTranslateLocation, arguments);
         }
 
         private static bool StartProcess(string toolLocation, string arguments)

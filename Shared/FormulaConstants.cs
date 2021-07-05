@@ -1,6 +1,6 @@
 ﻿#pragma warning disable 1591
 
-namespace SurferTools
+namespace Shared
 {
     public static class FormulaConstants
     {
@@ -11,12 +11,12 @@ namespace SurferTools
         public const string BodemclassificatieNietEolisch = "Bodemclassificatie Niet-Eolisch";
         public const string BodemclassificatieEolisch = "Bodemclassificatie Eolisch";
         public const string Slemp = "Slemp";
+        public const string Monsterpunten = "Monsterpunten";
         
         public const string Os = "OS";
         public const string Lutum = "Lutum";
         public const string Zandfractie = "Zandfractie";
         public const string M50 = "M50";
-        
     }
 }
 

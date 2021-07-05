@@ -58,7 +58,7 @@ namespace SurferTools.Tests
             if (File.Exists(newGridFilename)) File.Delete(newGridFilename);
 
             // TODO: add limits:
-            var retVal = _surferService.InverseDistanceGridding(_csvFileLocation, newGridFilename, 1, 2, 16, null);
+            var retVal = _surferService.InverseDistanceGridding(_csvFileLocation, newGridFilename, 1, 2, 16, null, new GridSettings());
             retVal.ShouldBeTrue("Gridding was not successful");
             File.Exists(newGridFilename).ShouldBeTrue("New grid file doesn't exists");
 
@@ -205,7 +205,7 @@ namespace SurferTools.Tests
             project.WorkingFolder.ShouldBe(@"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp");
             //project.ColumnIndexes.K40.ShouldBe(16);
             project.NuclideGridLocations.Alt.ShouldBe(@"D:\dev\TopX\Loonstra\Testdata\Van Leeuwen Boomkamp\2021 017 Van Leeuwen Boomkamp\2 Data\02 Lange Stuk\nuclide grids\Alt.grd");
-            project.GridSettings.GridSpacing.ShouldBe(3.5f);
+            project.GridSettings.GridSpacing.ShouldBe("3.5");
 
             // Write project file:
             var fileName = Path.Combine(Path.GetTempPath(), "project.json");

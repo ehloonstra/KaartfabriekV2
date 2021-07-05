@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -17,11 +18,31 @@ namespace KaartfabriekUI.Forms
     {
 
         private ProjectFile _projectFile;
+        private readonly ApplicationSettings _applicationSettings;
 
         /// <inheritdoc />
         public MainForm()
         {
             InitializeComponent();
+            // Load ApplicationSettings"
+            _applicationSettings = ApplicationSettings.Load();
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            GdalFolder.TextboxText = _applicationSettings.GdalLocation;
+            LevelFilesFolder.TextboxText = _applicationSettings.LevelFilesFolder;
+            if (!Directory.Exists(_applicationSettings.GdalLocation) ||
+                !Directory.Exists(_applicationSettings.LevelFilesFolder))
+            {
+                // Activate settings tab:
+                tabControl1.SelectedTab = tabControl1.TabPages[nameof(TabPageInstellingen)];
+            }
+
+            if (File.Exists(_applicationSettings.TemplateLocationAkkerbouw))
+            {
+                SurferTemplateLocation.TextboxText = _applicationSettings.TemplateLocationAkkerbouw;
+            }
         }
 
         private void BtnReprojectVelddataClick(object sender, EventArgs e)
@@ -64,7 +85,7 @@ namespace KaartfabriekUI.Forms
                 var result = ofd.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    return ProcessTools.ConvertLatLongToProjected(ofd.FileName, _projectFile.EpsgCode);
+                    return new ProcessTools().ConvertLatLongToProjected(ofd.FileName, _projectFile.EpsgCode);
                 }
             }
 
@@ -145,9 +166,18 @@ namespace KaartfabriekUI.Forms
 
         private void BtnMaakNuclideGrids_Click(object sender, EventArgs e)
         {
+            // Save project file first to save potential grid settings changes:
+            _projectFile.Save();
+
             var service = new KaartfabriekService(_projectFile, AddProgress);
             AddProgress("De nuclide grids worden gemaakt.");
-            service.CreateNuclideGrids(WorkingFolder.TextboxText, VeldDataLocation.TextboxText, BlankFileLocation.TextboxText,
+            var bufferDistance = 10d;
+            if (double.TryParse(TxtBuffer.Text, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
+                out var result))
+            {
+                bufferDistance = result;
+            }
+            service.CreateNuclideGrids(WorkingFolder.TextboxText, VeldDataLocation.TextboxText, BlankFileLocation.TextboxText, bufferDistance,
                 CboXcoord.SelectedIndex, CboYcoord.SelectedIndex, CboAlt.SelectedIndex,
                 CboK40.SelectedIndex, CboU238.SelectedIndex, CboTh232.SelectedIndex,
                 CboCs137.SelectedIndex, CboTotalCount.SelectedIndex);
@@ -197,7 +227,7 @@ namespace KaartfabriekUI.Forms
                 if (File.Exists(_projectFile.FieldDataFileLocation))
                 {
                     // TODO: Use EPSG-code from GUI:
-                    var fileName = ProcessTools.ConvertLatLongToProjected(_projectFile.FieldDataFileLocation, _projectFile.EpsgCode);
+                    var fileName = new ProcessTools().ConvertLatLongToProjected(_projectFile.FieldDataFileLocation, _projectFile.EpsgCode);
                     if (File.Exists(fileName))
                     {
                         AddProgress("Velddata is geconverteerd naar RD");
@@ -216,7 +246,7 @@ namespace KaartfabriekUI.Forms
                 if (File.Exists(_projectFile.SampleDataFileLocation))
                 {
                     // TODO: Use EPSG-code from GUI:
-                    var fileName = ProcessTools.ConvertLatLongToProjected(_projectFile.SampleDataFileLocation, _projectFile.EpsgCode);
+                    var fileName = new ProcessTools().ConvertLatLongToProjected(_projectFile.SampleDataFileLocation, _projectFile.EpsgCode);
                     if (File.Exists(fileName))
                     {
                         AddProgress("Monsterdata is geconverteerd naar RD");
@@ -229,6 +259,8 @@ namespace KaartfabriekUI.Forms
             if (File.Exists(_projectFile.FieldBorderLocation))
                 BlankFileLocation.TextboxText = _projectFile.FieldBorderLocation;
 
+            TxtBuffer.Text = _projectFile.FieldBorderBufferSize ?? "10";
+
             var pData = _projectFile.ParcelData;
             if (pData is not null)
             {
@@ -239,6 +271,27 @@ namespace KaartfabriekUI.Forms
             }
 
             FillGridViewFormulas();
+
+            FillGridSettings();
+        }
+
+        private void FillGridSettings()
+        {
+            if (_projectFile.GridSettings is null)
+            {
+                _projectFile.GridSettings = new GridSettings();
+                _projectFile.Save();
+            }
+
+            var gridSettings = _projectFile.GridSettings;
+            TxtIdPower.Text = gridSettings.IdPower;
+            TxtIdSmoothing.Text = gridSettings.IdSmoothing;
+            TxtSearchNumSectors.Text = gridSettings.SearchNumSectors;
+            TxtLimits.Text = gridSettings.Limits;
+            TxtMaxData.Text = gridSettings.SearchMaxData;
+            TxtMinData.Text = gridSettings.SearchMinData;
+            TxtSearchRadius.Text = gridSettings.SearchRadius;
+            TxtGridSpacing.Text = gridSettings.GridSpacing;
         }
 
         private void FillGridViewFormulas()
@@ -253,9 +306,7 @@ namespace KaartfabriekUI.Forms
             }
             else
             {
-                // Get formulas from application setting:
-                var service = new KaartfabriekService(_projectFile, AddProgress);
-                formulas = service.GetDefaultFormulas();
+                formulas = FormulaData.GetDefaultFormulas();
                 // Save to project file:
                 _projectFile.FormulaData = formulas;
                 _projectFile.Save();
@@ -287,6 +338,9 @@ namespace KaartfabriekUI.Forms
             if (result != DialogResult.OK) return;
 
             _projectFile = new ProjectFile();
+            // TODO: Get default formulas from application settings
+            FillGridViewFormulas();
+
             _projectFile.SaveAs(sfd.FileName);
 
             // Enable next groupbox:
@@ -544,5 +598,147 @@ namespace KaartfabriekUI.Forms
             ProcessTools.OpenFile(fileLocation);
         }
 
+        private void GdalFolder_TextboxUpdated(object sender, EventArgs e)
+        {
+            if (!File.Exists(Path.Combine(GdalFolder.TextboxText, "gdal_translate.exe")))
+            {
+                MessageBox.Show(@"Kan gdal_translate niet vinden!");
+                return;
+            }
+            if (!File.Exists(Path.Combine(GdalFolder.TextboxText, "ogr2ogr.exe")))
+            {
+                MessageBox.Show(@"Kan ogr2ogr niet vinden!");
+                return;
+            }
+
+            _applicationSettings.GdalLocation = GdalFolder.TextboxText;
+        }
+
+        private void LevelFilesFolder_TextboxUpdated(object sender, EventArgs e)
+        {
+            if (!Directory.Exists(LevelFilesFolder.TextboxText))
+            {
+                MessageBox.Show(@"Kan de levels folder niet vinden");
+                return;
+            }
+
+            _applicationSettings.LevelFilesFolder = LevelFilesFolder.TextboxText;
+        }
+
+        private void SurferTemplateLocation_TextboxUpdated(object sender, EventArgs e)
+        {
+            if (File.Exists(SurferTemplateLocation.TextboxText))
+            {
+                _applicationSettings.TemplateLocationAkkerbouw = SurferTemplateLocation.TextboxText;
+            }
+        }
+
+        private void TxtSearchNumSectors_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(TxtSearchNumSectors.Text, out _))
+            {
+                _projectFile.GridSettings.SearchNumSectors = TxtSearchNumSectors.Text;
+            }
+            else
+            {
+                MessageBox.Show(@"Number of sectors to search is niet correct! Het moet een heel getal zijn tussen 1 en 32.");
+            }
+        }
+
+        private void TxtSearchRadius_TextChanged(object sender, EventArgs e)
+        {
+            if (float.TryParse(TxtSearchRadius.Text, out _))
+            {
+                _projectFile.GridSettings.SearchRadius = TxtSearchRadius.Text;
+            }
+            else
+            {
+                MessageBox.Show(@"Search radius is niet correct! Het moet een getal zijn.");
+            }
+        }
+
+        private void TxtIdPower_TextChanged(object sender, EventArgs e)
+        {
+            if (float.TryParse(TxtIdPower.Text, out _))
+            {
+                _projectFile.GridSettings.IdPower = TxtIdPower.Text;
+            }
+            else
+            {
+                MessageBox.Show(@"Inverse Distance Power is niet correct! Het moet een getal zijn.");
+            }
+        }
+
+        private void TxtIdSmoothing_TextChanged(object sender, EventArgs e)
+        {
+            if (float.TryParse(TxtIdSmoothing.Text, out _))
+            {
+                _projectFile.GridSettings.IdSmoothing = TxtIdSmoothing.Text;
+            }
+            else
+            {
+                MessageBox.Show(@"Inverse Distance Smoothing is niet correct! Het moet een getal zijn.");
+            }
+        }
+
+        private void TxtLimits_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(TxtLimits.Text, out _))
+            {
+                _projectFile.GridSettings.Limits = TxtLimits.Text;
+            }
+            else
+            {
+                MessageBox.Show(@"De Limits zijn niet correct! Het moet een heel getal zijn.");
+            }
+        }
+
+        private void TxtMaxData_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(TxtMaxData.Text, out _))
+            {
+                _projectFile.GridSettings.SearchMaxData = TxtMaxData.Text;
+            }
+            else
+            {
+                MessageBox.Show(@"Max data to use is niet correct! Het moet een heel getal zijn tussen 1 en 128.");
+            }
+        }
+
+        private void TxtMinData_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(TxtMinData.Text, out _))
+            {
+                _projectFile.GridSettings.SearchMinData = TxtMinData.Text;
+            }
+            else
+            {
+                MessageBox.Show(@"Min data to use is niet correct! Het moet een heel getal zijn tussen 1 en 128.");
+            }
+        }
+
+        private void TxtGridSpacing_TextChanged(object sender, EventArgs e)
+        {
+            if (float.TryParse(TxtGridSpacing.Text, out _))
+            {
+                _projectFile.GridSettings.GridSpacing = TxtGridSpacing.Text;
+            }
+            else
+            {
+                MessageBox.Show(@"De Grid Spacing is niet correct! Het moet een getal zijn.");
+            }
+        }
+
+        private void TxtBuffer_TextChanged(object sender, EventArgs e)
+        {
+            if (float.TryParse(TxtBuffer.Text, out _))
+            {
+                _projectFile.FieldBorderBufferSize = TxtBuffer.Text;
+            }
+            else
+            {
+                MessageBox.Show(@"De Buffer is niet correct! Het moet een getal zijn.");
+            }
+        }
     }
 }

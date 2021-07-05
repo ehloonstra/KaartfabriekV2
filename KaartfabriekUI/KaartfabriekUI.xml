@@ -148,13 +148,14 @@
             <param name="colK40"></param>
             <returns></returns>
         </member>
-        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateNuclideGrids(System.String,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateNuclideGrids(System.String,System.String,System.String,System.Double,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
             Create the nuclide grids and add them to the active map
             </summary>
             <param name="workingFolder"></param>
             <param name="veldDataLocation"></param>
             <param name="blankFileLocation"></param>
+            <param name="bufferDistance"></param>
             <param name="colX"></param>
             <param name="colY"></param>
             <param name="colAlt"></param>
@@ -163,12 +164,6 @@
             <param name="colTh232"></param>
             <param name="colCs137"></param>
             <param name="colTc"></param>
-        </member>
-        <member name="M:KaartfabriekUI.Service.KaartfabriekService.GetDefaultFormulas">
-            <summary>
-            Get the default formulas from the application settings
-            </summary>
-            <returns></returns>
         </member>
         <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateSoilMaps(System.Collections.Generic.List{Shared.FormulaData},System.Action{System.Int32,System.Drawing.Color})">
             <summary>

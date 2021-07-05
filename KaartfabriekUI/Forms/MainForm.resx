@@ -87,6 +87,14 @@
         v5p/QVX1BY6VvZ9IL+XJAAAAAElFTkSuQmCC
 </value>
   </data>
+  <data name="label13.ToolTip" xml:space="preserve">
+    <value>The Smooth factor parameter allows you to incorporate an "uncertainty" factor associated with your input data. 
+The larger the smoothing factor parameter, the less overwhelming influence any particular observation has in computing a neighboring grid node.</value>
+  </data>
+  <data name="label16.ToolTip" xml:space="preserve">
+    <value>The Min data in ALL sectors (set to NoData if fewer) value assures that the specified number of points are encountered when interpolating a grid node. 
+If the minimum number of points is not found, the NoData value is assigned at the grid node.</value>
+  </data>
   <metadata name="GridColEnable.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>

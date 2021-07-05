@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using Shared;
 using Surfer;
@@ -32,7 +33,17 @@ namespace SurferTools
             _addProgress = addProgress;
 
             GetSurferObject(addPlotDocument);
-            _surferApp.DefaultFilePath = workingFolder;
+            try
+            {
+                // Sometimes it fails
+                _surferApp.DefaultFilePath = workingFolder;
+            }
+            catch (Exception e)
+            {
+                _addProgress("Kan de default file path for surfer niet zetten.");
+                // swallow throw;
+            }
+
         }
 
         /// <summary>
@@ -156,37 +167,40 @@ namespace SurferTools
         /// <param name="colY"></param>
         /// <param name="colZ">The column index of the Z-value</param>
         /// <param name="limits">The limits</param>
+        /// <param name="projectFileGridSettings"></param>
+        /// <param name="gridSettings"></param>
         /// <returns>True on success, false otherwise</returns>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="Exception"></exception>
-        public bool InverseDistanceGridding(string csvFileLocation, string newGridFilename, int colX, int colY, int colZ, Limits limits)
+        public bool InverseDistanceGridding(string csvFileLocation, string newGridFilename, int colX, int colY,
+            int colZ, Limits limits, GridSettings gridSettings)
         {
             // D:\dev\TopX\Loonstra\Svn\Surfer\trunk\clsSurfer.cls r1159
 
-            // Fixed variables:
-            const int searchMinData = 8;
-            const int searchMaxData = 64;
-
-            // For now constants, should be flexible:
-            const int searchRadius = 30; // in meters
-            const int searchNumSectors = 1;
-            const int idPower = 2;
-            const int idSmoothing = 20;
-            const float gridSpacing = 3.5f; // in meters
-
             if (!File.Exists(csvFileLocation))
                 throw new FileNotFoundException("Griddata file not found", csvFileLocation);
+
+            // Fixed variables:
+            var searchMinData = Convert.ToInt32(gridSettings.SearchMinData);
+            var searchMaxData = Convert.ToInt32(gridSettings.SearchMaxData);
+
+            // For now constants, should be flexible:
+            var searchRadius = Convert.ToInt32(gridSettings.SearchRadius);
+            var searchNumSectors = Convert.ToInt32(gridSettings.SearchNumSectors);
+            var idPower = Convert.ToInt32(gridSettings.IdPower);
+            var idSmoothing = Convert.ToInt32(gridSettings.IdSmoothing);
+            var gridSpacing = Convert.ToDouble(gridSettings.GridSpacing, CultureInfo.InvariantCulture);
 
             _surferApp.ScreenUpdating = false;
             try
             {
                 var retVal = _surferApp.GridData6(DataFile: csvFileLocation, OutGrid: newGridFilename,
-                    SearchEnable: true, SearchNumSectors: searchNumSectors, SearchRad1: searchRadius,
-                    SearchRad2: searchRadius,
+                    SearchEnable: true, SearchNumSectors: gridSettings.SearchNumSectors, SearchRad1: gridSettings.SearchRadius,
+                    SearchRad2: gridSettings.SearchRadius,
                     xCol: colX, yCol: colY, zCol: colZ,
-                    Algorithm: SrfGridAlgorithm.srfInverseDistance, IDPower: idPower, IDSmoothing: idSmoothing,
-                    SearchMinData: searchMinData, SearchDataPerSect: searchMaxData / searchNumSectors,
-                    SearchMaxEmpty: Math.Max(1, searchNumSectors - 1), SearchMaxData: searchMaxData,
+                    Algorithm: SrfGridAlgorithm.srfInverseDistance, IDPower: gridSettings.IdPower, IDSmoothing: gridSettings.IdSmoothing,
+                    SearchMinData: gridSettings.SearchMinData, SearchDataPerSect: searchMaxData / searchNumSectors,
+                    SearchMaxEmpty: Math.Max(1, searchNumSectors - 1), SearchMaxData: gridSettings.SearchMaxData,
                     xSize: gridSpacing, ySize: gridSpacing,
                     xMin: limits.Xmin, yMin: limits.Ymin, xMax: limits.Xmax, yMax: limits.Ymax,
                     OutGridOptions: SurferConstants.OutGridOptions,
@@ -585,7 +599,7 @@ namespace SurferTools
         /// <param name="bufferDistance"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public string BufferPolygon(IMapFrame mapFrame, int bufferDistance)
+        public string BufferPolygon(IMapFrame mapFrame, double bufferDistance)
         {
             if (mapFrame.Overlays.Item(1) is not IVectorBaseLayer2 baseMapLayer)
                 throw new Exception("Cannot get IVectorBaseLayer2");
@@ -709,6 +723,8 @@ namespace SurferTools
                     return specialCalculations.CalculateWaterdoorlatendheid(outGrid);
                 case FormulaConstants.Waterretentie:
                     return specialCalculations.CalculateWaterretentie(outGrid);
+                case FormulaConstants.Monsterpunten:
+                    return specialCalculations.ShowMonsterpuntenMap(outGrid);
             }
 
             var gridMathInput = new List<IGridMathInput>();

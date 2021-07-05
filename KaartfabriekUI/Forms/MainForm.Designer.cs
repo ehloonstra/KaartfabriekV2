@@ -40,6 +40,15 @@ namespace KaartfabriekUI.Forms
             this.BtnReprojectVelddata = new System.Windows.Forms.Button();
             this.BtnOpenProjectFile = new System.Windows.Forms.Button();
             this.BtnNewProjectFile = new System.Windows.Forms.Button();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TabPageVoorbereiding = new System.Windows.Forms.TabPage();
             this.GroupBoxVoorbereiding = new System.Windows.Forms.GroupBox();
@@ -57,6 +66,15 @@ namespace KaartfabriekUI.Forms
             this.BtnLoadVelddataInSurfer = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.GroupBoxNuclideGrids = new System.Windows.Forms.GroupBox();
+            this.TxtBuffer = new System.Windows.Forms.TextBox();
+            this.TxtGridSpacing = new System.Windows.Forms.TextBox();
+            this.TxtMinData = new System.Windows.Forms.TextBox();
+            this.TxtMaxData = new System.Windows.Forms.TextBox();
+            this.TxtLimits = new System.Windows.Forms.TextBox();
+            this.TxtIdSmoothing = new System.Windows.Forms.TextBox();
+            this.TxtIdPower = new System.Windows.Forms.TextBox();
+            this.TxtSearchRadius = new System.Windows.Forms.TextBox();
+            this.TxtSearchNumSectors = new System.Windows.Forms.TextBox();
             this.BtnMaakNuclideGrids = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.BtnTemplateCreate = new System.Windows.Forms.Button();
@@ -88,7 +106,6 @@ namespace KaartfabriekUI.Forms
             this.BtnAddFormula = new System.Windows.Forms.Button();
             this.TabPageInstellingen = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
@@ -236,6 +253,100 @@ namespace KaartfabriekUI.Forms
             this.BtnNewProjectFile.UseVisualStyleBackColor = true;
             this.BtnNewProjectFile.Click += new System.EventHandler(this.BtnNewProjectFile_Click);
             // 
+            // label11
+            // 
+            this.label11.Location = new System.Drawing.Point(211, 51);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(111, 15);
+            this.label11.TabIndex = 3;
+            this.label11.Text = "Search radius (m):";
+            this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label11, "This provides the search ellipse radius");
+            // 
+            // label12
+            // 
+            this.label12.Location = new System.Drawing.Point(6, 22);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(155, 15);
+            this.label12.TabIndex = 5;
+            this.label12.Text = "Inverse distance power:";
+            this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label12, "This specifies the inverse distance to a power, power number. \r\nPowers should usu" +
+        "ally fall between 1 and 3.");
+            // 
+            // label13
+            // 
+            this.label13.Location = new System.Drawing.Point(6, 51);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(155, 15);
+            this.label13.TabIndex = 7;
+            this.label13.Text = "Inverse distance smoothing:";
+            this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label13, resources.GetString("label13.ToolTip"));
+            // 
+            // label14
+            // 
+            this.label14.Location = new System.Drawing.Point(30, 80);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(131, 15);
+            this.label14.TabIndex = 9;
+            this.label14.Text = "Limits (m):";
+            this.label14.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label14, "Hoeveel groter moet het grid worden.");
+            // 
+            // label15
+            // 
+            this.label15.Location = new System.Drawing.Point(211, 109);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(111, 15);
+            this.label15.TabIndex = 11;
+            this.label15.Text = "Max data to use:";
+            this.label15.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label15, "The Max data to use from ALL sectors value limits the total number of points used" +
+        " when interpolating a grid node.");
+            // 
+            // label16
+            // 
+            this.label16.Location = new System.Drawing.Point(211, 80);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(111, 15);
+            this.label16.TabIndex = 13;
+            this.label16.Text = "Min data to use:";
+            this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label16, resources.GetString("label16.ToolTip"));
+            // 
+            // label17
+            // 
+            this.label17.Location = new System.Drawing.Point(38, 109);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(123, 15);
+            this.label17.TabIndex = 15;
+            this.label17.Text = "Grid spacing (m):";
+            this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label17, "This specifies the spacing of the output grid.");
+            // 
+            // label6
+            // 
+            this.label6.Location = new System.Drawing.Point(211, 22);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(111, 15);
+            this.label6.TabIndex = 19;
+            this.label6.Text = "Number of Sectors:";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label6, "The Number of sectors to search option divides the search area into smaller secti" +
+        "ons to which you can apply the following three search rules. \r\nYou can specify u" +
+        "p to 32 search sectors.");
+            // 
+            // label18
+            // 
+            this.label18.Location = new System.Drawing.Point(382, 22);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(129, 15);
+            this.label18.TabIndex = 20;
+            this.label18.Text = "Buffer om perceel (m):";
+            this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label18, "Hoe groot moet de buffer zijn");
+            // 
             // tabControl1
             // 
             this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -248,7 +359,7 @@ namespace KaartfabriekUI.Forms
             this.tabControl1.Location = new System.Drawing.Point(12, 51);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(812, 645);
+            this.tabControl1.Size = new System.Drawing.Size(812, 756);
             this.tabControl1.TabIndex = 6;
             // 
             // TabPageVoorbereiding
@@ -260,7 +371,7 @@ namespace KaartfabriekUI.Forms
             this.TabPageVoorbereiding.Location = new System.Drawing.Point(4, 24);
             this.TabPageVoorbereiding.Name = "TabPageVoorbereiding";
             this.TabPageVoorbereiding.Padding = new System.Windows.Forms.Padding(3);
-            this.TabPageVoorbereiding.Size = new System.Drawing.Size(804, 617);
+            this.TabPageVoorbereiding.Size = new System.Drawing.Size(804, 728);
             this.TabPageVoorbereiding.TabIndex = 0;
             this.TabPageVoorbereiding.Text = "Voorbereiding";
             this.TabPageVoorbereiding.UseVisualStyleBackColor = true;
@@ -451,20 +562,119 @@ namespace KaartfabriekUI.Forms
             // 
             this.GroupBoxNuclideGrids.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.GroupBoxNuclideGrids.Controls.Add(this.label18);
+            this.GroupBoxNuclideGrids.Controls.Add(this.label6);
+            this.GroupBoxNuclideGrids.Controls.Add(this.TxtBuffer);
+            this.GroupBoxNuclideGrids.Controls.Add(this.TxtGridSpacing);
+            this.GroupBoxNuclideGrids.Controls.Add(this.label17);
+            this.GroupBoxNuclideGrids.Controls.Add(this.TxtMinData);
+            this.GroupBoxNuclideGrids.Controls.Add(this.label16);
+            this.GroupBoxNuclideGrids.Controls.Add(this.TxtMaxData);
+            this.GroupBoxNuclideGrids.Controls.Add(this.label15);
+            this.GroupBoxNuclideGrids.Controls.Add(this.TxtLimits);
+            this.GroupBoxNuclideGrids.Controls.Add(this.label14);
+            this.GroupBoxNuclideGrids.Controls.Add(this.TxtIdSmoothing);
+            this.GroupBoxNuclideGrids.Controls.Add(this.label13);
+            this.GroupBoxNuclideGrids.Controls.Add(this.TxtIdPower);
+            this.GroupBoxNuclideGrids.Controls.Add(this.label12);
+            this.GroupBoxNuclideGrids.Controls.Add(this.TxtSearchRadius);
+            this.GroupBoxNuclideGrids.Controls.Add(this.label11);
+            this.GroupBoxNuclideGrids.Controls.Add(this.TxtSearchNumSectors);
             this.GroupBoxNuclideGrids.Controls.Add(this.BtnMaakNuclideGrids);
             this.GroupBoxNuclideGrids.Enabled = false;
             this.GroupBoxNuclideGrids.Location = new System.Drawing.Point(5, 542);
             this.GroupBoxNuclideGrids.Name = "GroupBoxNuclideGrids";
-            this.GroupBoxNuclideGrids.Size = new System.Drawing.Size(793, 69);
+            this.GroupBoxNuclideGrids.Size = new System.Drawing.Size(793, 180);
             this.GroupBoxNuclideGrids.TabIndex = 5;
             this.GroupBoxNuclideGrids.TabStop = false;
             this.GroupBoxNuclideGrids.Text = "4. Maak nuclide grids";
             // 
+            // TxtBuffer
+            // 
+            this.TxtBuffer.Location = new System.Drawing.Point(517, 19);
+            this.TxtBuffer.Name = "TxtBuffer";
+            this.TxtBuffer.Size = new System.Drawing.Size(37, 23);
+            this.TxtBuffer.TabIndex = 18;
+            this.TxtBuffer.Text = "10";
+            this.TxtBuffer.TextChanged += new System.EventHandler(this.TxtBuffer_TextChanged);
+            // 
+            // TxtGridSpacing
+            // 
+            this.TxtGridSpacing.Location = new System.Drawing.Point(168, 106);
+            this.TxtGridSpacing.Name = "TxtGridSpacing";
+            this.TxtGridSpacing.Size = new System.Drawing.Size(37, 23);
+            this.TxtGridSpacing.TabIndex = 16;
+            this.TxtGridSpacing.Text = "8";
+            this.TxtGridSpacing.TextChanged += new System.EventHandler(this.TxtGridSpacing_TextChanged);
+            // 
+            // TxtMinData
+            // 
+            this.TxtMinData.Location = new System.Drawing.Point(328, 77);
+            this.TxtMinData.Name = "TxtMinData";
+            this.TxtMinData.Size = new System.Drawing.Size(37, 23);
+            this.TxtMinData.TabIndex = 14;
+            this.TxtMinData.Text = "8";
+            this.TxtMinData.TextChanged += new System.EventHandler(this.TxtMinData_TextChanged);
+            // 
+            // TxtMaxData
+            // 
+            this.TxtMaxData.Location = new System.Drawing.Point(328, 106);
+            this.TxtMaxData.Name = "TxtMaxData";
+            this.TxtMaxData.Size = new System.Drawing.Size(37, 23);
+            this.TxtMaxData.TabIndex = 12;
+            this.TxtMaxData.Text = "64";
+            this.TxtMaxData.TextChanged += new System.EventHandler(this.TxtMaxData_TextChanged);
+            // 
+            // TxtLimits
+            // 
+            this.TxtLimits.Location = new System.Drawing.Point(168, 77);
+            this.TxtLimits.Name = "TxtLimits";
+            this.TxtLimits.Size = new System.Drawing.Size(37, 23);
+            this.TxtLimits.TabIndex = 10;
+            this.TxtLimits.Text = "20";
+            this.TxtLimits.TextChanged += new System.EventHandler(this.TxtLimits_TextChanged);
+            // 
+            // TxtIdSmoothing
+            // 
+            this.TxtIdSmoothing.Location = new System.Drawing.Point(168, 48);
+            this.TxtIdSmoothing.Name = "TxtIdSmoothing";
+            this.TxtIdSmoothing.Size = new System.Drawing.Size(37, 23);
+            this.TxtIdSmoothing.TabIndex = 8;
+            this.TxtIdSmoothing.Text = "20";
+            this.TxtIdSmoothing.TextChanged += new System.EventHandler(this.TxtIdSmoothing_TextChanged);
+            // 
+            // TxtIdPower
+            // 
+            this.TxtIdPower.Location = new System.Drawing.Point(168, 19);
+            this.TxtIdPower.Name = "TxtIdPower";
+            this.TxtIdPower.Size = new System.Drawing.Size(37, 23);
+            this.TxtIdPower.TabIndex = 6;
+            this.TxtIdPower.Text = "2";
+            this.TxtIdPower.TextChanged += new System.EventHandler(this.TxtIdPower_TextChanged);
+            // 
+            // TxtSearchRadius
+            // 
+            this.TxtSearchRadius.Location = new System.Drawing.Point(328, 48);
+            this.TxtSearchRadius.Name = "TxtSearchRadius";
+            this.TxtSearchRadius.Size = new System.Drawing.Size(37, 23);
+            this.TxtSearchRadius.TabIndex = 4;
+            this.TxtSearchRadius.Text = "30";
+            this.TxtSearchRadius.TextChanged += new System.EventHandler(this.TxtSearchRadius_TextChanged);
+            // 
+            // TxtSearchNumSectors
+            // 
+            this.TxtSearchNumSectors.Location = new System.Drawing.Point(328, 19);
+            this.TxtSearchNumSectors.Name = "TxtSearchNumSectors";
+            this.TxtSearchNumSectors.Size = new System.Drawing.Size(37, 23);
+            this.TxtSearchNumSectors.TabIndex = 2;
+            this.TxtSearchNumSectors.Text = "1";
+            this.TxtSearchNumSectors.TextChanged += new System.EventHandler(this.TxtSearchNumSectors_TextChanged);
+            // 
             // BtnMaakNuclideGrids
             // 
-            this.BtnMaakNuclideGrids.Location = new System.Drawing.Point(7, 22);
+            this.BtnMaakNuclideGrids.Location = new System.Drawing.Point(7, 141);
             this.BtnMaakNuclideGrids.Name = "BtnMaakNuclideGrids";
-            this.BtnMaakNuclideGrids.Size = new System.Drawing.Size(390, 33);
+            this.BtnMaakNuclideGrids.Size = new System.Drawing.Size(547, 33);
             this.BtnMaakNuclideGrids.TabIndex = 0;
             this.BtnMaakNuclideGrids.Text = "Maak nuclide grids";
             this.BtnMaakNuclideGrids.UseVisualStyleBackColor = true;
@@ -477,7 +687,7 @@ namespace KaartfabriekUI.Forms
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(804, 617);
+            this.tabPage1.Size = new System.Drawing.Size(804, 728);
             this.tabPage1.TabIndex = 3;
             this.tabPage1.Text = "Template";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -598,7 +808,8 @@ namespace KaartfabriekUI.Forms
             this.SurferTemplateLocation.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.File;
             this.SurferTemplateLocation.Size = new System.Drawing.Size(770, 44);
             this.SurferTemplateLocation.TabIndex = 4;
-            this.SurferTemplateLocation.TextboxText = "D:\\dev\\TopX\\Loonstra\\Projecten\\Basis template.srf";
+            this.SurferTemplateLocation.TextboxText = "";
+            this.SurferTemplateLocation.TextboxUpdated += new System.EventHandler(this.SurferTemplateLocation_TextboxUpdated);
             // 
             // TabPageUitvoer
             // 
@@ -606,7 +817,7 @@ namespace KaartfabriekUI.Forms
             this.TabPageUitvoer.Location = new System.Drawing.Point(4, 24);
             this.TabPageUitvoer.Name = "TabPageUitvoer";
             this.TabPageUitvoer.Padding = new System.Windows.Forms.Padding(3);
-            this.TabPageUitvoer.Size = new System.Drawing.Size(804, 617);
+            this.TabPageUitvoer.Size = new System.Drawing.Size(804, 728);
             this.TabPageUitvoer.TabIndex = 1;
             this.TabPageUitvoer.Text = "Uitvoer";
             this.TabPageUitvoer.UseVisualStyleBackColor = true;
@@ -629,8 +840,8 @@ namespace KaartfabriekUI.Forms
             this.splitContainer1.Panel2.Controls.Add(this.BtnCreateSoilMaps);
             this.splitContainer1.Panel2.Controls.Add(this.BtnAddFormula);
             this.splitContainer1.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
-            this.splitContainer1.Size = new System.Drawing.Size(798, 611);
-            this.splitContainer1.SplitterDistance = 555;
+            this.splitContainer1.Size = new System.Drawing.Size(798, 722);
+            this.splitContainer1.SplitterDistance = 666;
             this.splitContainer1.TabIndex = 1;
             // 
             // GridViewFormulas
@@ -662,7 +873,7 @@ namespace KaartfabriekUI.Forms
             this.GridViewFormulas.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.GridViewFormulas.RowTemplate.Height = 25;
             this.GridViewFormulas.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.GridViewFormulas.Size = new System.Drawing.Size(798, 555);
+            this.GridViewFormulas.Size = new System.Drawing.Size(798, 666);
             this.GridViewFormulas.TabIndex = 1;
             this.GridViewFormulas.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.GridViewFormulas_CellMouseClick);
             this.GridViewFormulas.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.GridViewFormulas_CellMouseDoubleClick);
@@ -785,7 +996,7 @@ namespace KaartfabriekUI.Forms
             this.TabPageInstellingen.Controls.Add(this.groupBox1);
             this.TabPageInstellingen.Location = new System.Drawing.Point(4, 24);
             this.TabPageInstellingen.Name = "TabPageInstellingen";
-            this.TabPageInstellingen.Size = new System.Drawing.Size(804, 617);
+            this.TabPageInstellingen.Size = new System.Drawing.Size(804, 728);
             this.TabPageInstellingen.TabIndex = 2;
             this.TabPageInstellingen.Text = "Instellingen";
             this.TabPageInstellingen.UseVisualStyleBackColor = true;
@@ -794,33 +1005,21 @@ namespace KaartfabriekUI.Forms
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox3.Controls.Add(this.label6);
             this.groupBox3.Controls.Add(this.label7);
             this.groupBox3.Controls.Add(this.label8);
             this.groupBox3.Controls.Add(this.label9);
-            this.groupBox3.Location = new System.Drawing.Point(13, 212);
+            this.groupBox3.Location = new System.Drawing.Point(13, 148);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(782, 268);
             this.groupBox3.TabIndex = 3;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Project instellingen";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label6.Location = new System.Drawing.Point(16, 151);
-            this.label6.Name = "label6";
-            this.label6.Padding = new System.Windows.Forms.Padding(5);
-            this.label6.Size = new System.Drawing.Size(153, 27);
-            this.label6.TabIndex = 3;
-            this.label6.Text = "NAW + Perceelsgegevens";
-            // 
             // label7
             // 
             this.label7.AutoSize = true;
             this.label7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label7.Location = new System.Drawing.Point(16, 110);
+            this.label7.Location = new System.Drawing.Point(153, 227);
             this.label7.Name = "label7";
             this.label7.Padding = new System.Windows.Forms.Padding(5);
             this.label7.Size = new System.Drawing.Size(139, 27);
@@ -831,7 +1030,7 @@ namespace KaartfabriekUI.Forms
             // 
             this.label8.AutoSize = true;
             this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label8.Location = new System.Drawing.Point(16, 70);
+            this.label8.Location = new System.Drawing.Point(6, 227);
             this.label8.Name = "label8";
             this.label8.Padding = new System.Windows.Forms.Padding(5);
             this.label8.Size = new System.Drawing.Size(114, 27);
@@ -842,7 +1041,7 @@ namespace KaartfabriekUI.Forms
             // 
             this.label9.AutoSize = true;
             this.label9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label9.Location = new System.Drawing.Point(16, 34);
+            this.label9.Location = new System.Drawing.Point(6, 164);
             this.label9.Name = "label9";
             this.label9.Padding = new System.Windows.Forms.Padding(5);
             this.label9.Size = new System.Drawing.Size(122, 27);
@@ -857,7 +1056,7 @@ namespace KaartfabriekUI.Forms
             this.groupBox1.Controls.Add(this.GdalFolder);
             this.groupBox1.Location = new System.Drawing.Point(13, 14);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(782, 192);
+            this.groupBox1.Size = new System.Drawing.Size(782, 128);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Algemene instellingen";
@@ -875,6 +1074,7 @@ namespace KaartfabriekUI.Forms
             this.LevelFilesFolder.Size = new System.Drawing.Size(770, 44);
             this.LevelFilesFolder.TabIndex = 1;
             this.LevelFilesFolder.TextboxText = "";
+            this.LevelFilesFolder.TextboxUpdated += new System.EventHandler(this.LevelFilesFolder_TextboxUpdated);
             // 
             // GdalFolder
             // 
@@ -889,6 +1089,7 @@ namespace KaartfabriekUI.Forms
             this.GdalFolder.Size = new System.Drawing.Size(770, 44);
             this.GdalFolder.TabIndex = 0;
             this.GdalFolder.TextboxText = "";
+            this.GdalFolder.TextboxUpdated += new System.EventHandler(this.GdalFolder_TextboxUpdated);
             // 
             // panelVoortgang
             // 
@@ -899,7 +1100,7 @@ namespace KaartfabriekUI.Forms
             this.panelVoortgang.Controls.Add(this.LblVoortgang);
             this.panelVoortgang.Location = new System.Drawing.Point(830, 75);
             this.panelVoortgang.Name = "panelVoortgang";
-            this.panelVoortgang.Size = new System.Drawing.Size(374, 621);
+            this.panelVoortgang.Size = new System.Drawing.Size(374, 732);
             this.panelVoortgang.TabIndex = 10;
             // 
             // LblVoortgang
@@ -912,9 +1113,9 @@ namespace KaartfabriekUI.Forms
             this.LblVoortgang.Location = new System.Drawing.Point(0, 0);
             this.LblVoortgang.Margin = new System.Windows.Forms.Padding(3);
             this.LblVoortgang.MaximumSize = new System.Drawing.Size(350, 0);
-            this.LblVoortgang.MinimumSize = new System.Drawing.Size(350, 600);
+            this.LblVoortgang.MinimumSize = new System.Drawing.Size(360, 725);
             this.LblVoortgang.Name = "LblVoortgang";
-            this.LblVoortgang.Size = new System.Drawing.Size(350, 600);
+            this.LblVoortgang.Size = new System.Drawing.Size(360, 725);
             this.LblVoortgang.TabIndex = 8;
             this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
             this.LblVoortgang.DoubleClick += new System.EventHandler(this.LblVoortgang_DoubleClick);
@@ -923,7 +1124,7 @@ namespace KaartfabriekUI.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1214, 703);
+            this.ClientSize = new System.Drawing.Size(1214, 814);
             this.Controls.Add(this.panelVoortgang);
             this.Controls.Add(this.BtnNewProjectFile);
             this.Controls.Add(this.BtnOpenProjectFile);
@@ -932,6 +1133,7 @@ namespace KaartfabriekUI.Forms
             this.MinimumSize = new System.Drawing.Size(844, 742);
             this.Name = "MainForm";
             this.Text = "Kaartfabriek v2";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.TabPageVoorbereiding.ResumeLayout(false);
             this.GroupBoxVoorbereiding.ResumeLayout(false);
@@ -940,6 +1142,7 @@ namespace KaartfabriekUI.Forms
             this.GroupBoxPerceelsgrens.ResumeLayout(false);
             this.GroupBoxPerceelsgrens.PerformLayout();
             this.GroupBoxNuclideGrids.ResumeLayout(false);
+            this.GroupBoxNuclideGrids.PerformLayout();
             this.tabPage1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -1020,13 +1223,30 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.Label label2;
         private UserControls.TextSelectControl SurferTemplateLocation;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.DataGridView GridViewFormulas;
         private System.Windows.Forms.Panel panelVoortgang;
         private System.Windows.Forms.Label LblVoortgang;
+        private System.Windows.Forms.TextBox TxtSearchNumSectors;
+        private System.Windows.Forms.TextBox TxtSearchRadius;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox TxtIdPower;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox TxtIdSmoothing;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox TxtLimits;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox TxtMaxData;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TextBox TxtMinData;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.TextBox TxtGridSpacing;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.TextBox TxtBuffer;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label6;
     }
 }
 

@@ -23,6 +23,7 @@ namespace Shared
         private string _fieldBorderLocationBuffered = string.Empty;
         private string _epsgCode;
         private string _gridNames;
+        private string _fieldBorderBufferSize;
 
         public string WorkingFolder
         {
@@ -62,8 +63,14 @@ namespace Shared
 
         public string FieldBorderLocationBuffered
         {
-            get => _fieldBorderLocationBuffered;
+            get => _fieldBorderLocationBuffered ?? "10";
             set { _fieldBorderLocationBuffered = value; NotifyPropertyChanged(); }
+        }
+
+        public string FieldBorderBufferSize
+        {
+            get => _fieldBorderBufferSize;
+            set { _fieldBorderBufferSize = value; NotifyPropertyChanged(); }
         }
 
         public string EpsgCode
@@ -80,8 +87,8 @@ namespace Shared
 
         // public ColumnIndexes ColumnIndexes { get; set; }
         public NuclideGridLocations NuclideGridLocations { get; set; } = new();
-        public GridSettings GridSettings { get; set; }
-        public ParcelData ParcelData  { get; set; } = new();
+        public GridSettings GridSettings { get; set; } = new();
+        public ParcelData ParcelData { get; set; } = new();
         public List<FormulaData> FormulaData { get; set; } = new();
 
         public static ProjectFile Load(string fileName)
@@ -95,7 +102,6 @@ namespace Shared
 
             retValue.ProjectFileLocation = fileName;
             return retValue;
-
         }
 
         public bool SaveAs(string fileName)
@@ -127,3 +133,5 @@ namespace Shared
         }
     }
 }
+
+#pragma warning restore 1591

@@ -59,7 +59,7 @@ namespace KaartfabriekUI.Service
                 mapFrameVelddata.yMax);
 
             // Get AAN-data:
-            var aanShapefileLocation = ProcessTools.GetAanData(Limits.RoundUp(velddataLimits, 1), workingFolder);
+            var aanShapefileLocation = new ProcessTools().GetAanData(Limits.RoundUp(velddataLimits, 1), workingFolder);
             if (!File.Exists(aanShapefileLocation))
             {
                 throw new Exception("Kon de AAN-data niet ophalen.");
@@ -73,7 +73,7 @@ namespace KaartfabriekUI.Service
             var luchtfotoLimits =
                 Limits.RoundUp(new Limits(mapFrameAan.xMin, mapFrameAan.xMax, mapFrameAan.yMin, mapFrameAan.yMax), 50);
             // Get luchtfoto:
-            var luchtfotoLocation = ProcessTools.GetLuchtfotoImage(luchtfotoLimits, workingFolder);
+            var luchtfotoLocation = new ProcessTools().GetLuchtfotoImage(luchtfotoLimits, workingFolder);
             if (!File.Exists(aanShapefileLocation))
             {
                 throw new Exception("Kon de Luchtfoto-data niet ophalen.");
@@ -104,6 +104,7 @@ namespace KaartfabriekUI.Service
         /// <param name="workingFolder"></param>
         /// <param name="veldDataLocation"></param>
         /// <param name="blankFileLocation"></param>
+        /// <param name="bufferDistance"></param>
         /// <param name="colX"></param>
         /// <param name="colY"></param>
         /// <param name="colAlt"></param>
@@ -112,7 +113,7 @@ namespace KaartfabriekUI.Service
         /// <param name="colTh232"></param>
         /// <param name="colCs137"></param>
         /// <param name="colTc"></param>
-        public void CreateNuclideGrids(string workingFolder, string veldDataLocation, string blankFileLocation,
+        public void CreateNuclideGrids(string workingFolder, string veldDataLocation, string blankFileLocation, double bufferDistance,
             int colX, int colY, int colAlt, int colK40, int colU238, int colTh232, int colCs137, int colTc)
         {
             // TODO: Check inputs
@@ -137,7 +138,6 @@ namespace KaartfabriekUI.Service
                 if (!File.Exists(bufferedBlankFileLocation))
                 {
                     // Buffer blank file:
-                    const int bufferDistance = 10;
                     bufferedBlankFileLocation = surferService.BufferPolygon(mapBlankFileTmp, bufferDistance);
                     if (!File.Exists(bufferedBlankFileLocation))
                     {
@@ -204,10 +204,11 @@ namespace KaartfabriekUI.Service
                 var outGridLocation = Path.Combine(nuclideGridsFolder, fileName);
 
                 // Grid velddata:
+                var limits = Convert.ToInt32(_projectFile.GridSettings.Limits);
                 surferService.InverseDistanceGridding(veldDataLocation, tmpGridLocation, colX, colY, colZ,
                     Limits.RoundUp(
                         new Limits(mapBufferedBlankFile.xMin, mapBufferedBlankFile.xMax, mapBufferedBlankFile.yMin,
-                            mapBufferedBlankFile.yMax), 50));
+                            mapBufferedBlankFile.yMax), limits), _projectFile.GridSettings);
                 _addProgress($"Het grid van {layerName} is berekend.");
                 // Blank using buffered file:
                 if (!surferService.GridAssignNoData(tmpGridLocation, bufferedBlankFileLocation, outGridLocation))
@@ -243,47 +244,6 @@ namespace KaartfabriekUI.Service
             }
         }
 
-        /// <summary>
-        /// Get the default formulas from the application settings
-        /// </summary>
-        /// <returns></returns>
-        public List<FormulaData> GetDefaultFormulas()
-        {
-            // If application settings has no formulas, use these hard-coded ones:
-            var retVal = new List<FormulaData>
-        {
-            new(FormulaConstants.Lutum, "0.7*Th232-4", "Th232", "", "", "", "", "", "Lutum 0-10.lvl"),
-            new(FormulaConstants.Zandfractie, "-0.8*(Th232 + U238) + 103", "Th232", "U238", "", "", "", "", "Zandfractie 75-100.lvl"),
-            new("Leem", "100-Zandfractie", "Zandfractie", "", "", "", "", "", "Leem 0 30 Oud.lvl"),
-            new("M0", "-0.5*K40+250", "K40", "", "", "", "", "", "M0 0-130.lvl"),
-            new(FormulaConstants.M50, "-0.36709706918763*K40+235", "K40", "", "", "", "", "", "M50 150 250.lvl"),
-            new(FormulaConstants.Os, "5.23297521874561 -0.0235 * Cs137 -0.012 * K40", "Cs137", "K40", "", "", "", "", "OS 0-5.lvl"),
-            new("pH", "1.21876485586487 + 0.0299 * Th232 + 0.4333 * U238", "Th232", "U238", "", "", "5.5", "6.9",
-                "Ph 4-7 0.25.lvl"),
-            new("K-getal", "191.122454275834 -0.7771 * TC", "TC", "", "", "", "15", "29", "K-getal.lvl"),
-            new("PW", "52.3556817192375 -7.7197 * Th232 + 7.3653 * U238", "Th232", "U238", "", "", "40", "75",
-                "Pw.lvl"),
-            new("Mg", "77.4222684918912 + 1.8301 * Th232 -2.8296 * U238", "Th232", "U238", "", "", "57", "71",
-                "Mg 0-125 25.lvl"),
-            new("Stikstof", "4067.52188017669 -13.2469 * TC+60", "TC", "", "", "", "1040", "1290",
-                "Bgr 0-2000 200.lvl"),
-
-            new(FormulaConstants.Bulkdichtheid, FormulaConstants.Bulkdichtheid, "", "", "", "", "", "", "Bulkdichtheid.lvl"),
-            new(FormulaConstants.Waterretentie, FormulaConstants.Waterretentie, "", "", "", "", "", "", "Waterretentie 20-30.lvl"),
-            new(FormulaConstants.Veldcapaciteit, FormulaConstants.Veldcapaciteit, "", "", "", "", "", "", "Veldcapaciteit 0.3-0.38 0.1.lvl"),
-            new(FormulaConstants.Waterdoorlatendheid, FormulaConstants.Waterdoorlatendheid, "", "", "", "", "", "", "Waterdoorlatendheid 0-50 5.lvl"),
-            new(FormulaConstants.BodemclassificatieNietEolisch, FormulaConstants.BodemclassificatieNietEolisch, "", "", "", "", "", "", "Bodemclassificatie Niet-Eolisch.lvl"),
-            new(FormulaConstants.BodemclassificatieEolisch, FormulaConstants.BodemclassificatieEolisch, "", "", "", "", "", "", "Bodemclassificatie Eolisch.lvl"),
-            new(FormulaConstants.Slemp, FormulaConstants.Slemp, "", "", "", "", "", "", "Slemp.lvl"),
-
-            new("Monsterpunten", "TC", "TC", "", "", "", "", "", "Tc 200 250.lvl"),
-            new("Ligging", "Alt", "Alt", "", "", "", "", "", "Ligging 2-7.lvl")
-        };
-
-            // TODO: Save to application settings file:
-
-            return retVal;
-        }
 
         /// <summary>
         /// Calculate the new grids and add them as contour file to the template plot document
