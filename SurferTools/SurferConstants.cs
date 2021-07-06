@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿#if !DEBUG
+using System;
+#endif
+using System.IO;
 
 #pragma warning disable 1591
 

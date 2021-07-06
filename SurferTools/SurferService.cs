@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using Shared;
@@ -40,10 +39,9 @@ namespace SurferTools
             }
             catch (Exception e)
             {
-                _addProgress("Kan de default file path for surfer niet zetten.");
+                _addProgress("Kan de default file path for surfer niet zetten. Error: " + e.Message);
                 // swallow throw;
             }
-
         }
 
         /// <summary>
@@ -167,7 +165,6 @@ namespace SurferTools
         /// <param name="colY"></param>
         /// <param name="colZ">The column index of the Z-value</param>
         /// <param name="limits">The limits</param>
-        /// <param name="projectFileGridSettings"></param>
         /// <param name="gridSettings"></param>
         /// <returns>True on success, false otherwise</returns>
         /// <exception cref="FileNotFoundException"></exception>
@@ -180,15 +177,8 @@ namespace SurferTools
             if (!File.Exists(csvFileLocation))
                 throw new FileNotFoundException("Griddata file not found", csvFileLocation);
 
-            // Fixed variables:
-            var searchMinData = Convert.ToInt32(gridSettings.SearchMinData);
             var searchMaxData = Convert.ToInt32(gridSettings.SearchMaxData);
-
-            // For now constants, should be flexible:
-            var searchRadius = Convert.ToInt32(gridSettings.SearchRadius);
             var searchNumSectors = Convert.ToInt32(gridSettings.SearchNumSectors);
-            var idPower = Convert.ToInt32(gridSettings.IdPower);
-            var idSmoothing = Convert.ToInt32(gridSettings.IdSmoothing);
             var gridSpacing = Convert.ToDouble(gridSettings.GridSpacing, CultureInfo.InvariantCulture);
 
             _surferApp.ScreenUpdating = false;

@@ -16,7 +16,6 @@ namespace KaartfabriekUI.Forms
     /// </summary>
     public partial class MainForm : Form
     {
-
         private ProjectFile _projectFile;
         private readonly ApplicationSettings _applicationSettings;
 
@@ -30,6 +29,12 @@ namespace KaartfabriekUI.Forms
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            Text = $@"{Application.ProductName} v{Application.ProductVersion}";
+
+            var gdalFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "GDAL");
+            if (Directory.Exists(gdalFolder))
+                _applicationSettings.GdalLocation = gdalFolder;
+
             GdalFolder.TextboxText = _applicationSettings.GdalLocation;
             LevelFilesFolder.TextboxText = _applicationSettings.LevelFilesFolder;
             if (!Directory.Exists(_applicationSettings.GdalLocation) ||

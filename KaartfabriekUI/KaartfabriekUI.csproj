@@ -5,6 +5,15 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <Version>2.0.0.1</Version>
+    <Copyright>TopX GeoICT</Copyright>
+    <Company>TopX GeoICT</Company>
+    <Product>Kaartfabriek</Product>
+    <Authors>Paul Meems</Authors>
+    <PackageIcon>beeldmerkmol1000.png</PackageIcon>
+    <PackageIconUrl />
+    <AssemblyName>Kaartfabriek</AssemblyName>
+    <AssemblyVersion>2.0.0.1</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -41,6 +50,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Resources\beeldmerkmol1000.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -156,7 +156,7 @@ namespace KaartfabriekUI.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MonsterDataLocation.FileFilter = "csv files|*.csv";
             this.MonsterDataLocation.InitialDirectory = null;
-            this.MonsterDataLocation.Label = "Locatie van de monsterdata (monsterdata-RD.csv):";
+            this.MonsterDataLocation.Label = "Locatie van de monsterdata (monsterdata-EPSG28992.csv):";
             this.MonsterDataLocation.Location = new System.Drawing.Point(6, 122);
             this.MonsterDataLocation.Name = "MonsterDataLocation";
             this.MonsterDataLocation.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.File;
@@ -172,7 +172,7 @@ namespace KaartfabriekUI.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.VeldDataLocation.FileFilter = "csv files|*.csv";
             this.VeldDataLocation.InitialDirectory = null;
-            this.VeldDataLocation.Label = "Locatie van de velddata (velddata-RD.csv):";
+            this.VeldDataLocation.Label = "Locatie van de velddata (velddata-EPSG28992.csv):";
             this.VeldDataLocation.Location = new System.Drawing.Point(6, 72);
             this.VeldDataLocation.Name = "VeldDataLocation";
             this.VeldDataLocation.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.File;
