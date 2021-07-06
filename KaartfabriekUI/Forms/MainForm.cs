@@ -572,7 +572,7 @@ namespace KaartfabriekUI.Forms
 
             var service = new KaartfabriekService(_projectFile, AddProgress);
             GridViewFormulas.ClearSelection();
-            service.CreateSoilMaps(selectedFormulas, ColorRow);
+            service.CreateSoilMaps(selectedFormulas, _applicationSettings.LevelFilesFolder,  ColorRow);
             AddProgress("De geselecteerde grids zijn berekend.");
         }
 

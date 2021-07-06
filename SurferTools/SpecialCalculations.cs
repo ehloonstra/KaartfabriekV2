@@ -73,6 +73,23 @@ namespace SurferTools
             return File.Exists(outGrid);
         }
 
+        /// <summary>
+        /// Calculate the monsterdata grid
+        /// </summary>
+        /// <param name="outGrid"></param>
+        /// <param name="inputGrid"></param>
+        /// <returns></returns>
+        public bool CalculateMonsterpunten(string outGrid, string inputGrid)
+        {
+            var tcGridLocation = SurferService.GetFullPath(_workingFolder, inputGrid);
+            if (File.Exists(tcGridLocation))
+            {
+                File.Copy(tcGridLocation, outGrid, true);
+            }
+
+            return true;
+        }
+
         public bool CalculateSlemp(string outGrid)
         {
             // Lutum, CaCO3, OS, pH, GWT
@@ -96,12 +113,7 @@ namespace SurferTools
             // OS, Lutum, Zandfactie, M50, Bulkdichtheid
             return false;
         }
-
-        public bool ShowMonsterpuntenMap(string outGrid)
-        {
-            return false;
-        }
-
+        
         private void DeleteFile(string fileLocation)
         {
             if (File.Exists(fileLocation))

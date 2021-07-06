@@ -42,7 +42,7 @@ namespace KaartfabriekUI.Service
         public bool OpenDataForBlanking(string workingFolder, string veldDataLocation, string monsterDataLocation,
             int colX, int colY, int colK40)
         {
-            var surferService = new SurferService(SurferConstants.GetProjectionName(_projectFile.EpsgCode), workingFolder,
+            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode), workingFolder,
                 _addProgress);
 
             // Add Velddata:
@@ -118,7 +118,7 @@ namespace KaartfabriekUI.Service
         {
             // TODO: Check inputs
 
-            var surferService = new SurferService(SurferConstants.GetProjectionName(_projectFile.EpsgCode), workingFolder,
+            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode), workingFolder,
                 _addProgress, false);
 
             var nuclideGridsFolder = Path.Combine(workingFolder, SurferConstants.NuclideGridsFolder);
@@ -249,11 +249,13 @@ namespace KaartfabriekUI.Service
         /// Calculate the new grids and add them as contour file to the template plot document
         /// </summary>
         /// <param name="selectedFormulas"></param>
+        /// <param name="levelFilesFolder"></param>
         /// <param name="colorRow"></param>
-        public void CreateSoilMaps(List<FormulaData> selectedFormulas, Action<int, Color> colorRow)
+        public void CreateSoilMaps(List<FormulaData> selectedFormulas, string levelFilesFolder,
+            Action<int, Color> colorRow)
         {
             _addProgress("Het maken van de bodembestanden is gestart.");
-            var surferService = new SurferService(SurferConstants.GetProjectionName(_projectFile.EpsgCode),
+            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
                 _projectFile.WorkingFolder, _addProgress, false);
 
             try
@@ -286,7 +288,7 @@ namespace KaartfabriekUI.Service
                         var statistics = surferService.ChangeGridSource(SurferConstants.TemplateMapName,
                             Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
                                 $"{formula.Output}.grd"),
-                            Path.Combine(@"D:\dev\TopX\Loonstra\TSC Tools\Kaartfabriek\Steven", formula.LevelFile));
+                            Path.Combine(levelFilesFolder, formula.LevelFile));
 
                         // Change text:
                         if (statistics is not null)
@@ -296,6 +298,22 @@ namespace KaartfabriekUI.Service
                         }
 
                         surferService.SetSoilMapData(formula.Output);
+
+                        // For Monsterdata additional steps are required
+                        if (formula.Formula == FormulaConstants.Monsterpunten)
+                        {
+                            var postLayer = surferService.AddPostLayer(SurferConstants.TemplateMapName,
+                                _projectFile.FieldDataFileLocationProjected, "Velddata");
+                            postLayer.Symbol.Index = 11; //	Returns/sets the glyph index.
+                            postLayer.Symbol.Color = srfColor.srfColorBlack40;
+
+                            // Move to just above the contour layer:
+                            postLayer.SetZOrder(SrfZOrder.srfZOToBack);
+                            postLayer.SetZOrder(SrfZOrder.srfZOForward);
+
+                            // Make sure monster data layer is visible:
+                            surferService.SetLayerVisibility(SurferConstants.TemplateMapName, "Monster data", true);
+                        }
 
                         surferService.SavePlotDocument();
                         colorRow(formula.RowIndex, Color.DarkGreen);
@@ -322,7 +340,7 @@ namespace KaartfabriekUI.Service
         public void CreateTemplate(string surferTemplateLocation)
         {
             _addProgress("Het maken van de template is gestart.");
-            var surferService = new SurferService(SurferConstants.GetProjectionName(_projectFile.EpsgCode),
+            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
                 _projectFile.WorkingFolder, _addProgress, false);
 
             try

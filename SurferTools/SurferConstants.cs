@@ -21,7 +21,7 @@ namespace SurferTools
         public const string TemplateName = "Template.srf";
         public const string TemplateMapName = "Template";
 
-        public static string GetProjectionName(string epsgCode)
+        public static string GetCoordinateSystemName(string epsgCode)
         {
             if (epsgCode.ToLower().Trim().Equals("EPSG:28992"))
                 return "Amersfoort / RD New";

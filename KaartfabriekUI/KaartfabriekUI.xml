@@ -165,11 +165,12 @@
             <param name="colCs137"></param>
             <param name="colTc"></param>
         </member>
-        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateSoilMaps(System.Collections.Generic.List{Shared.FormulaData},System.Action{System.Int32,System.Drawing.Color})">
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateSoilMaps(System.Collections.Generic.List{Shared.FormulaData},System.String,System.Action{System.Int32,System.Drawing.Color})">
             <summary>
             Calculate the new grids and add them as contour file to the template plot document
             </summary>
             <param name="selectedFormulas"></param>
+            <param name="levelFilesFolder"></param>
             <param name="colorRow"></param>
         </member>
         <member name="M:KaartfabriekUI.Service.KaartfabriekService.CreateTemplate(System.String)">

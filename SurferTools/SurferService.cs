@@ -12,7 +12,7 @@ namespace SurferTools
     /// </summary>
     public class SurferService
     {
-        private readonly string _epsgCode;
+        private readonly string _coordinateSystem;
         private readonly string _workingFolder;
         private readonly Action<string> _addProgress;
         private IPlotDocument3 _activePlotDocument;
@@ -21,13 +21,13 @@ namespace SurferTools
         /// <summary>
         /// Constructor 
         /// </summary>
-        /// <param name="epsgCode">The epsg code for all layers</param>
+        /// <param name="coordinateSystem">The coordinate system for all layers</param>
         /// <param name="workingFolder">The working folder</param>
         /// <param name="addProgress"></param>
         /// <param name="addPlotDocument"></param>
-        public SurferService(string epsgCode, string workingFolder, Action<string> addProgress, bool addPlotDocument = true)
+        public SurferService(string coordinateSystem, string workingFolder, Action<string> addProgress, bool addPlotDocument = true)
         {
-            _epsgCode = epsgCode;
+            _coordinateSystem = coordinateSystem;
             _workingFolder = workingFolder;
             _addProgress = addProgress;
 
@@ -259,7 +259,7 @@ namespace SurferTools
                 if (mapFrame.Overlays.Item(1) is not IContourLayer contourLayer)
                     throw new Exception("Cannot get contourLayer");
 
-                contourLayer.CoordinateSystem = _epsgCode;
+                contourLayer.CoordinateSystem = _coordinateSystem;
                 contourLayer.FillContours = true;
                 contourLayer.SmoothContours = SrfConSmoothType.srfConSmoothHigh;
                 contourLayer.Name = layerName;
@@ -303,6 +303,7 @@ namespace SurferTools
             DeselectAll();
         }
 
+
         /// <summary>
         /// Add a postmap
         /// </summary>
@@ -339,7 +340,7 @@ namespace SurferTools
                 postMapLayer.LabCol = 0; // Returns/sets the column containing the labels (0 if none).
 
                 // Set the coordinate system:
-                postMapLayer.CoordinateSystem = _epsgCode;
+                postMapLayer.CoordinateSystem = _coordinateSystem;
 
                 return mapFrame;
             }
@@ -352,6 +353,45 @@ namespace SurferTools
             {
                 _surferApp.ScreenUpdating = true;
             }
+        }
+
+        /// <summary>
+        /// Add PostMap to existing map frame
+        /// </summary>
+        /// <param name="mapName"></param>
+        /// <param name="csvFileLocation"></param>
+        /// <param name="layerName"></param>
+        /// <param name="xCol"></param>
+        /// <param name="yCol"></param>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="Exception"></exception>
+        public IPostLayer2 AddPostLayer(string mapName, string csvFileLocation, string layerName, int xCol = 1, int yCol = 2)
+        {
+            if (!File.Exists(csvFileLocation))
+                throw new FileNotFoundException("Cannot find data file", csvFileLocation);
+
+            if (_activePlotDocument.Shapes.Item(mapName) is not IMapFrame3 mapFrame)
+                throw new Exception("Could not find map with name " + mapName);
+
+            if (_activePlotDocument.Shapes is not IShapes7 shapes)
+                throw new Exception("Could not get shapes");
+
+            if (shapes.AddPostLayer(mapFrame, csvFileLocation, xCol, yCol) is not IPostLayer2 postLayer)
+                throw new Exception("Could not add data as post layer");
+
+            postLayer.Name = layerName;
+            postLayer.CoordinateSystem = _coordinateSystem;
+
+            // Set default symbol settings:
+            postLayer.Symbol.Index = 12; //	Returns/sets the glyph index.
+            postLayer.Symbol.Color = srfColor.srfColorRed;
+            postLayer.Symbol.Size = 0.15; // Returns/sets the symbol height in page units.
+            postLayer.SymCol = 0;  // Returns/sets the column containing the symbol type (0 if none).
+
+            // No labels
+            postLayer.LabCol = 0; // Returns/sets the column containing the labels (0 if none).
+
+            return postLayer;
         }
 
         /// <summary>
@@ -379,7 +419,7 @@ namespace SurferTools
                 baseMapLayer.Line.ForeColor = srfColor.srfColorPurple;
                 baseMapLayer.Line.Width = 0.01;
 
-                baseMapLayer.CoordinateSystem = _epsgCode;
+                baseMapLayer.CoordinateSystem = _coordinateSystem;
 
                 return mapFrame;
             }
@@ -436,7 +476,7 @@ namespace SurferTools
                 foreach (var mapFrame in mapFrames)
                 {
                     mapFrame.Selected = true;
-                    mapFrame.CoordinateSystem = _epsgCode;
+                    mapFrame.CoordinateSystem = _coordinateSystem;
                 }
 
                 var newMapFrame = _activePlotDocument.Selection.OverlayMaps();
@@ -531,8 +571,6 @@ namespace SurferTools
 
                 if (postMapLayer.SymbolColorMap is not IColorMap2 colorMap)
                     throw new Exception("Cannot get colorMap");
-                // Load the color file:
-                //postMapLayer.SymbolColorMap.LoadFile(Path.Combine(GetSurferSamplesLocation(), "Rainbow.clr"));
                 colorMap.LoadPreset("Rainbow");
 
                 // Force reload:
@@ -714,7 +752,7 @@ namespace SurferTools
                 case FormulaConstants.Waterretentie:
                     return specialCalculations.CalculateWaterretentie(outGrid);
                 case FormulaConstants.Monsterpunten:
-                    return specialCalculations.ShowMonsterpuntenMap(outGrid);
+                    return specialCalculations.CalculateMonsterpunten(outGrid, formula.GridA);
             }
 
             var gridMathInput = new List<IGridMathInput>();
@@ -751,7 +789,7 @@ namespace SurferTools
 
                 // Set coordinate system:
                 grid.LoadFile2(gridLocation);
-                grid.CoordinateSystem = _epsgCode;
+                grid.CoordinateSystem = _coordinateSystem;
                 grid.SaveFile2(gridLocation, Options: SurferConstants.OutGridOptions);
                 // TODO: Shouldn't close?
             }
@@ -885,7 +923,7 @@ namespace SurferTools
                 throw new Exception("Error in changing grid source. Possibly horizontal planar", e);
             }
 
-            contourLayer.CoordinateSystem = _epsgCode;
+            contourLayer.CoordinateSystem = _coordinateSystem;
 
             if (File.Exists(lvlFile))
             {
@@ -921,7 +959,7 @@ namespace SurferTools
             baseLayer.Line.ForeColor = srfColor.srfColorPurple;
             baseLayer.Line.Width = 0.01;
 
-            baseLayer.CoordinateSystem = _epsgCode;
+            baseLayer.CoordinateSystem = _coordinateSystem;
         }
 
         /// <summary>
@@ -946,7 +984,7 @@ namespace SurferTools
                 throw new Exception("Could not add sample data");
 
             postLayer.Name = "Monster data";
-            postLayer.CoordinateSystem = _epsgCode;
+            postLayer.CoordinateSystem = _coordinateSystem;
             SetLabelMonsterdataPostmap(postLayer, 3);
         }
 
@@ -1067,6 +1105,30 @@ namespace SurferTools
                 throw new Exception("Could not find text with name " + label2);
 
             text.Text = text.Text.Replace("Projectie: x", $"Projectie: {soilMapName}");
+        }
+
+        /// <summary>
+        /// Set the visibility of the layer
+        /// </summary>
+        /// <param name="mapName"></param>
+        /// <param name="layerName"></param>
+        /// <param name="visible"></param>
+        /// <exception cref="Exception"></exception>
+        public void SetLayerVisibility(string mapName, string layerName, bool visible)
+        {
+            if (_activePlotDocument.Shapes.Item(mapName) is not IMapFrame3 mapFrame)
+                throw new Exception("Could not find map with name " + mapName);
+
+            try
+            {
+                var layer = mapFrame.Overlays.Item(layerName);
+                if (layer is not null) layer.Visible = visible;
+            }
+            catch (Exception e)
+            {
+                _addProgress($"Could not find layer with name {layerName}. Error: {e.Message}");
+                // swallow throw;
+            }
         }
     }
 }
