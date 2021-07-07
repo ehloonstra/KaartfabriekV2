@@ -580,6 +580,11 @@ namespace KaartfabriekUI.Forms
         private void ColorRow(int rowIndex, Color color)
         {
             GridViewFormulas.Rows[rowIndex].DefaultCellStyle.BackColor = color;
+
+            if (color != Color.DarkGreen) return;
+
+            if (GridViewFormulas.Rows[rowIndex].Cells[0] is not DataGridViewCheckBoxCell cell) return;
+            cell.Value = false;
         }
 
         private void BtnTemplateCreate_Click(object sender, EventArgs e)
