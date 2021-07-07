@@ -76,7 +76,7 @@ namespace Shared
                 new(FormulaConstants.Waterretentie, FormulaConstants.Waterretentie, "", "", "", "", "", "",
                     "Waterretentie 20-30.lvl"),
                 new(FormulaConstants.Veldcapaciteit, FormulaConstants.Veldcapaciteit, "", "", "", "", "", "",
-                    "Veldcapaciteit 0.3-0.38 0.1.lvl"),
+                    "Veldcapaciteit 15-35 2.5.lvl"),
                 new(FormulaConstants.Waterdoorlatendheid, FormulaConstants.Waterdoorlatendheid, "", "", "", "", "", "",
                     "Waterdoorlatendheid 0-50 5.lvl"),
                 new(FormulaConstants.BodemclassificatieNietEolisch, FormulaConstants.BodemclassificatieNietEolisch, "",
@@ -85,7 +85,7 @@ namespace Shared
                     "", "", "", "Bodemclassificatie Eolisch.lvl"),
                 new(FormulaConstants.Slemp, FormulaConstants.Slemp, "", "", "", "", "", "", "Slemp.lvl"),
 
-                new(FormulaConstants.Monsterpunten, FormulaConstants.Monsterpunten, "", "", "", "", "", "",
+                new(FormulaConstants.Monsterpunten, FormulaConstants.Monsterpunten, "TC", "", "", "", "", "",
                     "Tc 200 250.lvl"),
                 new("Ligging", "Alt", "Alt", "", "", "", "", "", "Ligging 2-7.lvl")
             };

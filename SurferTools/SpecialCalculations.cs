@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -86,11 +87,7 @@ namespace SurferTools
             return false;
         }
 
-        public bool CalculateVeldcapaciteit(string outGrid)
-        {
-            // Zie Waterretentie
-            return false;
-        }
+
 
         public bool CalculateWaterdoorlatendheid(string outGrid)
         {
@@ -134,6 +131,46 @@ namespace SurferTools
             };
 
             const string formula = "(A-B)*100";
+            DeleteFile(outGrid);
+            _surferApp.GridMath3(formula, gridMathInput.ToArray(), outGrid);
+            return File.Exists(outGrid);
+        }
+
+        /// <summary>
+        /// Calculate Veldcapaciteit
+        /// Veel overeenkomsten met Waterretentie
+        /// </summary>
+        /// <param name="outGrid"></param>
+        /// <returns></returns>
+        public bool CalculateVeldcapaciteit(string outGrid)
+        {
+            // Zie Waterretentie, ThetaPfTweePuntNul * 100
+
+            // TODO: check op negatieve waarde:
+            // Bij hele lage waarden lutum en leem (sportvelden)
+            // gaat de berekening niet goed
+
+            var tmpOs = AftoppenOs();
+    
+            // BetaS
+            var tmpBetaS = CalculateWaterretentieBetaS(tmpOs);
+
+            // Alpha:
+            var tmpAlpha = CalculateWaterretentieAlpha(tmpOs);
+
+            // N
+            var tmpN = CalculateWaterretentieN(tmpOs);
+
+            // ThetaPfTweePuntNul
+            var tmpThetaPfTweePuntNul = CalculateWaterretentieThetaPfTweePuntNul(tmpBetaS, tmpAlpha, tmpN);
+
+            // Waterretentie:
+            var gridMathInput = new List<IGridMathInput>
+            {
+                _surferApp.NewGridMathInput(tmpThetaPfTweePuntNul, "A")
+            };
+
+            const string formula = "A*100";
             DeleteFile(outGrid);
             _surferApp.GridMath3(formula, gridMathInput.ToArray(), outGrid);
             return File.Exists(outGrid);
