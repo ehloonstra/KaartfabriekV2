@@ -111,8 +111,8 @@ namespace KaartfabriekUI.Forms
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
-                throw;
+                AddProgress("Er ging wat fout met OpenDataForBlanking. Error: " + exception.Message);
+                // swallow: throw;
             }
 
         }

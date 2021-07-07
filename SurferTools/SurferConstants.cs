@@ -1,6 +1,4 @@
-﻿#if !DEBUG
-using System;
-#endif
+﻿using System;
 using System.IO;
 
 #pragma warning disable 1591
@@ -23,13 +21,11 @@ namespace SurferTools
 
         public static string GetCoordinateSystemName(string epsgCode)
         {
-            if (epsgCode.ToLower().Trim().Equals("EPSG:28992"))
+            if (epsgCode.ToUpper().Trim().Equals("EPSG:28992"))
                 return "Amersfoort / RD New";
-#if DEBUG
-            return "Amersfoort / RD New";
-#else
+
             throw new Exception("Unknown projection: " + epsgCode);
-#endif
+
         }
     }
 }

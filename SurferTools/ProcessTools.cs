@@ -144,11 +144,16 @@ namespace SurferTools
 
         private static bool StartProcess(string toolLocation, string arguments)
         {
+            if (!File.Exists($"{toolLocation}.exe"))
+                throw new FileNotFoundException($"Kan de GDAL tool '{toolLocation}' niet vinden.", toolLocation);
+
             using var myProcess = new Process
             {
                 StartInfo =
                 {
                     CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
                     FileName = toolLocation,
                     Arguments = arguments
                 },
@@ -156,14 +161,25 @@ namespace SurferTools
             };
 
             myProcess.Start();
-            myProcess.WaitForExit(10_000);
 
+            // To avoid deadlocks, always read the output stream first and then wait.  
+            var output = myProcess.StandardError.ReadToEnd();
+            if (!string.IsNullOrEmpty(output))
+                throw new Exception($"Exception in processing GDAL tool ({Path.GetFileName(toolLocation)}). {output}");
+            
+            myProcess.WaitForExit(10_000);
+            
             if (myProcess.ExitCode == 0) return true;
 
             // Something went wrong, show the window
             // TODO: Doesn't work:
-            ShowWindow(myProcess.MainWindowHandle, 0);
+            //ShowWindow(myProcess.MainWindowHandle, 0);
             return false;
+        }
+
+        private static void OutputHandler(object sender, DataReceivedEventArgs e)
+        {
+            Console.WriteLine(e.Data);
         }
     }
 }
