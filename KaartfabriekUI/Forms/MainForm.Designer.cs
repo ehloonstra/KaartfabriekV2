@@ -49,8 +49,13 @@ namespace KaartfabriekUI.Forms
             this.label17 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TabPageVoorbereiding = new System.Windows.Forms.TabPage();
+            this.GroupBoxProjectInstellingen = new System.Windows.Forms.GroupBox();
+            this.CboGrondwatertrap = new KaartfabriekUI.UserControls.ColumnSelectControl();
+            this.TxtEpsgCode = new System.Windows.Forms.TextBox();
             this.GroupBoxVoorbereiding = new System.Windows.Forms.GroupBox();
             this.GroupBoxVelddataKolommen = new System.Windows.Forms.GroupBox();
             this.CboTotalCount = new KaartfabriekUI.UserControls.ColumnSelectControl();
@@ -76,7 +81,7 @@ namespace KaartfabriekUI.Forms
             this.TxtSearchRadius = new System.Windows.Forms.TextBox();
             this.TxtSearchNumSectors = new System.Windows.Forms.TextBox();
             this.BtnMaakNuclideGrids = new System.Windows.Forms.Button();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.TabPageTemplate = new System.Windows.Forms.TabPage();
             this.BtnTemplateCreate = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.TxtTemplateNummer = new System.Windows.Forms.TextBox();
@@ -105,10 +110,6 @@ namespace KaartfabriekUI.Forms
             this.BtnCreateSoilMaps = new System.Windows.Forms.Button();
             this.BtnAddFormula = new System.Windows.Forms.Button();
             this.TabPageInstellingen = new System.Windows.Forms.TabPage();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.LevelFilesFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
@@ -116,11 +117,12 @@ namespace KaartfabriekUI.Forms
             this.LblVoortgang = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
+            this.GroupBoxProjectInstellingen.SuspendLayout();
             this.GroupBoxVoorbereiding.SuspendLayout();
             this.GroupBoxVelddataKolommen.SuspendLayout();
             this.GroupBoxPerceelsgrens.SuspendLayout();
             this.GroupBoxNuclideGrids.SuspendLayout();
-            this.tabPage1.SuspendLayout();
+            this.TabPageTemplate.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.TabPageUitvoer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -129,7 +131,6 @@ namespace KaartfabriekUI.Forms
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GridViewFormulas)).BeginInit();
             this.TabPageInstellingen.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panelVoortgang.SuspendLayout();
             this.SuspendLayout();
@@ -347,13 +348,33 @@ namespace KaartfabriekUI.Forms
             this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.toolTip1.SetToolTip(this.label18, "Hoe groot moet de buffer zijn");
             // 
+            // label8
+            // 
+            this.label8.Location = new System.Drawing.Point(7, 30);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(101, 15);
+            this.label8.TabIndex = 10;
+            this.label8.Text = "Grondwatertrap:";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label8, "De grondwatertrap wordt gebruikt bij de Slempberekening");
+            // 
+            // label7
+            // 
+            this.label7.Location = new System.Drawing.Point(9, 62);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(99, 15);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "EPSG Code:";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.label7, "De EPSG code wordt gebruikt om de projectie te bepalen.");
+            // 
             // tabControl1
             // 
             this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.TabPageVoorbereiding);
-            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.TabPageTemplate);
             this.tabControl1.Controls.Add(this.TabPageUitvoer);
             this.tabControl1.Controls.Add(this.TabPageInstellingen);
             this.tabControl1.Location = new System.Drawing.Point(12, 51);
@@ -364,6 +385,7 @@ namespace KaartfabriekUI.Forms
             // 
             // TabPageVoorbereiding
             // 
+            this.TabPageVoorbereiding.Controls.Add(this.GroupBoxProjectInstellingen);
             this.TabPageVoorbereiding.Controls.Add(this.GroupBoxVoorbereiding);
             this.TabPageVoorbereiding.Controls.Add(this.GroupBoxVelddataKolommen);
             this.TabPageVoorbereiding.Controls.Add(this.GroupBoxPerceelsgrens);
@@ -375,6 +397,42 @@ namespace KaartfabriekUI.Forms
             this.TabPageVoorbereiding.TabIndex = 0;
             this.TabPageVoorbereiding.Text = "Voorbereiding";
             this.TabPageVoorbereiding.UseVisualStyleBackColor = true;
+            // 
+            // GroupBoxProjectInstellingen
+            // 
+            this.GroupBoxProjectInstellingen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.GroupBoxProjectInstellingen.Controls.Add(this.label8);
+            this.GroupBoxProjectInstellingen.Controls.Add(this.CboGrondwatertrap);
+            this.GroupBoxProjectInstellingen.Controls.Add(this.TxtEpsgCode);
+            this.GroupBoxProjectInstellingen.Controls.Add(this.label7);
+            this.GroupBoxProjectInstellingen.Enabled = false;
+            this.GroupBoxProjectInstellingen.Location = new System.Drawing.Point(420, 186);
+            this.GroupBoxProjectInstellingen.Name = "GroupBoxProjectInstellingen";
+            this.GroupBoxProjectInstellingen.Size = new System.Drawing.Size(378, 174);
+            this.GroupBoxProjectInstellingen.TabIndex = 9;
+            this.GroupBoxProjectInstellingen.TabStop = false;
+            this.GroupBoxProjectInstellingen.Text = "2b. Project instellingen";
+            // 
+            // CboGrondwatertrap
+            // 
+            this.CboGrondwatertrap.Data = null;
+            this.CboGrondwatertrap.Label = "";
+            this.CboGrondwatertrap.Location = new System.Drawing.Point(113, 9);
+            this.CboGrondwatertrap.Name = "CboGrondwatertrap";
+            this.CboGrondwatertrap.PresetValue = null;
+            this.CboGrondwatertrap.SelectedText = "";
+            this.CboGrondwatertrap.Size = new System.Drawing.Size(94, 44);
+            this.CboGrondwatertrap.TabIndex = 9;
+            this.CboGrondwatertrap.ComboboxSelectedIndexChanged += new System.EventHandler(this.CboGrondwatertrap_ComboboxSelectedIndexChanged);
+            // 
+            // TxtEpsgCode
+            // 
+            this.TxtEpsgCode.Location = new System.Drawing.Point(116, 58);
+            this.TxtEpsgCode.Name = "TxtEpsgCode";
+            this.TxtEpsgCode.Size = new System.Drawing.Size(91, 23);
+            this.TxtEpsgCode.TabIndex = 8;
+            this.TxtEpsgCode.TextChanged += new System.EventHandler(this.TxtEpsgCode_TextChanged);
             // 
             // GroupBoxVoorbereiding
             // 
@@ -395,8 +453,6 @@ namespace KaartfabriekUI.Forms
             // 
             // GroupBoxVelddataKolommen
             // 
-            this.GroupBoxVelddataKolommen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.GroupBoxVelddataKolommen.Controls.Add(this.CboTotalCount);
             this.GroupBoxVelddataKolommen.Controls.Add(this.CboCs137);
             this.GroupBoxVelddataKolommen.Controls.Add(this.CboTh232);
@@ -409,7 +465,7 @@ namespace KaartfabriekUI.Forms
             this.GroupBoxVelddataKolommen.Enabled = false;
             this.GroupBoxVelddataKolommen.Location = new System.Drawing.Point(5, 186);
             this.GroupBoxVelddataKolommen.Name = "GroupBoxVelddataKolommen";
-            this.GroupBoxVelddataKolommen.Size = new System.Drawing.Size(793, 174);
+            this.GroupBoxVelddataKolommen.Size = new System.Drawing.Size(409, 174);
             this.GroupBoxVelddataKolommen.TabIndex = 7;
             this.GroupBoxVelddataKolommen.TabStop = false;
             this.GroupBoxVelddataKolommen.Text = "2. Velddata kolommen";
@@ -534,6 +590,7 @@ namespace KaartfabriekUI.Forms
             this.GroupBoxPerceelsgrens.TabIndex = 6;
             this.GroupBoxPerceelsgrens.TabStop = false;
             this.GroupBoxPerceelsgrens.Text = "3. Perceelsgrens";
+            this.GroupBoxPerceelsgrens.EnabledChanged += new System.EventHandler(this.GroupBoxPerceelsgrens_EnabledChanged);
             // 
             // BtnLoadVelddataInSurfer
             // 
@@ -680,17 +737,17 @@ namespace KaartfabriekUI.Forms
             this.BtnMaakNuclideGrids.UseVisualStyleBackColor = true;
             this.BtnMaakNuclideGrids.Click += new System.EventHandler(this.BtnMaakNuclideGrids_Click);
             // 
-            // tabPage1
+            // TabPageTemplate
             // 
-            this.tabPage1.Controls.Add(this.BtnTemplateCreate);
-            this.tabPage1.Controls.Add(this.groupBox2);
-            this.tabPage1.Location = new System.Drawing.Point(4, 24);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(804, 728);
-            this.tabPage1.TabIndex = 3;
-            this.tabPage1.Text = "Template";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.TabPageTemplate.Controls.Add(this.BtnTemplateCreate);
+            this.TabPageTemplate.Controls.Add(this.groupBox2);
+            this.TabPageTemplate.Location = new System.Drawing.Point(4, 24);
+            this.TabPageTemplate.Name = "TabPageTemplate";
+            this.TabPageTemplate.Padding = new System.Windows.Forms.Padding(3);
+            this.TabPageTemplate.Size = new System.Drawing.Size(804, 728);
+            this.TabPageTemplate.TabIndex = 3;
+            this.TabPageTemplate.Text = "Template";
+            this.TabPageTemplate.UseVisualStyleBackColor = true;
             // 
             // BtnTemplateCreate
             // 
@@ -992,7 +1049,6 @@ namespace KaartfabriekUI.Forms
             // 
             // TabPageInstellingen
             // 
-            this.TabPageInstellingen.Controls.Add(this.groupBox3);
             this.TabPageInstellingen.Controls.Add(this.groupBox1);
             this.TabPageInstellingen.Location = new System.Drawing.Point(4, 24);
             this.TabPageInstellingen.Name = "TabPageInstellingen";
@@ -1000,53 +1056,6 @@ namespace KaartfabriekUI.Forms
             this.TabPageInstellingen.TabIndex = 2;
             this.TabPageInstellingen.Text = "Instellingen";
             this.TabPageInstellingen.UseVisualStyleBackColor = true;
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox3.Controls.Add(this.label7);
-            this.groupBox3.Controls.Add(this.label8);
-            this.groupBox3.Controls.Add(this.label9);
-            this.groupBox3.Location = new System.Drawing.Point(13, 148);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(782, 268);
-            this.groupBox3.TabIndex = 3;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Project instellingen";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label7.Location = new System.Drawing.Point(153, 227);
-            this.label7.Name = "label7";
-            this.label7.Padding = new System.Windows.Forms.Padding(5);
-            this.label7.Size = new System.Drawing.Size(139, 27);
-            this.label7.TabIndex = 2;
-            this.label7.Text = "TODO: Grondwatertrap";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label8.Location = new System.Drawing.Point(6, 227);
-            this.label8.Name = "label8";
-            this.label8.Padding = new System.Windows.Forms.Padding(5);
-            this.label8.Size = new System.Drawing.Size(114, 27);
-            this.label8.TabIndex = 1;
-            this.label8.Text = "TODO: EPGS Code";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label9.Location = new System.Drawing.Point(6, 164);
-            this.label9.Name = "label9";
-            this.label9.Padding = new System.Windows.Forms.Padding(5);
-            this.label9.Size = new System.Drawing.Size(122, 27);
-            this.label9.TabIndex = 0;
-            this.label9.Text = "TODO: Grid settings";
             // 
             // groupBox1
             // 
@@ -1136,6 +1145,8 @@ namespace KaartfabriekUI.Forms
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.TabPageVoorbereiding.ResumeLayout(false);
+            this.GroupBoxProjectInstellingen.ResumeLayout(false);
+            this.GroupBoxProjectInstellingen.PerformLayout();
             this.GroupBoxVoorbereiding.ResumeLayout(false);
             this.GroupBoxVoorbereiding.PerformLayout();
             this.GroupBoxVelddataKolommen.ResumeLayout(false);
@@ -1143,7 +1154,7 @@ namespace KaartfabriekUI.Forms
             this.GroupBoxPerceelsgrens.PerformLayout();
             this.GroupBoxNuclideGrids.ResumeLayout(false);
             this.GroupBoxNuclideGrids.PerformLayout();
-            this.tabPage1.ResumeLayout(false);
+            this.TabPageTemplate.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.TabPageUitvoer.ResumeLayout(false);
@@ -1154,8 +1165,6 @@ namespace KaartfabriekUI.Forms
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.GridViewFormulas)).EndInit();
             this.TabPageInstellingen.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.panelVoortgang.ResumeLayout(false);
             this.panelVoortgang.PerformLayout();
@@ -1209,7 +1218,7 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
         private System.Windows.Forms.DataGridViewTextBoxColumn GridColLevelFile;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage TabPageTemplate;
         private System.Windows.Forms.Button BtnTemplateCreate;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox TxtTemplateNummer;
@@ -1222,10 +1231,6 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.TextBox TxtTemplateNaam;
         private System.Windows.Forms.Label label2;
         private UserControls.TextSelectControl SurferTemplateLocation;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.DataGridView GridViewFormulas;
         private System.Windows.Forms.Panel panelVoortgang;
         private System.Windows.Forms.Label LblVoortgang;
@@ -1247,6 +1252,11 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.TextBox TxtBuffer;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.GroupBox GroupBoxProjectInstellingen;
+        private System.Windows.Forms.Label label8;
+        private UserControls.ColumnSelectControl CboGrondwatertrap;
+        private System.Windows.Forms.TextBox TxtEpsgCode;
+        private System.Windows.Forms.Label label7;
     }
 }
 

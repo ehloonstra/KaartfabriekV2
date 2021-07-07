@@ -273,7 +273,7 @@ namespace KaartfabriekUI.Service
                     try
                     {
                         colorRow(formula.RowIndex, Color.Blue);
-                        if (!surferService.CalcGrid(formula, _projectFile.ParcelData.Name))
+                        if (!surferService.CalcGrid(formula, _projectFile.ParcelData.Name, _projectFile.Gwt))
                         {
                             _addProgress($"Er ging iets niet goed bij het berekenen van {formula.Output}.");
                             continue;

@@ -24,6 +24,7 @@ namespace Shared
         private string _epsgCode;
         private string _gridNames;
         private string _fieldBorderBufferSize;
+        private string _gwt;
 
         public string WorkingFolder
         {
@@ -77,6 +78,12 @@ namespace Shared
         {
             get => _epsgCode ?? "EPSG:28992";
             set { _epsgCode = value; NotifyPropertyChanged(); }
+        }
+
+        public string Gwt
+        {
+            get => _gwt;
+            set { _gwt = value; NotifyPropertyChanged(); }
         }
 
         public string GridNames

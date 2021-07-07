@@ -10,7 +10,7 @@ namespace SurferTools
     /// <summary>
     /// Class for special more complicated soil map calculations
     /// </summary>
-    public class SpecialCalculations
+    public partial class SpecialCalculations
     {
         private readonly string _workingFolder;
         private readonly string _fieldName;
@@ -83,13 +83,7 @@ namespace SurferTools
 
             return true;
         }
-
-        public bool CalculateSlemp(string outGrid)
-        {
-            // Lutum, CaCO3, OS, pH, GWT
-            return false;
-        }
-
+        
         /// <summary>
         /// Calculate Waterdoorlatendheid
         /// </summary>

@@ -728,7 +728,8 @@ namespace SurferTools
         /// </summary>
         /// <param name="formula"></param>
         /// <param name="fieldName"></param>
-        public bool CalcGrid(FormulaData formula, string fieldName)
+        /// <param name="gwt"></param>
+        public bool CalcGrid(FormulaData formula, string fieldName, string gwt)
         {
             var outputFolder = Path.Combine(_workingFolder, SurferConstants.BodemkaartenGridsFolder);
             if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
@@ -746,7 +747,7 @@ namespace SurferTools
                 case FormulaConstants.Bulkdichtheid:
                     return specialCalculations.CalculateBulkdichtheid(outGrid);
                 case FormulaConstants.Slemp:
-                    return specialCalculations.CalculateSlemp(outGrid);
+                    return specialCalculations.CalculateSlemp(outGrid, gwt);
                 case FormulaConstants.Veldcapaciteit:
                     return specialCalculations.CalculateVeldcapaciteit(outGrid);
                 case FormulaConstants.Waterdoorlatendheid:

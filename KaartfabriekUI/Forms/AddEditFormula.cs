@@ -25,6 +25,11 @@ namespace KaartfabriekUI.Forms
         /// </summary>
         public bool IsNewFormula { get; set; }
 
+        /// <summary>
+        /// The location of the levels folder
+        /// </summary>
+        public string LevelsFolder { get; set; }
+
         /// <inheritdoc />
         public AddEditFormula()
         {
@@ -57,7 +62,7 @@ namespace KaartfabriekUI.Forms
             // Load data for the comboboxes:
             SetLevelFiles();
             SetGridComboxes();
-
+    
             // Pre-select the form items:
             // Formula, output, gridA, gridB GridC, gridD, minimum, maximum, level
             TxtBoxFormule.Text = FormulaData.Formula;
@@ -82,8 +87,7 @@ namespace KaartfabriekUI.Forms
 
         private void SetLevelFiles()
         {
-            // TODO: Make path flexible:
-            var fileEntries = Directory.GetFiles(@"D:\dev\TopX\Loonstra\TSC Tools\Kaartfabriek\Steven", "*.lvl", SearchOption.TopDirectoryOnly);
+            var fileEntries = Directory.GetFiles(LevelsFolder, "*.lvl", SearchOption.TopDirectoryOnly);
             var data = fileEntries.Select(Path.GetFileName).ToList();
             CboLevels.Data = string.Join(';', data);
         }

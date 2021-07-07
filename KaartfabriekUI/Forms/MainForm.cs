@@ -31,6 +31,15 @@ namespace KaartfabriekUI.Forms
         {
             Text = $@"{Application.ProductName} v{Application.ProductVersion}";
 
+            // Disable other tabpages:
+            TabPageTemplate.Enabled = false;
+            TabPageUitvoer.Enabled = false;
+
+            if (File.Exists(_applicationSettings.TemplateLocationAkkerbouw))
+            {
+                SurferTemplateLocation.TextboxText = _applicationSettings.TemplateLocationAkkerbouw;
+            }
+
             var gdalFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "GDAL");
             if (Directory.Exists(gdalFolder))
                 _applicationSettings.GdalLocation = gdalFolder;
@@ -42,11 +51,6 @@ namespace KaartfabriekUI.Forms
             {
                 // Activate settings tab:
                 tabControl1.SelectedTab = tabControl1.TabPages[nameof(TabPageInstellingen)];
-            }
-
-            if (File.Exists(_applicationSettings.TemplateLocationAkkerbouw))
-            {
-                SurferTemplateLocation.TextboxText = _applicationSettings.TemplateLocationAkkerbouw;
             }
         }
 
@@ -133,7 +137,9 @@ namespace KaartfabriekUI.Forms
                 CboU238.SelectedIndex > -1 && CboTotalCount.SelectedIndex > -1)
             {
                 // Enable next group box:
-                GroupBoxPerceelsgrens.Enabled = true;
+                GroupBoxProjectInstellingen.Enabled = true;
+                if (!string.IsNullOrEmpty(TxtEpsgCode.Text))
+                    GroupBoxPerceelsgrens.Enabled = true;
             }
         }
 
@@ -219,6 +225,10 @@ namespace KaartfabriekUI.Forms
 
         private void ProjectFile2Gui()
         {
+            // Enable tabpages:
+            TabPageTemplate.Enabled = true;
+            TabPageUitvoer.Enabled = true;
+
             if (Directory.Exists(_projectFile.WorkingFolder))
             {
                 WorkingFolder.TextboxText = _projectFile.WorkingFolder;
@@ -266,6 +276,15 @@ namespace KaartfabriekUI.Forms
 
             TxtBuffer.Text = _projectFile.FieldBorderBufferSize ?? "10";
 
+            // GWT
+            CboGrondwatertrap.Data = "I; II; III+; V+; III-; V-; IV; VI; VII";
+            if (!string.IsNullOrEmpty(_projectFile.Gwt))
+                CboGrondwatertrap.PresetValue = _projectFile.Gwt;
+
+            // EPSG:
+            if (!string.IsNullOrEmpty(_projectFile.EpsgCode))
+                TxtEpsgCode.Text = _projectFile.EpsgCode;
+
             var pData = _projectFile.ParcelData;
             if (pData is not null)
             {
@@ -278,6 +297,8 @@ namespace KaartfabriekUI.Forms
             FillGridViewFormulas();
 
             FillGridSettings();
+
+
         }
 
         private void FillGridSettings()
@@ -409,8 +430,10 @@ namespace KaartfabriekUI.Forms
             _projectFile.FieldBorderLocation = BlankFileLocation.TextboxText;
 
             AddProgress("De locatie van de perceelsgrens is bekend. De nuclide grids kunnen worden gemaakt.");
+            
             // Enable next groupbox:
-            GroupBoxNuclideGrids.Enabled = true;
+            if (GroupBoxPerceelsgrens.Enabled)
+                GroupBoxNuclideGrids.Enabled = true;
         }
 
         private void ComboboxSelectedIndexChanged(object sender, EventArgs e)
@@ -457,11 +480,13 @@ namespace KaartfabriekUI.Forms
             {
                 // Send values to form:
                 GridNames = _projectFile.GridNames,
-                FormulaData = Row2Formula(row)
+                FormulaData = Row2Formula(row),
+                LevelsFolder = _applicationSettings.LevelFilesFolder
             };
 
             var dialogResult = addEditFormulaForm.ShowDialog(this);
 
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (dialogResult == DialogResult.OK)
             {
                 // Get updated values from form:
@@ -476,8 +501,7 @@ namespace KaartfabriekUI.Forms
                 // Save formulas to project file:
                 SaveFormulasToProjectFile();
             }
-
-            if (dialogResult == DialogResult.Yes)
+            else if (dialogResult == DialogResult.Yes)
             {
                 // Delete formula:
                 GridViewFormulas.Rows.Remove(row);
@@ -583,7 +607,7 @@ namespace KaartfabriekUI.Forms
 
             var service = new KaartfabriekService(_projectFile, AddProgress);
             GridViewFormulas.ClearSelection();
-            service.CreateSoilMaps(selectedFormulas, _applicationSettings.LevelFilesFolder,  ColorRow);
+            service.CreateSoilMaps(selectedFormulas, _applicationSettings.LevelFilesFolder, ColorRow);
             AddProgress("De geselecteerde grids zijn berekend.");
         }
 
@@ -760,6 +784,36 @@ namespace KaartfabriekUI.Forms
             {
                 MessageBox.Show(@"De Buffer is niet correct! Het moet een getal zijn.");
             }
+        }
+
+        private void TxtEpsgCode_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(TxtEpsgCode.Text)) return;
+
+            _projectFile.EpsgCode = TxtEpsgCode.Text;
+            EnableGroupBoxPerceelsgrens();
+        }
+
+        private void CboGrondwatertrap_ComboboxSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(CboGrondwatertrap.PresetValue)) return;
+
+            _projectFile.Gwt = CboGrondwatertrap.SelectedText;
+            EnableGroupBoxPerceelsgrens();
+        }
+
+        private void EnableGroupBoxPerceelsgrens()
+        {
+            // Enable next group:
+            if (GroupBoxVelddataKolommen.Enabled && !string.IsNullOrEmpty(TxtEpsgCode.Text) && !string.IsNullOrEmpty(CboGrondwatertrap.SelectedText))
+                GroupBoxPerceelsgrens.Enabled = true;
+        }
+
+        private void GroupBoxPerceelsgrens_EnabledChanged(object sender, EventArgs e)
+        {
+            // Enable next groupbox:
+            if (File.Exists(BlankFileLocation.TextboxText))
+                GroupBoxNuclideGrids.Enabled = true;
         }
     }
 }

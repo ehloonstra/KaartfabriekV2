@@ -22,6 +22,11 @@
             Is it a new formula?
             </summary>
         </member>
+        <member name="P:KaartfabriekUI.Forms.AddEditFormula.LevelsFolder">
+            <summary>
+            The location of the levels folder
+            </summary>
+        </member>
         <member name="M:KaartfabriekUI.Forms.AddEditFormula.#ctor">
             <inheritdoc />
         </member>
