@@ -273,7 +273,7 @@ namespace KaartfabriekUI.Service
                     try
                     {
                         colorRow(formula.RowIndex, Color.Blue);
-                        if (!surferService.CalcGrid(formula))
+                        if (!surferService.CalcGrid(formula, _projectFile.ParcelData.Name))
                         {
                             _addProgress($"Er ging iets niet goed bij het berekenen van {formula.Output}.");
                             continue;
@@ -283,11 +283,11 @@ namespace KaartfabriekUI.Service
                         // Open template:
                         surferService.OpenSrf(templateLocation);
                         surferService.SaveAsPlotDocument(Path.Combine(_projectFile.WorkingFolder,
-                            SurferConstants.BodemkaartenResultaatSurferFolder, $"{formula.Output}.srf"));
+                            SurferConstants.BodemkaartenResultaatSurferFolder, $"{_projectFile.ParcelData.Name} {formula.Output}.srf"));
                         // Change grid
                         var statistics = surferService.ChangeGridSource(SurferConstants.TemplateMapName,
                             Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
-                                $"{formula.Output}.grd"),
+                                $"{_projectFile.ParcelData.Name} {formula.Output}.grd"),
                             Path.Combine(levelFilesFolder, formula.LevelFile));
 
                         // Change text:

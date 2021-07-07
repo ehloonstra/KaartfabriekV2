@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Shared;
 using Surfer;
 
@@ -16,21 +13,27 @@ namespace SurferTools
     public class SpecialCalculations
     {
         private readonly string _workingFolder;
+        private readonly string _fieldName;
         private readonly IApplication5 _surferApp;
-        private readonly Action<string> _addProgress;
 
-        public SpecialCalculations(string workingFolder, IApplication5 surferApp, Action<string> addProgress)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="workingFolder"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="surferApp"></param>
+        public SpecialCalculations(string workingFolder, string fieldName, IApplication5 surferApp)
         {
             _workingFolder = workingFolder;
+            _fieldName = fieldName;
             _surferApp = surferApp;
-            _addProgress = addProgress;
         }
 
-        public bool CalculateBodemclassificatie(string outGrid, bool eolisch)
-        {
-            // Moerig, OS, Lutum, Zandfactie, CaCO3
-            return false;
-        }
+        //public bool CalculateBodemclassificatie(string outGrid, bool eolisch)
+        //{
+        //    // Moerig, OS, Lutum, Zandfactie, CaCO3
+        //    return false;
+        //}
 
         /// <summary>
         /// Calculate Bulkdichtheid
@@ -47,9 +50,9 @@ namespace SurferTools
             var gridMathInput = new List<IGridMathInput>
             {
                 _surferApp.NewGridMathInput(tmpOs, FormulaConstants.Os),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Lutum), FormulaConstants.Lutum),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.M50), FormulaConstants.M50)
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50)
             };
 
             // ReSharper disable once ConvertToConstant.Local
@@ -72,7 +75,7 @@ namespace SurferTools
         /// <returns></returns>
         public bool CalculateMonsterpunten(string outGrid, string inputGrid)
         {
-            var tcGridLocation = SurferService.GetFullPath(_workingFolder, inputGrid);
+            var tcGridLocation = SurferService.GetFullPath(_workingFolder, _fieldName, inputGrid);
             if (File.Exists(tcGridLocation))
             {
                 File.Copy(tcGridLocation, outGrid, true);
@@ -87,12 +90,66 @@ namespace SurferTools
             return false;
         }
 
-
-
+        /// <summary>
+        /// Calculate Waterdoorlatendheid
+        /// </summary>
+        /// <param name="outGrid"></param>
+        /// <returns></returns>
         public bool CalculateWaterdoorlatendheid(string outGrid)
         {
-            // OS, Lutum, Zandfractie, M50, Bulkdichtheid
-            return false;
+            // TODO: check op negatieve waarde:
+            // Bij hele lage waarden lutum en leem (sportvelden)
+            // gaat de berekening niet goed
+
+            var tmpOs = AftoppenOs();
+
+            // Formula is getting too long (> 256):
+            var tmpKsSterKlei = CalculateWaterdoorlatendheidKsSter(tmpOs, true);
+            var tmpKsSterZand = CalculateWaterdoorlatendheidKsSter(tmpOs, false);
+
+            var gridMathInput = new List<IGridMathInput>
+            {
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(tmpKsSterKlei, "A"),
+                _surferApp.NewGridMathInput(tmpKsSterZand, "B")
+            };
+
+            // ReSharper disable once ConvertToConstant.Local
+            var formula = $"IF({FormulaConstants.Lutum}>=8,Exp(A),Exp(B))";
+            Debug.WriteLine("Lengte formule: " + formula.Length);
+
+            DeleteFile(outGrid);
+            _surferApp.GridMath3(formula, gridMathInput.ToArray(), outGrid);
+            return File.Exists(outGrid);
+        }
+
+        private string CalculateWaterdoorlatendheidKsSter(string tmpOs, bool forKlei)
+        {
+            var gridMathInput = new List<IGridMathInput>
+            {
+                _surferApp.NewGridMathInput(tmpOs, FormulaConstants.Os),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
+            };
+
+            string tmpFile, formula;
+            if (forKlei)
+            {
+                tmpFile = Path.Combine(Path.GetTempPath(), "KsSterKlei.grd");
+                formula = $"-42.6 + (8.71 * {FormulaConstants.Os}) + (61.9 * {FormulaConstants.Bulkdichtheid}) - (20.79 * ({FormulaConstants.Bulkdichtheid} ^ 2)) - (0.2107 * ({FormulaConstants.Os} ^ 2)) - (0.01622 * {FormulaConstants.Lutum} * {FormulaConstants.Os}) - (5.382 * {FormulaConstants.Bulkdichtheid} * {FormulaConstants.Os})";
+            }
+            else
+            {
+                tmpFile = Path.Combine(Path.GetTempPath(), "KsSterZand.grd");
+                formula = $"45.8 - (14.34 * {FormulaConstants.Bulkdichtheid}) + (0.001481 * ((100-{FormulaConstants.Zandfractie}) ^ 2)) - (27.5 * ({FormulaConstants.Bulkdichtheid} ^ -1)) - (0.891 * Ln((100-{FormulaConstants.Zandfractie}))) - (0.34 * Ln({FormulaConstants.Os}))";
+            }
+
+            DeleteFile(tmpFile);
+            _surferApp.GridMath3(formula, gridMathInput.ToArray(), tmpFile);
+
+            return tmpFile;
         }
 
         /// <summary>
@@ -151,7 +208,7 @@ namespace SurferTools
             // gaat de berekening niet goed
 
             var tmpOs = AftoppenOs();
-    
+
             // BetaS
             var tmpBetaS = CalculateWaterretentieBetaS(tmpOs);
 
@@ -182,7 +239,7 @@ namespace SurferTools
             // de berekening niet werkt. OS > 15% = Veen:
             var gridMathInput = new List<IGridMathInput>
             {
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Os), FormulaConstants.Os)
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Os), FormulaConstants.Os)
             };
             var tmpOs = Path.Combine(Path.GetTempPath(), "OS15.grd");
             DeleteFile(tmpOs);
@@ -198,10 +255,10 @@ namespace SurferTools
             var gridMathInput = new List<IGridMathInput>
             {
                 _surferApp.NewGridMathInput(tmpOs, FormulaConstants.Os),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Lutum), FormulaConstants.Lutum),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.M50), FormulaConstants.M50),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
             };
 
             var tmpFile = Path.Combine(Path.GetTempPath(), "BetaS.grd");
@@ -227,10 +284,10 @@ namespace SurferTools
             var gridMathInput = new List<IGridMathInput>
             {
                 _surferApp.NewGridMathInput(tmpOs, FormulaConstants.Os),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Lutum), FormulaConstants.Lutum),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.M50), FormulaConstants.M50),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
             };
 
             var tmpFile = Path.Combine(Path.GetTempPath(), "Alpha.grd");
@@ -256,10 +313,10 @@ namespace SurferTools
             var gridMathInput = new List<IGridMathInput>
             {
                 _surferApp.NewGridMathInput(tmpOs, FormulaConstants.Os),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Lutum), FormulaConstants.Lutum),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.M50), FormulaConstants.M50),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50),
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
             };
 
             var tmpFile = Path.Combine(Path.GetTempPath(), "N.grd");
