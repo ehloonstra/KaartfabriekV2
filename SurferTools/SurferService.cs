@@ -739,10 +739,10 @@ namespace SurferTools
             var specialCalculations = new SpecialCalculations(_workingFolder,  fieldName,_surferApp);
             switch (formula.Formula)
             {
-                //case FormulaConstants.BodemclassificatieEolisch:
-                //    return specialCalculations.CalculateBodemclassificatie(outGrid, true);
-                //case FormulaConstants.BodemclassificatieNietEolisch:
-                //    return specialCalculations.CalculateBodemclassificatie(outGrid, false);
+                case FormulaConstants.BodemclassificatieEolisch:
+                    return false;
+                case FormulaConstants.BodemclassificatieNietEolisch:
+                    return false;
                 case FormulaConstants.Bulkdichtheid:
                     return specialCalculations.CalculateBulkdichtheid(outGrid);
                 case FormulaConstants.Slemp:

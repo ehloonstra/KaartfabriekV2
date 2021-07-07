@@ -126,5 +126,16 @@ namespace KaartfabriekUI.Forms
             // Navigate to the URL.
             ProcessTools.OpenUrl("http://surferhelp.goldensoftware.com/wtopics/mathematical_functions.htm");
         }
+
+        private void BtnRemoveFormula_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show(
+                @$"Weet je zeker dat je deze formule wilt verwijderen?{Environment.NewLine}Dit kan niet ongedaan worden gemaakt.",
+                @"Verwijder formule", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button1) != DialogResult.Yes) return;
+
+            DialogResult = DialogResult.Yes;
+            Close();
+        }
     }
 }

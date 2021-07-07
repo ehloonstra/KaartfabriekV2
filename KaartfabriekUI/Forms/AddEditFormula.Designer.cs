@@ -44,6 +44,7 @@ namespace KaartfabriekUI.Forms
             this.CboLevels = new KaartfabriekUI.UserControls.ColumnSelectControl();
             this.BtnSaveClose = new System.Windows.Forms.Button();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.BtnRemoveFormula = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // CboOutput
@@ -198,6 +199,16 @@ namespace KaartfabriekUI.Forms
             this.linkLabel1.VisitedLinkColor = System.Drawing.Color.Blue;
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
+            // BtnRemoveFormula
+            // 
+            this.BtnRemoveFormula.Location = new System.Drawing.Point(219, 270);
+            this.BtnRemoveFormula.Name = "BtnRemoveFormula";
+            this.BtnRemoveFormula.Size = new System.Drawing.Size(193, 33);
+            this.BtnRemoveFormula.TabIndex = 15;
+            this.BtnRemoveFormula.Text = "Verwijder deze formule";
+            this.BtnRemoveFormula.UseVisualStyleBackColor = true;
+            this.BtnRemoveFormula.Click += new System.EventHandler(this.BtnRemoveFormula_Click);
+            // 
             // AddEditFormula
             // 
             this.AcceptButton = this.BtnSaveClose;
@@ -205,6 +216,7 @@ namespace KaartfabriekUI.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(426, 363);
+            this.Controls.Add(this.BtnRemoveFormula);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.BtnSaveClose);
             this.Controls.Add(this.CboLevels);
@@ -248,5 +260,6 @@ namespace KaartfabriekUI.Forms
         private UserControls.ColumnSelectControl CboLevels;
         private System.Windows.Forms.Button BtnSaveClose;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.Button BtnRemoveFormula;
     }
 }

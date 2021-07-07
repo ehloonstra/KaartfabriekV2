@@ -460,7 +460,9 @@ namespace KaartfabriekUI.Forms
                 FormulaData = Row2Formula(row)
             };
 
-            if (addEditFormulaForm.ShowDialog(this) == DialogResult.OK)
+            var dialogResult = addEditFormulaForm.ShowDialog(this);
+
+            if (dialogResult == DialogResult.OK)
             {
                 // Get updated values from form:
                 var formulaData = addEditFormulaForm.FormulaData;
@@ -471,7 +473,15 @@ namespace KaartfabriekUI.Forms
                 // Save to project:
                 _projectFile.GridNames = addEditFormulaForm.GridNames;
 
-                // Save formulas to project:
+                // Save formulas to project file:
+                SaveFormulasToProjectFile();
+            }
+
+            if (dialogResult == DialogResult.Yes)
+            {
+                // Delete formula:
+                GridViewFormulas.Rows.Remove(row);
+                // Save formulas to project file:
                 SaveFormulasToProjectFile();
             }
 
