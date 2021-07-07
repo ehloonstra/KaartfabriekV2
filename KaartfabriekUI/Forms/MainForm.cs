@@ -360,7 +360,8 @@ namespace KaartfabriekUI.Forms
         }
         private void AddProgress(string text, bool clear)
         {
-            if (clear) LblVoortgang.Text = string.Empty;
+            if (clear)
+                LblVoortgang.Text = string.Empty;
 
             LblVoortgang.Text += $@"{text}{Environment.NewLine}";
         }
@@ -598,7 +599,7 @@ namespace KaartfabriekUI.Forms
         {
             // Create temp file and open it in Notepad:
             var fileLocation = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetTempFileName(), ".txt"));
-            var header = $"Kaartfabriek logging.{Environment.NewLine}Datum: {DateTime.UtcNow:f}{Environment.NewLine}Werkfolder: {_projectFile.WorkingFolder}{Environment.NewLine}";
+            var header = $"{Text}{Environment.NewLine}Datum: {DateTime.UtcNow:f}{Environment.NewLine}Werkfolder: {_projectFile.WorkingFolder}{Environment.NewLine}";
             File.WriteAllText(fileLocation, $"{header}{Environment.NewLine}{LblVoortgang.Text}");
             ProcessTools.OpenFile(fileLocation);
         }
