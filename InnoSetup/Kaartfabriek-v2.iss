@@ -12,6 +12,8 @@
 #define MyAppExeName "Kaartfabriek.exe"
 #define MyAppVersion GetVersionNumbersString(ExeBinPath + 'Kaartfabriek.exe')
 
+#define Patched "PatchedVersion"
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -28,7 +30,13 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName=Kaartfabriek
 AllowNoIcons=yes
 OutputDir=Output
-OutputBaseFilename=Kaartfabriek-v{#MyAppVersion}
+
+#ifdef Patched
+  OutputBaseFilename=Kaartfabriek-v{#MyAppVersion}-{#Patched}
+#else
+  OutputBaseFilename=Kaartfabriek-v{#MyAppVersion}
+#endif
+
 SetupIconFile=D:\dev\TopX\Loonstra\Docs\Favicon\favicon.ico
 Compression=lzma
 SolidCompression=yes
@@ -50,8 +58,9 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 [Files]
 ;Source: "D:\dev\TopX\Loonstra\Git\Publish\Kaartfabriek.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ExeBinPath}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "GDAL\*"; DestDir: "{app}\GDAL"; Flags: ignoreversion recursesubdirs createallsubdirs
-
+#ifndef Patched
+  Source: "GDAL\*"; DestDir: "{app}\GDAL"; Flags: ignoreversion recursesubdirs createallsubdirs
+#endif
 ;Source: "CodeDependencies\netcorecheck.exe"; DestDir: "{tmp}"; Flags: dontcopy noencryption deleteafterinstall ignoreversion
 Source: "CodeDependencies\netcorecheck_x64.exe"; DestDir: "{tmp}"; Flags: dontcopy noencryption deleteafterinstall ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
