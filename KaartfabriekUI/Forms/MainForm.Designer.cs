@@ -115,6 +115,7 @@ namespace KaartfabriekUI.Forms
             this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.panelVoortgang = new System.Windows.Forms.Panel();
             this.LblVoortgang = new System.Windows.Forms.Label();
+            this.BtnProjectImport = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
             this.GroupBoxProjectInstellingen.SuspendLayout();
@@ -1129,11 +1130,23 @@ namespace KaartfabriekUI.Forms
             this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
             this.LblVoortgang.DoubleClick += new System.EventHandler(this.LblVoortgang_DoubleClick);
             // 
+            // BtnProjectImport
+            // 
+            this.BtnProjectImport.Location = new System.Drawing.Point(238, 12);
+            this.BtnProjectImport.Name = "BtnProjectImport";
+            this.BtnProjectImport.Size = new System.Drawing.Size(107, 33);
+            this.BtnProjectImport.TabIndex = 11;
+            this.BtnProjectImport.Text = "Importeer project";
+            this.toolTip1.SetToolTip(this.BtnProjectImport, "Open het project (*.json)");
+            this.BtnProjectImport.UseVisualStyleBackColor = true;
+            this.BtnProjectImport.Click += new System.EventHandler(this.BtnProjectImport_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1214, 814);
+            this.Controls.Add(this.BtnProjectImport);
             this.Controls.Add(this.panelVoortgang);
             this.Controls.Add(this.BtnNewProjectFile);
             this.Controls.Add(this.BtnOpenProjectFile);
@@ -1257,6 +1270,7 @@ namespace KaartfabriekUI.Forms
         private UserControls.ColumnSelectControl CboGrondwatertrap;
         private System.Windows.Forms.TextBox TxtEpsgCode;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button BtnProjectImport;
     }
 }
 

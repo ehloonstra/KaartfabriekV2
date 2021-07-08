@@ -17,6 +17,15 @@ namespace Shared
         public const string Lutum = "Lutum";
         public const string Zandfractie = "Zandfractie";
         public const string M50 = "M50";
+        
+        public const string K40 = "K40";
+        public const string U238 = "U238";
+        public const string Th232 = "Th232";
+        public const string Cs137 = "Cs137";
+        public const string Tc = "Tc";
+        public const string Alt = "Alt";
+
+
     }
 }
 

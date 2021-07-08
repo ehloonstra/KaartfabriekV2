@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Linq;
 using Shared;
 using Surfer;
 using SurferTools;
@@ -304,12 +306,14 @@ namespace KaartfabriekUI.Service
                         {
                             var postLayer = surferService.AddPostLayer(SurferConstants.TemplateMapName,
                                 _projectFile.FieldDataFileLocationProjected, "Velddata");
-                            postLayer.Symbol.Index = 11; //	Returns/sets the glyph index.
+                            postLayer.Symbol.Index = 0; //	Returns/sets the glyph index.
+                            postLayer.Symbol.Size = 0.05;
                             postLayer.Symbol.Color = srfColor.srfColorBlack40;
 
                             // Move to just above the contour layer:
                             postLayer.SetZOrder(SrfZOrder.srfZOToBack);
-                            postLayer.SetZOrder(SrfZOrder.srfZOForward);
+                            postLayer.SetZOrder(SrfZOrder.srfZOForward); // Above background image
+                            postLayer.SetZOrder(SrfZOrder.srfZOForward); // Above contour
 
                             // Make sure monster data layer is visible:
                             surferService.SetLayerVisibility(SurferConstants.TemplateMapName, "Monster data", true);
@@ -387,6 +391,117 @@ namespace KaartfabriekUI.Service
                 // Show surfer:
                 surferService.ShowHideSurfer(true);
             }
+        }
+
+        public bool ConvertOldProjectFile(string xmlFile)
+        {
+            var doc = XDocument.Load(xmlFile);
+
+            var nawNode = doc.Root?.Element("NAW");
+            if (nawNode is null) throw new XmlException("Cannot find NAW node");
+            _projectFile.ParcelData.Customer = nawNode.Element("Naam")?.Value;
+            _projectFile.ParcelData.Name = nawNode.Element("Perceelnaam")?.Value;
+
+            var projectgegevensNode = doc.Root?.Element("Projectgegevens");
+            if (projectgegevensNode is null) throw new XmlException("Cannot find Projectgegevens node");
+            _projectFile.ParcelData.Number = projectgegevensNode.Element("Projectnr")?.Value;
+            _projectFile.ParcelData.Size = projectgegevensNode.Element("Oppervlakte")?.Value.Replace("ha", "").Trim();
+            _projectFile.Gwt = projectgegevensNode.Element("Grondwatertrap")?.Value;
+
+            var gridsettingsNode = doc.Root?.Element("Gridsettings");
+            if (gridsettingsNode is null) throw new XmlException("Cannot find Gridsettings node");
+            _projectFile.GridSettings.SearchNumSectors = gridsettingsNode.Element("SearchNumberSectors")?.Value;
+            _projectFile.GridSettings.SearchRadius = gridsettingsNode.Element("SearchRadius1")?.Element("RD")?.Value;
+            _projectFile.GridSettings.IdPower = gridsettingsNode.Element("InverseDistancePower")?.Value;
+            _projectFile.GridSettings.IdSmoothing = gridsettingsNode.Element("InverseDistanceSmoothing")?.Value;
+            _projectFile.GridSettings.GridSpacing = gridsettingsNode.Element("GridSpacingX")?.Value;
+            _projectFile.GridSettings.Limits = gridsettingsNode.Element("Limits")?.Element("RD")?.Element("xMin")?.Value;
+
+            var formulesNode = doc.Root?.Element("Formules")?.Element("Formules");
+            if (formulesNode is null) throw new XmlException("Cannot find Formules node");
+
+            var formules = _projectFile.FormulaData;
+            foreach (var element in formulesNode.Descendants("Formule"))
+            {
+                var output = GetCorrectGridName(element.Element("GridC")?.Value);
+                if (SkipFormula(output)) continue;
+
+                var gridA  =  GetCorrectGridName(element.Element("GridA")?.Value);
+                var gridB  =  GetCorrectGridName(element.Element("GridB")?.Value);
+                var gridC  =  GetCorrectGridName(element.Element("GridD")?.Value);
+                var gridD  =  GetCorrectGridName(element.Element("GridE")?.Value);
+                var min = element.Element("Min")?.Value;
+                var max = element.Element("Max")?.Value;
+                var lvlFile = element.Element("LvlFile")?.Value;
+                if (output.Trim().ToLower() == "veldcapaciteit") lvlFile = "Veldcapaciteit 15-35 2.5.lvl";
+
+                var function = ConvertFormulaFunction(element.Element("Function")?.Value, output, gridA, gridB, gridC, gridD);
+                
+                if (string.IsNullOrEmpty(function)) continue;
+
+                _projectFile.FormulaData.Add(new FormulaData(output, function, gridA, gridB, gridC, gridD, min, max,
+                    lvlFile));
+            }
+
+            return true;
+        }
+
+        private bool SkipFormula(string output)
+        {
+            if (output.Trim().ToLower() == "uitspoelingsgevoeligheid") return true;
+            if (output.Trim().ToLower() == "pratylenchus penetrans") return true;
+            if (output.Trim().ToLower() == "trichodorus") return true;
+            if (output.Trim().ToLower() == "chitwoodi") return true;
+            if (output.Trim().ToLower() == "schurft") return true;
+            if (output.Trim().ToLower() == "stuifgevoeligheid") return true;
+            if (output.Trim().ToLower().StartsWith("bodemclassificatie")) return true;
+
+            return false;
+        }
+
+        private string ConvertFormulaFunction(string formula, string output, string gridA, string gridB, string gridC, string gridD)
+        {
+            if (output.Trim().ToLower() == "monsterpunten") return FormulaConstants.Monsterpunten;
+            if (output.Trim().ToLower() == "ligging") return FormulaConstants.Alt;
+            if (output.Trim().ToLower() == "bulkdichtheid") return FormulaConstants.Bulkdichtheid;
+            if (output.Trim().ToLower() == "waterretentie") return FormulaConstants.Waterretentie;
+            if (output.Trim().ToLower() == "veldcapaciteit") return FormulaConstants.Veldcapaciteit;
+            if (output.Trim().ToLower() == "waterdoorlatendheid") return FormulaConstants.Waterdoorlatendheid;
+            if (output.Trim().ToLower() == "slemp") return FormulaConstants.Slemp;
+
+            // First strip 'C='
+            var retVal = formula.Replace("C=", "").Trim();
+            // Now replace 'a' variable:
+            retVal = retVal.Replace("a", $"{gridA}");
+            // If exist, replace 'b' variable:
+            if (!string.IsNullOrEmpty(gridB))
+                retVal = retVal.Replace("b", $"{gridB}");
+            // 'c' variable is output
+            // If exist, replace 'd' variable:
+            if (!string.IsNullOrEmpty(gridC))
+                retVal = retVal.Replace("d", $"{gridC}");
+            // If exist, replace 'c' variable:
+            if (!string.IsNullOrEmpty(gridD))
+                retVal = retVal.Replace("e", $"{gridD}"); 
+            
+            return retVal.Trim();
+        }
+
+        private string GetCorrectGridName(string gridName)
+        {
+            if (string.IsNullOrEmpty(gridName)) return string.Empty;
+            
+            // Alt;Cs137;K40;TC;Th232;U238;CaCO3;K-getal;Ligging; Lutum; M0; M50; Mg; Mn; Monsterpunten;
+            // OS; P-Al; pH; PW; Stikstof; Zandfractie; Bulkdichtheid; Slemp; Veldcapaciteit; Waterdoorlatendheid; Waterretentie
+
+            if (gridName.Trim().ToLower() == "os") return FormulaConstants.Os;
+            if (gridName.Trim().ToLower() == "cs") return FormulaConstants.Cs137;
+            if (gridName.Trim().ToLower() == "k") return FormulaConstants.K40;
+            if (gridName.Trim().ToLower() == "u") return FormulaConstants.U238;
+            if (gridName.Trim().ToLower() == "th") return FormulaConstants.Th232;
+            if (gridName.Trim().ToLower() == "tc") return FormulaConstants.Tc;
+
+            return gridName;
         }
     }
 }

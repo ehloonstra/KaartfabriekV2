@@ -158,6 +158,8 @@ namespace KaartfabriekUI.Forms
             }
 
             var header = File.ReadLines(VeldDataLocation.TextboxText).First();
+            // Remove possible double quotes:
+            header = header.Replace("\"", "");
             if (string.IsNullOrWhiteSpace(header))
             {
                 MessageBox.Show(@"De velddata heeft geen inhoud");
@@ -814,6 +816,64 @@ namespace KaartfabriekUI.Forms
             // Enable next groupbox:
             if (File.Exists(BlankFileLocation.TextboxText))
                 GroupBoxNuclideGrids.Enabled = true;
+        }
+
+        private void BtnProjectImport_Click(object sender, EventArgs e)
+        {
+            AddProgress("Het projectbestand wordt geimporteerd.", true);
+            using var ofd = new OpenFileDialog
+            {
+                CheckFileExists = true,
+                CheckPathExists = true,
+                DefaultExt = "xml",
+                Filter = @"xml files|*.xml|All files (*.*)|*.*",
+                Multiselect = false,
+                SupportMultiDottedExtensions = true,
+                Title = @"Selecteer project.xml",
+                FileName = "project.xml",
+                ClientGuid = Guid.Parse("{BA4B80C8-7022-4E34-BFAA-FF9C00F7F4E3}")
+            };
+            var result = ofd.ShowDialog();
+            if (result != DialogResult.OK) return;
+
+            try
+            {
+                _projectFile = new ProjectFile();
+                var service = new KaartfabriekService(_projectFile, AddProgress);
+                if (!service.ConvertOldProjectFile(ofd.FileName)) return;
+            }
+            catch (Exception exception)
+            {
+                AddProgress(exception.Message);
+                // swallow throw;
+                return;
+            }
+
+            // Select new location
+            using var sfd = new SaveFileDialog
+            {
+                AddExtension = true,
+                DefaultExt = "json",
+                Filter = @"project v2 (.json)|*.json|All files (*.*)|*.*",
+                CheckPathExists = true,
+                CheckFileExists = false,
+                FileName = "project.json",
+                SupportMultiDottedExtensions = true,
+                Title = @"Sla het geconverteerde bestand als een project v2 bestand op"
+            };
+
+            var resultSave = sfd.ShowDialog();
+            if (resultSave != DialogResult.OK) return;
+            
+            _projectFile.WorkingFolder = Path.GetDirectoryName(sfd.FileName);
+            _projectFile.SaveAs(sfd.FileName);
+
+            ProjectFile2Gui();
+
+            // Enable next groupbox:
+            GroupBoxVoorbereiding.Enabled = true;
+
+            AddProgress("Het projectbestand is geimporteerd en geopend.");
         }
     }
 }

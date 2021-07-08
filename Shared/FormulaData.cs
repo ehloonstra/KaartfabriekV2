@@ -85,7 +85,7 @@ namespace Shared
 
                 new(FormulaConstants.Monsterpunten, FormulaConstants.Monsterpunten, "TC", "", "", "", "", "",
                     "Tc 200 250.lvl"),
-                new("Ligging", "Alt", "Alt", "", "", "", "", "", "Ligging 2-7.lvl")
+                new("Ligging", FormulaConstants.Alt, FormulaConstants.Alt, "", "", "", "", "", "Ligging 2-7.lvl")
             };
 
             return retVal;
