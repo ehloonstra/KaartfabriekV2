@@ -25,6 +25,7 @@ namespace Shared
         private string _gridNames;
         private string _fieldBorderBufferSize;
         private string _gwt;
+        private string _projectNr;
 
         public string WorkingFolder
         {
@@ -84,6 +85,12 @@ namespace Shared
         {
             get => _gwt;
             set { _gwt = value; NotifyPropertyChanged(); }
+        }
+
+        public string ProjectNr
+        {
+            get => _projectNr;
+            set { _projectNr = value; NotifyPropertyChanged(); }
         }
 
         public string GridNames

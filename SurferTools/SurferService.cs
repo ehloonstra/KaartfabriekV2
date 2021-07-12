@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using Shared;
@@ -529,7 +530,7 @@ namespace SurferTools
             }
             else
             {
-                ratioWidth = endWidth - pageSetup.LeftMargin / mapFrame.Width;
+                ratioWidth = (endWidth - pageSetup.LeftMargin) / mapFrame.Width;
             }
 
             mapFrame.Axes.Item("Left Axis").ShowLabels = false;
@@ -737,7 +738,7 @@ namespace SurferTools
             var outGrid = Path.Combine(outputFolder, $"{fieldName} {formula.Output}.grd");
 
             //  Check for special formulas like Bodemclassificatie, Waterretentie, etc.
-            var specialCalculations = new SpecialCalculations(_workingFolder,  fieldName,_surferApp);
+            var specialCalculations = new SpecialCalculations(_workingFolder, fieldName, _surferApp);
             switch (formula.Formula)
             {
                 case FormulaConstants.BodemclassificatieEolisch:
@@ -1014,47 +1015,75 @@ namespace SurferTools
             if (groupDimensions.Shapes.Item("dimBottom") is not IShape dimBottom)
                 throw new Exception("Could not find dimBottom");
 
-            MakeMapFrameFit(mapFrame, dimTop.Left, dimBottom.Top);
+            var ratio = MakeMapFrameFit(mapFrame, dimTop.Left, dimBottom.Top);
+
+            // De labels en ticks van de assen verpoeren de breedte,
+            // dus eerst uitzetten:
+            LabelsAssenWijzigen(false, mapFrame.Axes);
 
             // Center map:
-            mapFrame.Left += (dimTop.Left - mapFrame.Left - mapFrame.Width) / 2;
-            // mapFrame.Top -= (dimTop.Top - dimBottom.Top - mapFrame.Height) / 2;
-
-            // Check if map needs to be enlarged:
-            //object.SetScale( Minimum, Maximum, MajorInterval, FirstMajorTick, LastMajorTick, Cross1, Cross2 )
-            // Dit moet in coordinaten niet in page units.
-            // Rekening houden met de verschaling (ratio)!
-
-            ////controleren of niet al maximaal hoog is:
-            //if ((dimTop.Top - mapFrame.Top) > 0.001)
-            //{
-            //    mapFrame.Axes.Item("Top Axis").SetScale(Cross1: mapFrame.Axes.Item("Top Axis").Cross1 +
-            //                                                    (dimTop.Top - mapFrame.Top) * mapFrame.xMapPerPU /
-            //                                                    ratio);
-            //    mapFrame.Axes.Item("Bottom Axis").SetScale Cross1:= oAxis("Bottom Axis").Cross1 - ((_
-            //        .top - .Height - dimDimensions.bottom) * _
-            //        .xMapPerPU / dScale)
-            //}
+            if (dimTop.Left - dimBottom.Left > mapFrame.Width)
+                mapFrame.Left += (dimTop.Left - mapFrame.Left - mapFrame.Width) / 2;
+            if (dimTop.Top - dimBottom.Top > mapFrame.Height)
+                mapFrame.Top -= (dimTop.Top - dimBottom.Top - mapFrame.Height) / 2;
 
             var pageSetup = _activePlotDocument.PageSetup;
 
-            var xMin = mapFrame.Axes.Item("Left Axis").Cross1 - mapFrame.Left * mapFrame.yMapPerPU;
-            xMin = Math.Round(xMin / 10, MidpointRounding.ToZero) * 10; // 162870
-            mapFrame.Axes.Item("Left Axis").SetScale(Cross1: xMin);
+            // Check if the width needs to be enlarged:
+            if (dimTop.Left - dimBottom.Left > mapFrame.Width)
+            {
+                //var xMin = mapFrame.Axes.Item("Left Axis").Cross1 - mapFrame.Left * mapFrame.yMapPerPU;
+                var xMin = mapFrame.Axes.Item("Left Axis").Cross1 - (mapFrame.Left - dimBottom.Left) * mapFrame.yMapPerPU;
+                xMin = (Math.Round(xMin / 10, MidpointRounding.ToZero) * 10) + 10; // 162870
+                mapFrame.Axes.Item("Left Axis").SetScale(Cross1: xMin);
 
-            var xMax = mapFrame.Axes.Item("Right Axis").Cross1 + ((dimTop.Left - mapFrame.Width + mapFrame.Left + pageSetup.LeftMargin) * mapFrame.yMapPerPU); // 163600
-            mapFrame.Axes.Item("Right Axis").SetScale(Cross1: xMax);
+                // Reset:
+                mapFrame.Left = dimBottom.Left;
 
-            // Enlarge top and bottom axes:
-            mapFrame.Axes.Item("Top Axis").SetScale(Minimum: xMin, FirstMajorTick: xMin, Maximum: xMax, LastMajorTick: xMax);
-            mapFrame.Axes.Item("Bottom Axis").SetScale(Minimum: xMin, FirstMajorTick: xMin, Maximum: xMax, LastMajorTick: xMax);
+                var xMax = mapFrame.Axes.Item("Right Axis").Cross1 +
+                           (dimTop.Left - mapFrame.Left - mapFrame.Width) * mapFrame.yMapPerPU * ratio; // 163370 163550
+                mapFrame.Axes.Item("Right Axis").SetScale(Cross1: xMax);
+
+                // Enlarge top and bottom axes:
+                mapFrame.Axes.Item("Top Axis")
+                    .SetScale(Minimum: xMin, FirstMajorTick: xMin, Maximum: xMax, LastMajorTick: xMax);
+                mapFrame.Axes.Item("Bottom Axis").SetScale(Minimum: xMin, FirstMajorTick: xMin, Maximum: xMax,
+                    LastMajorTick: xMax);
+            }
+
+            // Check if the height needs to be enlarged:
+            if (dimTop.Top - dimBottom.Top > mapFrame.Height)
+            {
+                // 527420
+                var yMin = mapFrame.Axes.Item("Bottom Axis").Cross1 - dimBottom.Top * mapFrame.xMapPerPU;
+                yMin = Math.Round(yMin / 10, MidpointRounding.ToZero) * 10; // 527340
+                mapFrame.Axes.Item("Bottom Axis").SetScale(Cross1: yMin);
+
+                // Reset:
+                mapFrame.Top = dimBottom.Top + mapFrame.Height;
+
+                // 527960
+                var yMax = mapFrame.Axes.Item("Top Axis").Cross1 +
+                           (dimTop.Top - mapFrame.Height - pageSetup.TopMargin) * mapFrame.xMapPerPU * ratio; // 528035 516752
+                mapFrame.Axes.Item("Top Axis").SetScale(Cross1: yMax);
+
+                // Enlarge left and right axes:
+                mapFrame.Axes.Item("Left Axis")
+                    .SetScale(Minimum: yMin, FirstMajorTick: yMin, Maximum: yMax, LastMajorTick: yMax);
+                mapFrame.Axes.Item("Right Axis")
+                    .SetScale(Minimum: yMin, FirstMajorTick: yMin, Maximum: yMax, LastMajorTick: yMax);
+            }
 
             // Set limits of Map frame:
             mapFrame.SetLimits(mapFrame.Axes.Item("Bottom Axis").Minimum, mapFrame.Axes.Item("Bottom Axis").Maximum,
                 mapFrame.Axes.Item("Left Axis").Minimum, mapFrame.Axes.Item("Left Axis").Maximum);
 
-            // Reset left:
-            mapFrame.Left = pageSetup.LeftMargin;
+            // Reset location:
+            mapFrame.Left = dimBottom.Left;
+            mapFrame.Top = dimTop.Top;
+
+            // Show labels again:
+            LabelsAssenWijzigen(true, mapFrame.Axes);
 
             // The map scale is not properly scaled:
             if (shapes.Item("Map Scale") is not IScaleBar3 mapScale)
@@ -1062,7 +1091,27 @@ namespace SurferTools
             mapScale.LabelFont.Size = 8;
 
             // Remove Dimensions:
+#if !DEBUG
             groupDimensions.Delete();
+#endif
+        }
+
+        private static void LabelsAssenWijzigen(bool enabled, IAxes axes)
+        {
+            if (enabled)
+            {
+                axes.Item("Bottom Axis").ShowLabels = true;
+                axes.Item("Bottom Axis").MajorTickType = SrfTickType.srfTickOut;
+                axes.Item("Left Axis").ShowLabels = true;
+                axes.Item("Left Axis").MajorTickType = SrfTickType.srfTickOut;
+            }
+            else
+            {
+                axes.Item("Bottom Axis").ShowLabels = false;
+                axes.Item("Bottom Axis").MajorTickType = SrfTickType.srfTickNone;
+                axes.Item("Left Axis").ShowLabels = false;
+                axes.Item("Left Axis").MajorTickType = SrfTickType.srfTickNone;
+            }
         }
 
         /// <summary>

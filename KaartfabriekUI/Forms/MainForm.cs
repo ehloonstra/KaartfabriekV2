@@ -92,13 +92,18 @@ namespace KaartfabriekUI.Forms
                 }
 
                 var result = ofd.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    return new ProcessTools().ConvertLatLongToProjected(ofd.FileName, _projectFile.EpsgCode);
-                }
-            }
+                if (result != DialogResult.OK) return "Something went wrong";
 
-            return "Something went wrong";
+                AddProgress(Path.GetFileName(ofd.FileName + " wordt geconverteerd."));
+                var retVal = new ProcessTools().ConvertLatLongToProjected(ofd.FileName, _projectFile.EpsgCode);
+                if (File.Exists(retVal))
+                {
+                    AddProgress("Het bestand is geconverteerd naar " +  _projectFile.EpsgCode);
+                    return retVal;
+                }
+
+                throw new Exception("Er ging iets fout bij het converteren.");
+            }
         }
 
         private void BtnLoadVelddataInSurfer_Click(object sender, EventArgs e)
@@ -132,6 +137,7 @@ namespace KaartfabriekUI.Forms
 
         private void CheckColumns()
         {
+            GroupBoxProjectInstellingen.Enabled = false;
             if (CboXcoord.SelectedIndex > -1 && CboYcoord.SelectedIndex > -1 && CboAlt.SelectedIndex > -1 &&
                 CboK40.SelectedIndex > -1 && CboCs137.SelectedIndex > -1 && CboTh232.SelectedIndex > -1 &&
                 CboU238.SelectedIndex > -1 && CboTotalCount.SelectedIndex > -1)
@@ -216,7 +222,16 @@ namespace KaartfabriekUI.Forms
 
             if (!File.Exists(ofd.FileName)) return;
 
-            _projectFile = ProjectFile.Load(ofd.FileName);
+            try
+            {
+                _projectFile = ProjectFile.Load(ofd.FileName);
+
+            }
+            catch (Exception exception)
+            {
+                AddProgress("Kon het projectbestand niet openen. Error: " + exception.Message);
+                return;
+            }
 
             // Enable next groupbox:
             GroupBoxVoorbereiding.Enabled = true;
@@ -225,16 +240,28 @@ namespace KaartfabriekUI.Forms
             ProjectFile2Gui();
         }
 
+        private void ResetGui()
+        {
+            // Reset:
+            VeldDataLocation.TextboxText = string.Empty;
+            MonsterDataLocation.TextboxText = string.Empty;
+           BlankFileLocation.TextboxText = string.Empty;
+            
+            GroupBoxVelddataKolommen.Enabled = false;
+            GroupBoxProjectInstellingen.Enabled = false;
+            GroupBoxNuclideGrids.Enabled = false;
+        }
+
         private void ProjectFile2Gui()
         {
             // Enable tabpages:
+            // TODO: Check inputs first:
             TabPageTemplate.Enabled = true;
             TabPageUitvoer.Enabled = true;
 
-            if (Directory.Exists(_projectFile.WorkingFolder))
-            {
-                WorkingFolder.TextboxText = _projectFile.WorkingFolder;
-            }
+            ResetGui();
+
+            WorkingFolder.TextboxText = Directory.Exists(_projectFile.WorkingFolder) ? _projectFile.WorkingFolder : "";
             if (File.Exists(_projectFile.FieldDataFileLocationProjected))
             {
                 VeldDataLocation.TextboxText = _projectFile.FieldDataFileLocationProjected;
@@ -243,7 +270,6 @@ namespace KaartfabriekUI.Forms
             {
                 if (File.Exists(_projectFile.FieldDataFileLocation))
                 {
-                    // TODO: Use EPSG-code from GUI:
                     var fileName = new ProcessTools().ConvertLatLongToProjected(_projectFile.FieldDataFileLocation, _projectFile.EpsgCode);
                     if (File.Exists(fileName))
                     {
@@ -251,6 +277,11 @@ namespace KaartfabriekUI.Forms
                         _projectFile.FieldDataFileLocationProjected = fileName;
                         VeldDataLocation.TextboxText = _projectFile.FieldDataFileLocationProjected;
                     }
+                }
+                else
+                {
+                    VeldDataLocation.TextboxText = string.Empty;
+                    GroupBoxVelddataKolommen.Enabled = false;
                 }
             }
 
@@ -271,21 +302,26 @@ namespace KaartfabriekUI.Forms
                         MonsterDataLocation.TextboxText = _projectFile.SampleDataFileLocationProjected;
                     }
                 }
+                else
+                {
+                    MonsterDataLocation.TextboxText = string.Empty;
+                    GroupBoxVelddataKolommen.Enabled = false;
+                }
             }
 
-            if (File.Exists(_projectFile.FieldBorderLocation))
-                BlankFileLocation.TextboxText = _projectFile.FieldBorderLocation;
+            BlankFileLocation.TextboxText = File.Exists(_projectFile.FieldBorderLocation) ? _projectFile.FieldBorderLocation : string.Empty;
 
             TxtBuffer.Text = _projectFile.FieldBorderBufferSize ?? "10";
 
             // GWT
             CboGrondwatertrap.Data = "I; II; III+; V+; III-; V-; IV; VI; VII";
-            if (!string.IsNullOrEmpty(_projectFile.Gwt))
-                CboGrondwatertrap.PresetValue = _projectFile.Gwt;
+            CboGrondwatertrap.PresetValue = !string.IsNullOrEmpty(_projectFile.Gwt) ? _projectFile.Gwt : null;
 
             // EPSG:
             if (!string.IsNullOrEmpty(_projectFile.EpsgCode))
                 TxtEpsgCode.Text = _projectFile.EpsgCode;
+
+            TxtTemplateProjectNr.Text = _projectFile.ProjectNr;
 
             var pData = _projectFile.ParcelData;
             if (pData is not null)
@@ -293,14 +329,11 @@ namespace KaartfabriekUI.Forms
                 TxtTemplateNaam.Text = pData.Customer;
                 TxtTemplatePerceel.Text = pData.Name;
                 TxtTemplateOmvang.Text = pData.Size;
-                TxtTemplateNummer.Text = pData.Number;
             }
 
             FillGridViewFormulas();
 
             FillGridSettings();
-
-
         }
 
         private void FillGridSettings()
@@ -432,7 +465,7 @@ namespace KaartfabriekUI.Forms
             _projectFile.FieldBorderLocation = BlankFileLocation.TextboxText;
 
             AddProgress("De locatie van de perceelsgrens is bekend. De nuclide grids kunnen worden gemaakt.");
-            
+
             // Enable next groupbox:
             if (GroupBoxPerceelsgrens.Enabled)
                 GroupBoxNuclideGrids.Enabled = true;
@@ -628,7 +661,7 @@ namespace KaartfabriekUI.Forms
             _projectFile.ParcelData.Customer = TxtTemplateNaam.Text;
             _projectFile.ParcelData.Name = TxtTemplatePerceel.Text;
             _projectFile.ParcelData.Size = TxtTemplateOmvang.Text;
-            _projectFile.ParcelData.Number = TxtTemplateNummer.Text;
+            _projectFile.ProjectNr = TxtTemplateProjectNr.Text;
             _projectFile.Save();
 
             var service = new KaartfabriekService(_projectFile, AddProgress);
@@ -798,7 +831,7 @@ namespace KaartfabriekUI.Forms
 
         private void CboGrondwatertrap_ComboboxSelectedIndexChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CboGrondwatertrap.PresetValue)) return;
+            if (CboGrondwatertrap.SelectedIndex <= 0) return;
 
             _projectFile.Gwt = CboGrondwatertrap.SelectedText;
             EnableGroupBoxPerceelsgrens();
@@ -807,15 +840,15 @@ namespace KaartfabriekUI.Forms
         private void EnableGroupBoxPerceelsgrens()
         {
             // Enable next group:
-            if (GroupBoxVelddataKolommen.Enabled && !string.IsNullOrEmpty(TxtEpsgCode.Text) && !string.IsNullOrEmpty(CboGrondwatertrap.SelectedText))
-                GroupBoxPerceelsgrens.Enabled = true;
+            GroupBoxPerceelsgrens.Enabled = GroupBoxVelddataKolommen.Enabled &&
+                                            !string.IsNullOrEmpty(TxtEpsgCode.Text) &&
+                                            !string.IsNullOrEmpty(CboGrondwatertrap.SelectedText);
         }
 
         private void GroupBoxPerceelsgrens_EnabledChanged(object sender, EventArgs e)
         {
             // Enable next groupbox:
-            if (File.Exists(BlankFileLocation.TextboxText))
-                GroupBoxNuclideGrids.Enabled = true;
+            GroupBoxNuclideGrids.Enabled = File.Exists(BlankFileLocation.TextboxText);
         }
 
         private void BtnProjectImport_Click(object sender, EventArgs e)
@@ -864,7 +897,7 @@ namespace KaartfabriekUI.Forms
 
             var resultSave = sfd.ShowDialog();
             if (resultSave != DialogResult.OK) return;
-            
+
             _projectFile.WorkingFolder = Path.GetDirectoryName(sfd.FileName);
             _projectFile.SaveAs(sfd.FileName);
 
@@ -872,8 +905,24 @@ namespace KaartfabriekUI.Forms
 
             // Enable next groupbox:
             GroupBoxVoorbereiding.Enabled = true;
+            // Select first tab:
+            tabControl1.SelectedTab = tabControl1.TabPages[nameof(TabPageVoorbereiding)];
 
             AddProgress("Het projectbestand is geimporteerd en geopend.");
+        }
+
+        private void GroupBoxVelddataKolommen_EnabledChanged(object sender, EventArgs e)
+        {
+            CheckColumns();
+            if (!GroupBoxVelddataKolommen.Enabled)
+                GroupBoxProjectInstellingen.Enabled = false;
+        }
+
+        private void GroupBoxProjectInstellingen_EnabledChanged(object sender, EventArgs e)
+        {
+            if (!GroupBoxProjectInstellingen.Enabled)
+                GroupBoxPerceelsgrens.Enabled = false;
+
         }
     }
 }

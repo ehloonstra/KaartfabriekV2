@@ -164,22 +164,12 @@ namespace SurferTools
 
             // To avoid deadlocks, always read the output stream first and then wait.  
             var output = myProcess.StandardError.ReadToEnd();
-            if (!string.IsNullOrEmpty(output))
+            if (!string.IsNullOrEmpty(output) && output.Contains("Error", StringComparison.InvariantCultureIgnoreCase))
                 throw new Exception($"Exception in processing GDAL tool ({Path.GetFileName(toolLocation)}). {output}");
             
             myProcess.WaitForExit(10_000);
             
-            if (myProcess.ExitCode == 0) return true;
-
-            // Something went wrong, show the window
-            // TODO: Doesn't work:
-            //ShowWindow(myProcess.MainWindowHandle, 0);
-            return false;
-        }
-
-        private static void OutputHandler(object sender, DataReceivedEventArgs e)
-        {
-            Console.WriteLine(e.Data);
+            return myProcess.ExitCode == 0;
         }
     }
 }

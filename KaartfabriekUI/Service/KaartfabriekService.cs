@@ -359,7 +359,7 @@ namespace KaartfabriekUI.Service
                 surferService.SaveAsPlotDocument(Path.Combine(folder, SurferConstants.TemplateName));
 
                 // Change Perceelnr:
-                surferService.ChangeText("Perceelnr", _projectFile.ParcelData.Number);
+                surferService.ChangeText("Perceelnr", _projectFile.ProjectNr);
                 // Change Perceelgegevens:
                 var pData = _projectFile.ParcelData;
                 var value = string.Format("Naam: {1}{0}{0}Perceel: {2}{0}{0}Omvang: {3} ha{0}{0}Projectie: x",
@@ -393,6 +393,12 @@ namespace KaartfabriekUI.Service
             }
         }
 
+        /// <summary>
+        /// Convert XML project file from older version to JSON project file for this version.
+        /// </summary>
+        /// <param name="xmlFile"></param>
+        /// <returns></returns>
+        /// <exception cref="XmlException"></exception>
         public bool ConvertOldProjectFile(string xmlFile)
         {
             var doc = XDocument.Load(xmlFile);
@@ -404,7 +410,8 @@ namespace KaartfabriekUI.Service
 
             var projectgegevensNode = doc.Root?.Element("Projectgegevens");
             if (projectgegevensNode is null) throw new XmlException("Cannot find Projectgegevens node");
-            _projectFile.ParcelData.Number = projectgegevensNode.Element("Projectnr")?.Value;
+            _projectFile.ProjectNr = projectgegevensNode.Element("Projectnr")?.Value;
+            _projectFile.ParcelData.Number = projectgegevensNode.Element("Perceelnr")?.Value;
             _projectFile.ParcelData.Size = projectgegevensNode.Element("Oppervlakte")?.Value.Replace("ha", "").Trim();
             _projectFile.Gwt = projectgegevensNode.Element("Grondwatertrap")?.Value;
 
