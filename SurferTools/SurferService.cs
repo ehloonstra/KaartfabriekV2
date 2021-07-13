@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using Shared;
@@ -933,6 +932,15 @@ namespace SurferTools
             if (File.Exists(lvlFile))
             {
                 contourLayer.Levels.LoadFile(lvlFile);
+                if (Path.GetFileName(newGridLocation).EndsWith($"{FormulaConstants.Slemp}.grd"))
+                {
+                    contourLayer.ColorScale.LabelFormat.NumDigits = 2;
+                    contourLayer.ColorScale.LabelFormat.Type = SrfLabelType.srfLabFixed;
+                }
+            }
+            else
+            {
+                _addProgress($"Kon {Path.GetFileName(lvlFile)} niet vinden.");
             }
 
             return (contourLayer.Grid as IGrid3)?.Statistics();
@@ -1027,27 +1035,28 @@ namespace SurferTools
             if (dimTop.Top - dimBottom.Top > mapFrame.Height)
                 mapFrame.Top -= (dimTop.Top - dimBottom.Top - mapFrame.Height) / 2;
 
-            var pageSetup = _activePlotDocument.PageSetup;
+            const int roundUp = 10;
 
             // Check if the width needs to be enlarged:
             if (dimTop.Left - dimBottom.Left > mapFrame.Width)
             {
                 //var xMin = mapFrame.Axes.Item("Left Axis").Cross1 - mapFrame.Left * mapFrame.yMapPerPU;
                 var xMin = mapFrame.Axes.Item("Left Axis").Cross1 - (mapFrame.Left - dimBottom.Left) * mapFrame.yMapPerPU;
-                xMin = (Math.Round(xMin / 10, MidpointRounding.ToZero) * 10) + 10; // 162870
+                xMin = (Math.Round(xMin / roundUp, MidpointRounding.ToZero) * roundUp); // 162870
                 mapFrame.Axes.Item("Left Axis").SetScale(Cross1: xMin);
 
                 // Reset:
                 mapFrame.Left = dimBottom.Left;
 
                 var xMax = mapFrame.Axes.Item("Right Axis").Cross1 +
-                           (dimTop.Left - mapFrame.Left - mapFrame.Width) * mapFrame.yMapPerPU * ratio; // 163370 163550
+                           ((dimTop.Left - (mapFrame.Left + mapFrame.Width)) * mapFrame.xMapPerPU); // 163370 163550
+                xMax /= ratio;
                 mapFrame.Axes.Item("Right Axis").SetScale(Cross1: xMax);
 
                 // Enlarge top and bottom axes:
                 mapFrame.Axes.Item("Top Axis")
-                    .SetScale(Minimum: xMin, FirstMajorTick: xMin, Maximum: xMax, LastMajorTick: xMax);
-                mapFrame.Axes.Item("Bottom Axis").SetScale(Minimum: xMin, FirstMajorTick: xMin, Maximum: xMax,
+                    .SetScale(Minimum: xMin, FirstMajorTick: xMin + roundUp, Maximum: xMax, LastMajorTick: xMax);
+                mapFrame.Axes.Item("Bottom Axis").SetScale(Minimum: xMin, FirstMajorTick: xMin + roundUp, Maximum: xMax,
                     LastMajorTick: xMax);
             }
 
@@ -1055,8 +1064,8 @@ namespace SurferTools
             if (dimTop.Top - dimBottom.Top > mapFrame.Height)
             {
                 // 527420
-                var yMin = mapFrame.Axes.Item("Bottom Axis").Cross1 - dimBottom.Top * mapFrame.xMapPerPU;
-                yMin = Math.Round(yMin / 10, MidpointRounding.ToZero) * 10; // 527340
+                var yMin = mapFrame.Axes.Item("Bottom Axis").Cross1 - (dimBottom.Top * mapFrame.xMapPerPU);
+                yMin = Math.Round(yMin / roundUp, MidpointRounding.ToZero) * roundUp; // 527340
                 mapFrame.Axes.Item("Bottom Axis").SetScale(Cross1: yMin);
 
                 // Reset:
@@ -1064,14 +1073,15 @@ namespace SurferTools
 
                 // 527960
                 var yMax = mapFrame.Axes.Item("Top Axis").Cross1 +
-                           (dimTop.Top - mapFrame.Height - pageSetup.TopMargin) * mapFrame.xMapPerPU * ratio; // 528035 516752
+                           (dimTop.Top - dimBottom.Top - mapFrame.Height) * mapFrame.xMapPerPU; // 528035 516752
+                //yMax /= ratio;
                 mapFrame.Axes.Item("Top Axis").SetScale(Cross1: yMax);
 
                 // Enlarge left and right axes:
                 mapFrame.Axes.Item("Left Axis")
-                    .SetScale(Minimum: yMin, FirstMajorTick: yMin, Maximum: yMax, LastMajorTick: yMax);
+                    .SetScale(Minimum: yMin, FirstMajorTick: yMin + roundUp, Maximum: yMax, LastMajorTick: yMax);
                 mapFrame.Axes.Item("Right Axis")
-                    .SetScale(Minimum: yMin, FirstMajorTick: yMin, Maximum: yMax, LastMajorTick: yMax);
+                    .SetScale(Minimum: yMin, FirstMajorTick: yMin + roundUp, Maximum: yMax, LastMajorTick: yMax);
             }
 
             // Set limits of Map frame:
@@ -1182,6 +1192,23 @@ namespace SurferTools
                 _addProgress($"Could not find layer with name {layerName}. Error: {e.Message}");
                 // swallow throw;
             }
+        }
+
+        /// <summary>
+        /// Export active document as emf-file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="resultFolder"></param>
+        /// <returns></returns>
+        public bool ExportAsEmf(string fileName, string resultFolder)
+        {
+            OpenSrf(fileName);
+
+            // http://surferhelp.goldensoftware.com/subsys/subsys_hid_gsiemf2_scriptopt.htm?Highlight=emf
+            // ReSharper disable once AssignNullToNotNullAttribute
+            var newFileName = Path.Combine(resultFolder, Path.ChangeExtension(Path.GetFileName(fileName), ".emf"));
+
+            return _activePlotDocument.Export2(newFileName, false, "Defaults=1,AllTextToPolygons=0,MaxBitmapSizeInMB=10", "emf");
         }
     }
 }

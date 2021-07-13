@@ -17,6 +17,8 @@ namespace Shared
         public const string Lutum = "Lutum";
         public const string Zandfractie = "Zandfractie";
         public const string M50 = "M50";
+        public const string Ph = "pH";
+        public const string CaCo3 = "CACO3";
         
         public const string K40 = "K40";
         public const string U238 = "U238";
