@@ -924,5 +924,19 @@ namespace KaartfabriekUI.Forms
                 GroupBoxPerceelsgrens.Enabled = false;
 
         }
+
+        private void BtnExportEmf_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var service = new KaartfabriekService(_projectFile, AddProgress);
+                service.ExportEmf();
+            }
+            catch (Exception exception)
+            {
+                AddProgress("Er ging wat fout bij het exporteren. Error: " + exception.Message);
+                // swallow: throw;
+            }
+        }
     }
 }

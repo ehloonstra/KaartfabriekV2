@@ -433,17 +433,17 @@ namespace KaartfabriekUI.Service
                 var output = GetCorrectGridName(element.Element("GridC")?.Value);
                 if (SkipFormula(output)) continue;
 
-                var gridA  =  GetCorrectGridName(element.Element("GridA")?.Value);
-                var gridB  =  GetCorrectGridName(element.Element("GridB")?.Value);
-                var gridC  =  GetCorrectGridName(element.Element("GridD")?.Value);
-                var gridD  =  GetCorrectGridName(element.Element("GridE")?.Value);
+                var gridA = GetCorrectGridName(element.Element("GridA")?.Value);
+                var gridB = GetCorrectGridName(element.Element("GridB")?.Value);
+                var gridC = GetCorrectGridName(element.Element("GridD")?.Value);
+                var gridD = GetCorrectGridName(element.Element("GridE")?.Value);
                 var min = element.Element("Min")?.Value;
                 var max = element.Element("Max")?.Value;
                 var lvlFile = element.Element("LvlFile")?.Value;
                 if (output.Trim().ToLower() == "veldcapaciteit") lvlFile = "Veldcapaciteit 15-35 2.5.lvl";
 
                 var function = ConvertFormulaFunction(element.Element("Function")?.Value, output, gridA, gridB, gridC, gridD);
-                
+
                 if (string.IsNullOrEmpty(function)) continue;
 
                 _projectFile.FormulaData.Add(new FormulaData(output, function, gridA, gridB, gridC, gridD, min, max,
@@ -489,15 +489,15 @@ namespace KaartfabriekUI.Service
                 retVal = retVal.Replace("d", $"{gridC}");
             // If exist, replace 'c' variable:
             if (!string.IsNullOrEmpty(gridD))
-                retVal = retVal.Replace("e", $"{gridD}"); 
-            
+                retVal = retVal.Replace("e", $"{gridD}");
+
             return retVal.Trim();
         }
 
         private string GetCorrectGridName(string gridName)
         {
             if (string.IsNullOrEmpty(gridName)) return string.Empty;
-            
+
             // Alt;Cs137;K40;TC;Th232;U238;CaCO3;K-getal;Ligging; Lutum; M0; M50; Mg; Mn; Monsterpunten;
             // OS; P-Al; pH; PW; Stikstof; Zandfractie; Bulkdichtheid; Slemp; Veldcapaciteit; Waterdoorlatendheid; Waterretentie
 
@@ -509,6 +509,35 @@ namespace KaartfabriekUI.Service
             if (gridName.Trim().ToLower() == "tc") return FormulaConstants.Tc;
 
             return gridName;
+        }
+
+        public void ExportEmf()
+        {
+            var resultFolder = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenResultaatEmfFolder);
+            if (!Directory.Exists(resultFolder))
+                Directory.CreateDirectory(resultFolder);
+
+            // Get all soilmaps from formula section of project file:
+            foreach (var formulaData in _projectFile.FormulaData)
+            {
+                var fileName = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenResultaatSurferFolder,
+                    $"{_projectFile.ParcelData.Name} {formulaData.Output}.srf");
+
+                if (File.Exists(fileName))
+                {
+                    var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
+                        _projectFile.WorkingFolder, _addProgress, false);
+                    var result = surferService.ExportAsEmf(fileName, resultFolder);
+                    _addProgress(result
+                        ? $"{formulaData.Output} is geëxporteerd."
+                        : $"Er ging wat fout bij het exporteren van {formulaData.Output}");
+                }
+                else
+                {
+                    _addProgress($"{formulaData.Output}.srf bestaat niet en wordt niet geëxporteerd.");
+                }
+
+            }
         }
     }
 }
