@@ -117,6 +117,11 @@
               Looks up a localized resource of type System.Drawing.Bitmap.
             </summary>
         </member>
+        <member name="T:KaartfabriekUI.Service.DatStructure">
+            <summary>
+            Class for the Surfer Dat-file structure
+            </summary>
+        </member>
         <member name="T:KaartfabriekUI.Service.Helpers">
             <summary>
             Static class with helper methods
@@ -183,6 +188,24 @@
             Create the template, which will be used for all soil maps
             </summary>
             <param name="surferTemplateLocation">The location of the base template</param>
+        </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.ConvertOldProjectFile(System.String)">
+            <summary>
+            Convert XML project file from older version to JSON project file for this version.
+            </summary>
+            <param name="xmlFile"></param>
+            <returns></returns>
+            <exception cref="T:System.Xml.XmlException"></exception>
+        </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.ExportEmf">
+            <summary>
+            Export all soilmaps to EMF
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.ExportCsv">
+            <summary>
+            Export all grids using in the formulas as 1 csv file.
+            </summary>
         </member>
         <member name="T:KaartfabriekUI.UserControls.ColumnSelectControl">
             <summary>

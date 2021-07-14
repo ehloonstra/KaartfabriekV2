@@ -14,6 +14,7 @@ namespace SurferTools
         public static string BodemkaartenResultaatSurferFolder = Path.Combine(BodemkaartenResultaatFolder, "Surfer");
         public static string BodemkaartenResultaatShapefileFolder = Path.Combine(BodemkaartenResultaatFolder, "Shapefile");
         public static string BodemkaartenResultaatEmfFolder = Path.Combine(BodemkaartenResultaatFolder, "Emf");
+        public static string BodemkaartenResultaatCsvFolder = Path.Combine(BodemkaartenResultaatFolder, "Csv");
 
         public const string OutGridOptions = "UseDefaults=1, ForgetOptions=1, SaveRefInfoAsInternal=1, SaveRefInfoAsGSIREF2=1";
         public const string TemplateName = "Template.srf";

@@ -1210,5 +1210,44 @@ namespace SurferTools
 
             return _activePlotDocument.Export2(newFileName, false, "Defaults=1,AllTextToPolygons=0,MaxBitmapSizeInMB=10", "emf");
         }
+
+        /// <summary>
+        /// Export Surfer grid file as DAT-file
+        /// X, Y, Z space delimetered
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="newFileName"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public bool ExportAsDatFile(string fileName, string newFileName)
+        {
+            try
+            {
+                if (_surferApp.NewGrid() is not IGrid3 grid) return false;
+
+                DeleteFile(newFileName);
+
+                grid.LoadFile2(fileName);
+
+                // http://surferhelp.goldensoftware.com/subsys/XYZ_Grid_Export_Automation_Opt.htm
+                grid.SaveFile2(newFileName, SrfGridFormat.srfGridFmtXYZ, "Defaults=1, NoBlanks=1");
+
+                return File.Exists(newFileName);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in ExportAsDatFile", e);
+            }
+        }
+
+        /// <summary>
+        /// Delete the file if it exists
+        /// </summary>
+        /// <param name="fileLocation"></param>
+        public void DeleteFile(string fileLocation)
+        {
+            if (File.Exists(fileLocation))
+                File.Delete(fileLocation);
+        }
     }
 }

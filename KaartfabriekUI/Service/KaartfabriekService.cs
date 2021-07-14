@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Shared;
 using Surfer;
 using SurferTools;
@@ -511,11 +516,16 @@ namespace KaartfabriekUI.Service
             return gridName;
         }
 
+        /// <summary>
+        /// Export all soilmaps to EMF
+        /// </summary>
         public void ExportEmf()
         {
             var resultFolder = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenResultaatEmfFolder);
-            if (!Directory.Exists(resultFolder))
-                Directory.CreateDirectory(resultFolder);
+            if (!Directory.Exists(resultFolder)) Directory.CreateDirectory(resultFolder);
+
+            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
+                _projectFile.WorkingFolder, _addProgress, false);
 
             // Get all soilmaps from formula section of project file:
             foreach (var formulaData in _projectFile.FormulaData)
@@ -525,8 +535,7 @@ namespace KaartfabriekUI.Service
 
                 if (File.Exists(fileName))
                 {
-                    var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
-                        _projectFile.WorkingFolder, _addProgress, false);
+
                     var result = surferService.ExportAsEmf(fileName, resultFolder);
                     _addProgress(result
                         ? $"{formulaData.Output} is geëxporteerd."
@@ -538,6 +547,156 @@ namespace KaartfabriekUI.Service
                 }
 
             }
+        }
+
+        /// <summary>
+        /// Export all grids using in the formulas as 1 csv file.
+        /// </summary>
+        public void ExportCsv()
+        {
+            var resultFolder = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenResultaatCsvFolder);
+            if (!Directory.Exists(resultFolder)) Directory.CreateDirectory(resultFolder);
+
+            var datFilesDict = new Dictionary<string, string>();
+
+            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
+                _projectFile.WorkingFolder, _addProgress, false);
+
+            // Get all nuclide grids:
+            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.Alt, resultFolder, out var newFileName))
+                datFilesDict.Add(FormulaConstants.Alt, newFileName);
+            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.K40, resultFolder, out newFileName))
+                datFilesDict.Add(FormulaConstants.K40, newFileName);
+            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.Cs137, resultFolder, out newFileName))
+                datFilesDict.Add(FormulaConstants.Cs137, newFileName);
+            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.Th232, resultFolder, out newFileName))
+                datFilesDict.Add(FormulaConstants.Th232, newFileName);           
+            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.U238, resultFolder, out newFileName))
+                datFilesDict.Add(FormulaConstants.U238, newFileName);           
+            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.Tc, resultFolder, out newFileName))
+                datFilesDict.Add(FormulaConstants.Tc, newFileName);
+
+            // Get all soilmaps from formula section of project file:
+            foreach (var formulaData in _projectFile.FormulaData)
+            {
+                var fileName = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
+                    $"{_projectFile.ParcelData.Name} {formulaData.Output}.grd");
+
+                if (ExportNuclideGrid(surferService, fileName, resultFolder, out newFileName))
+                    datFilesDict.Add(formulaData.Output, newFileName);
+
+                //var fileName = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
+                //    $"{_projectFile.ParcelData.Name} {formulaData.Output}.grd");
+
+                //if (File.Exists(fileName))
+                //{
+                //    var newFileName = Path.Combine(resultFolder, Path.ChangeExtension(Path.GetFileName(fileName), ".dat"));
+
+                //    var result = surferService.ExportAsDatFile(fileName, newFileName);
+                //    _addProgress(result
+                //        ? $"{formulaData.Output} is geëxporteerd."
+                //        : $"Er ging wat fout bij het exporteren van {formulaData.Output}");
+                //    if (result) datFilesDict.Add(formulaData.Output, newFileName);
+                //}
+                //else
+                //{
+                //    _addProgress($"{formulaData.Output}.grd bestaat niet en wordt niet geëxporteerd.");
+                //}
+            }
+
+            // Now process each dat file and create 1 csv file:
+            var csvFileName = Path.Combine(resultFolder,
+                $"{_projectFile.ParcelData.Customer} {_projectFile.ParcelData.Name}.csv");
+            surferService.DeleteFile(csvFileName);
+            MergeDatFilesIntoCsv(datFilesDict, csvFileName);
+        }
+
+        private bool ExportNuclideGrid(SurferService surferService, string fileName, string resultFolder, out string newFileName )
+        {
+            var baseFileName = Path.GetFileName(fileName);
+            newFileName = string.Empty;
+
+            if (File.Exists(fileName))
+            {
+                newFileName = Path.Combine(resultFolder, Path.ChangeExtension(baseFileName, ".dat"));
+
+                var result = surferService.ExportAsDatFile(fileName, newFileName);
+                _addProgress(result
+                    ? $"{baseFileName} is geëxporteerd."
+                    : $"Er ging wat fout bij het exporteren van {baseFileName}");
+                return result;
+            }
+
+            _addProgress($"{baseFileName}.grd bestaat niet en wordt niet geëxporteerd.");
+            return false;
+        }
+
+        private void MergeDatFilesIntoCsv(Dictionary<string, string> datFilesDict, string csvFileName)
+        {
+            var lines = new List<StringBuilder>();
+
+            // Open all dat files and extract last column:
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = false,
+                Delimiter = " ",
+                WhiteSpaceChars = Array.Empty<char>()
+            };
+
+            // Read all files:
+            var fileNum = 0;
+            foreach (var (key, value) in datFilesDict)
+            {
+                using var reader = new StreamReader(value);
+                using var csv = new CsvReader(reader, config);
+                var lineNumber = 0;
+                var rows = csv.GetRecords<DatStructure>();
+                foreach (var row in rows)
+                {
+                    if (fileNum == 0)
+                    {
+                        // First file
+                        if (lineNumber == 0)
+                        {
+                            // Header
+                            lines.Add(new StringBuilder());
+                            lines[0].Append($"X,Y,{key}");
+                            lineNumber++;
+                        }
+
+                        lines.Add(new StringBuilder());
+                        lines[lineNumber]
+                            .Append($"{row.X.ToString("0.##", CultureInfo.InvariantCulture)},{row.Y.ToString("0.##", CultureInfo.InvariantCulture)},{row.Z.ToString("0.####", CultureInfo.InvariantCulture)}");
+                    }
+                    else
+                    {
+                        // Next file
+                        if (lineNumber == 0)
+                        {
+                            // Header
+                            lines[0].Append($",{key}");
+                            lineNumber++;
+                        }
+
+                        lines[lineNumber].Append($",{row.Z.ToString("0.####", CultureInfo.InvariantCulture)}");
+                    }
+
+                    lineNumber++;
+                }
+
+                fileNum++;
+            }
+
+            // Convert the list of string builders to 1 string builder:
+            var sb = new StringBuilder();
+            foreach (var line in lines)
+            {
+                sb.AppendLine(line.ToString());
+            }
+            // Write file:
+            File.WriteAllText(csvFileName, sb.ToString());
+            if (!File.Exists(csvFileName))
+                _addProgress("Kon het CSV-bestand niet maken: " + csvFileName);
         }
     }
 }

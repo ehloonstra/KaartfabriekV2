@@ -110,14 +110,15 @@ namespace KaartfabriekUI.Forms
             this.GridColLevelFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.BtnCreateSoilMaps = new System.Windows.Forms.Button();
             this.BtnAddFormula = new System.Windows.Forms.Button();
+            this.TabPageExport = new System.Windows.Forms.TabPage();
+            this.BtnExportCsv = new System.Windows.Forms.Button();
+            this.BtnExportEmf = new System.Windows.Forms.Button();
             this.TabPageInstellingen = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.LevelFilesFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.panelVoortgang = new System.Windows.Forms.Panel();
             this.LblVoortgang = new System.Windows.Forms.Label();
-            this.TabPageExport = new System.Windows.Forms.TabPage();
-            this.BtnExportEmf = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
             this.GroupBoxProjectInstellingen.SuspendLayout();
@@ -133,10 +134,10 @@ namespace KaartfabriekUI.Forms
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GridViewFormulas)).BeginInit();
+            this.TabPageExport.SuspendLayout();
             this.TabPageInstellingen.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panelVoortgang.SuspendLayout();
-            this.TabPageExport.SuspendLayout();
             this.SuspendLayout();
             // 
             // BlankFileLocation
@@ -1066,6 +1067,37 @@ namespace KaartfabriekUI.Forms
             this.BtnAddFormula.UseVisualStyleBackColor = true;
             this.BtnAddFormula.Click += new System.EventHandler(this.BtnAddFormula_Click);
             // 
+            // TabPageExport
+            // 
+            this.TabPageExport.Controls.Add(this.BtnExportCsv);
+            this.TabPageExport.Controls.Add(this.BtnExportEmf);
+            this.TabPageExport.Location = new System.Drawing.Point(4, 24);
+            this.TabPageExport.Name = "TabPageExport";
+            this.TabPageExport.Size = new System.Drawing.Size(804, 757);
+            this.TabPageExport.TabIndex = 4;
+            this.TabPageExport.Text = "Export";
+            this.TabPageExport.UseVisualStyleBackColor = true;
+            // 
+            // BtnExportCsv
+            // 
+            this.BtnExportCsv.Location = new System.Drawing.Point(27, 58);
+            this.BtnExportCsv.Name = "BtnExportCsv";
+            this.BtnExportCsv.Size = new System.Drawing.Size(368, 33);
+            this.BtnExportCsv.TabIndex = 1;
+            this.BtnExportCsv.Text = "Exporteer de bodemkaarten naar CSV";
+            this.BtnExportCsv.UseVisualStyleBackColor = true;
+            this.BtnExportCsv.Click += new System.EventHandler(this.BtnExportCsv_Click);
+            // 
+            // BtnExportEmf
+            // 
+            this.BtnExportEmf.Location = new System.Drawing.Point(27, 19);
+            this.BtnExportEmf.Name = "BtnExportEmf";
+            this.BtnExportEmf.Size = new System.Drawing.Size(368, 33);
+            this.BtnExportEmf.TabIndex = 0;
+            this.BtnExportEmf.Text = "Exporteer de bodemkaarten naar EMF";
+            this.BtnExportEmf.UseVisualStyleBackColor = true;
+            this.BtnExportEmf.Click += new System.EventHandler(this.BtnExportEmf_Click);
+            // 
             // TabPageInstellingen
             // 
             this.TabPageInstellingen.Controls.Add(this.groupBox1);
@@ -1148,26 +1180,6 @@ namespace KaartfabriekUI.Forms
             this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
             this.LblVoortgang.DoubleClick += new System.EventHandler(this.LblVoortgang_DoubleClick);
             // 
-            // TabPageExport
-            // 
-            this.TabPageExport.Controls.Add(this.BtnExportEmf);
-            this.TabPageExport.Location = new System.Drawing.Point(4, 24);
-            this.TabPageExport.Name = "TabPageExport";
-            this.TabPageExport.Size = new System.Drawing.Size(804, 757);
-            this.TabPageExport.TabIndex = 4;
-            this.TabPageExport.Text = "Export";
-            this.TabPageExport.UseVisualStyleBackColor = true;
-            // 
-            // BtnExportEmf
-            // 
-            this.BtnExportEmf.Location = new System.Drawing.Point(3, 21);
-            this.BtnExportEmf.Name = "BtnExportEmf";
-            this.BtnExportEmf.Size = new System.Drawing.Size(368, 33);
-            this.BtnExportEmf.TabIndex = 0;
-            this.BtnExportEmf.Text = "Exporteer de bodemkaarten naar EMF";
-            this.BtnExportEmf.UseVisualStyleBackColor = true;
-            this.BtnExportEmf.Click += new System.EventHandler(this.BtnExportEmf_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1203,11 +1215,11 @@ namespace KaartfabriekUI.Forms
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.GridViewFormulas)).EndInit();
+            this.TabPageExport.ResumeLayout(false);
             this.TabPageInstellingen.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.panelVoortgang.ResumeLayout(false);
             this.panelVoortgang.PerformLayout();
-            this.TabPageExport.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1300,6 +1312,7 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TabPage TabPageExport;
         private System.Windows.Forms.Button BtnExportEmf;
+        private System.Windows.Forms.Button BtnExportCsv;
     }
 }
 

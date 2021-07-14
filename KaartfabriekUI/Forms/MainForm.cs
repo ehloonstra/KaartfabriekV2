@@ -931,10 +931,26 @@ namespace KaartfabriekUI.Forms
             {
                 var service = new KaartfabriekService(_projectFile, AddProgress);
                 service.ExportEmf();
+                AddProgress("Het exporteren naar EMF is voltooid.");
             }
             catch (Exception exception)
             {
-                AddProgress("Er ging wat fout bij het exporteren. Error: " + exception.Message);
+                AddProgress("Er ging wat fout bij het exporteren naar EMF. Error: " + exception.Message);
+                // swallow: throw;
+            }
+        }
+
+        private void BtnExportCsv_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var service = new KaartfabriekService(_projectFile, AddProgress);
+                service.ExportCsv();
+                AddProgress("Het exporteren naar Csv is voltooid.");
+            }
+            catch (Exception exception)
+            {
+                AddProgress("Er ging wat fout bij het exporteren naar Csv. Error: " + exception.Message);
                 // swallow: throw;
             }
         }
