@@ -119,6 +119,7 @@ namespace KaartfabriekUI.Forms
             this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.panelVoortgang = new System.Windows.Forms.Panel();
             this.LblVoortgang = new System.Windows.Forms.Label();
+            this.BtnMonsterpuntenExport = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
             this.GroupBoxProjectInstellingen.SuspendLayout();
@@ -1069,6 +1070,7 @@ namespace KaartfabriekUI.Forms
             // 
             // TabPageExport
             // 
+            this.TabPageExport.Controls.Add(this.BtnMonsterpuntenExport);
             this.TabPageExport.Controls.Add(this.BtnExportCsv);
             this.TabPageExport.Controls.Add(this.BtnExportEmf);
             this.TabPageExport.Location = new System.Drawing.Point(4, 24);
@@ -1084,7 +1086,7 @@ namespace KaartfabriekUI.Forms
             this.BtnExportCsv.Name = "BtnExportCsv";
             this.BtnExportCsv.Size = new System.Drawing.Size(368, 33);
             this.BtnExportCsv.TabIndex = 1;
-            this.BtnExportCsv.Text = "Exporteer de bodemkaarten naar CSV";
+            this.BtnExportCsv.Text = "Exporteer alle grids naar 1 CSV-besatnd";
             this.BtnExportCsv.UseVisualStyleBackColor = true;
             this.BtnExportCsv.Click += new System.EventHandler(this.BtnExportCsv_Click);
             // 
@@ -1094,7 +1096,7 @@ namespace KaartfabriekUI.Forms
             this.BtnExportEmf.Name = "BtnExportEmf";
             this.BtnExportEmf.Size = new System.Drawing.Size(368, 33);
             this.BtnExportEmf.TabIndex = 0;
-            this.BtnExportEmf.Text = "Exporteer de bodemkaarten naar EMF";
+            this.BtnExportEmf.Text = "Exporteer de bodemkaarten naar EMF-bestanden";
             this.BtnExportEmf.UseVisualStyleBackColor = true;
             this.BtnExportEmf.Click += new System.EventHandler(this.BtnExportEmf_Click);
             // 
@@ -1179,6 +1181,16 @@ namespace KaartfabriekUI.Forms
             this.LblVoortgang.TabIndex = 8;
             this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
             this.LblVoortgang.DoubleClick += new System.EventHandler(this.LblVoortgang_DoubleClick);
+            // 
+            // BtnMonsterpuntenExport
+            // 
+            this.BtnMonsterpuntenExport.Location = new System.Drawing.Point(27, 97);
+            this.BtnMonsterpuntenExport.Name = "BtnMonsterpuntenExport";
+            this.BtnMonsterpuntenExport.Size = new System.Drawing.Size(368, 33);
+            this.BtnMonsterpuntenExport.TabIndex = 2;
+            this.BtnMonsterpuntenExport.Text = "Exporteer alle data op de monsterpunten";
+            this.BtnMonsterpuntenExport.UseVisualStyleBackColor = true;
+            this.BtnMonsterpuntenExport.Click += new System.EventHandler(this.BtnMonsterpuntenExport_Click);
             // 
             // MainForm
             // 
@@ -1313,6 +1325,7 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.TabPage TabPageExport;
         private System.Windows.Forms.Button BtnExportEmf;
         private System.Windows.Forms.Button BtnExportCsv;
+        private System.Windows.Forms.Button BtnMonsterpuntenExport;
     }
 }
 

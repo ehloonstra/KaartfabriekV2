@@ -563,45 +563,30 @@ namespace KaartfabriekUI.Service
                 _projectFile.WorkingFolder, _addProgress, false);
 
             // Get all nuclide grids:
-            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.Alt, resultFolder, out var newFileName))
+            if (ExportGridToDat(surferService, _projectFile.NuclideGridLocations.Alt, resultFolder, out var newFileName))
                 datFilesDict.Add(FormulaConstants.Alt, newFileName);
-            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.K40, resultFolder, out newFileName))
+            if (ExportGridToDat(surferService, _projectFile.NuclideGridLocations.K40, resultFolder, out newFileName))
                 datFilesDict.Add(FormulaConstants.K40, newFileName);
-            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.Cs137, resultFolder, out newFileName))
+            if (ExportGridToDat(surferService, _projectFile.NuclideGridLocations.Cs137, resultFolder, out newFileName))
                 datFilesDict.Add(FormulaConstants.Cs137, newFileName);
-            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.Th232, resultFolder, out newFileName))
-                datFilesDict.Add(FormulaConstants.Th232, newFileName);           
-            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.U238, resultFolder, out newFileName))
-                datFilesDict.Add(FormulaConstants.U238, newFileName);           
-            if (ExportNuclideGrid(surferService, _projectFile.NuclideGridLocations.Tc, resultFolder, out newFileName))
+            if (ExportGridToDat(surferService, _projectFile.NuclideGridLocations.Th232, resultFolder, out newFileName))
+                datFilesDict.Add(FormulaConstants.Th232, newFileName);
+            if (ExportGridToDat(surferService, _projectFile.NuclideGridLocations.U238, resultFolder, out newFileName))
+                datFilesDict.Add(FormulaConstants.U238, newFileName);
+            if (ExportGridToDat(surferService, _projectFile.NuclideGridLocations.Tc, resultFolder, out newFileName))
                 datFilesDict.Add(FormulaConstants.Tc, newFileName);
 
             // Get all soilmaps from formula section of project file:
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
             foreach (var formulaData in _projectFile.FormulaData)
             {
+                if (formulaData.Output == FormulaConstants.Monsterpunten) continue;
+
                 var fileName = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
                     $"{_projectFile.ParcelData.Name} {formulaData.Output}.grd");
 
-                if (ExportNuclideGrid(surferService, fileName, resultFolder, out newFileName))
+                if (ExportGridToDat(surferService, fileName, resultFolder, out newFileName))
                     datFilesDict.Add(formulaData.Output, newFileName);
-
-                //var fileName = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
-                //    $"{_projectFile.ParcelData.Name} {formulaData.Output}.grd");
-
-                //if (File.Exists(fileName))
-                //{
-                //    var newFileName = Path.Combine(resultFolder, Path.ChangeExtension(Path.GetFileName(fileName), ".dat"));
-
-                //    var result = surferService.ExportAsDatFile(fileName, newFileName);
-                //    _addProgress(result
-                //        ? $"{formulaData.Output} is geëxporteerd."
-                //        : $"Er ging wat fout bij het exporteren van {formulaData.Output}");
-                //    if (result) datFilesDict.Add(formulaData.Output, newFileName);
-                //}
-                //else
-                //{
-                //    _addProgress($"{formulaData.Output}.grd bestaat niet en wordt niet geëxporteerd.");
-                //}
             }
 
             // Now process each dat file and create 1 csv file:
@@ -611,7 +596,7 @@ namespace KaartfabriekUI.Service
             MergeDatFilesIntoCsv(datFilesDict, csvFileName);
         }
 
-        private bool ExportNuclideGrid(SurferService surferService, string fileName, string resultFolder, out string newFileName )
+        private bool ExportGridToDat(SurferService surferService, string fileName, string resultFolder, out string newFileName)
         {
             var baseFileName = Path.GetFileName(fileName);
             newFileName = string.Empty;
@@ -633,6 +618,8 @@ namespace KaartfabriekUI.Service
 
         private void MergeDatFilesIntoCsv(Dictionary<string, string> datFilesDict, string csvFileName)
         {
+            const string delimeter = ";";
+
             var lines = new List<StringBuilder>();
 
             // Open all dat files and extract last column:
@@ -660,13 +647,13 @@ namespace KaartfabriekUI.Service
                         {
                             // Header
                             lines.Add(new StringBuilder());
-                            lines[0].Append($"X,Y,{key}");
+                            lines[0].Append($"X{delimeter}Y{delimeter}{key}");
                             lineNumber++;
                         }
 
                         lines.Add(new StringBuilder());
                         lines[lineNumber]
-                            .Append($"{row.X.ToString("0.##", CultureInfo.InvariantCulture)},{row.Y.ToString("0.##", CultureInfo.InvariantCulture)},{row.Z.ToString("0.####", CultureInfo.InvariantCulture)}");
+                            .Append($"{row.X.ToString("0.##", CultureInfo.InvariantCulture)}{delimeter}{row.Y.ToString("0.##", CultureInfo.InvariantCulture)}{delimeter}{row.Z.ToString("0.####", CultureInfo.InvariantCulture)}");
                     }
                     else
                     {
@@ -674,11 +661,11 @@ namespace KaartfabriekUI.Service
                         if (lineNumber == 0)
                         {
                             // Header
-                            lines[0].Append($",{key}");
+                            lines[0].Append($"{delimeter}{key}");
                             lineNumber++;
                         }
 
-                        lines[lineNumber].Append($",{row.Z.ToString("0.####", CultureInfo.InvariantCulture)}");
+                        lines[lineNumber].Append($"{delimeter}{row.Z.ToString("0.####", CultureInfo.InvariantCulture)}");
                     }
 
                     lineNumber++;
@@ -697,6 +684,38 @@ namespace KaartfabriekUI.Service
             File.WriteAllText(csvFileName, sb.ToString());
             if (!File.Exists(csvFileName))
                 _addProgress("Kon het CSV-bestand niet maken: " + csvFileName);
+        }
+
+        /// <summary>
+        /// Get values from all soil maps fot the sample points and add them to the CSV-file
+        /// </summary>
+        public void ExportSamplePointsData()
+        {
+            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
+                _projectFile.WorkingFolder, _addProgress, false);
+
+            var resultFolder = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenResultaatCsvFolder);
+            if (!Directory.Exists(resultFolder)) Directory.CreateDirectory(resultFolder);
+
+            // Copy sample data file to output folder:
+            var newLocation = Path.Combine(resultFolder,
+                $"{_projectFile.ParcelData.Customer} {_projectFile.ParcelData.Name} Monsterpunten.csv");
+            File.Copy(_projectFile.SampleDataFileLocationProjected, newLocation, true);
+
+            // Get the last column:
+            var header = File.ReadLines(newLocation).First();
+            var tmp = header.Split(';');
+            var lastColumn = tmp.Length;
+
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var formulaData in _projectFile.FormulaData)
+            {
+                if (formulaData.Output == FormulaConstants.Monsterpunten) continue;
+
+                var gridFileLocation = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
+                    $"{_projectFile.ParcelData.Name} {formulaData.Output}.grd");
+                surferService.PointSample(gridFileLocation, newLocation, ++lastColumn, formulaData.Output);
+            }
         }
     }
 }

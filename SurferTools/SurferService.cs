@@ -1249,5 +1249,13 @@ namespace SurferTools
             if (File.Exists(fileLocation))
                 File.Delete(fileLocation);
         }
+
+        public void PointSample(string gridFileLocation, string csvLocation, int zCol, string columnName)
+        {
+            var wksDocument = _surferApp.PointSample(gridFileLocation, csvLocation, 1, 2, zCol);
+            wksDocument.Cells(1, zCol).Value = columnName;
+            wksDocument.SaveAs(csvLocation);
+            wksDocument.Close();
+        }
     }
 }

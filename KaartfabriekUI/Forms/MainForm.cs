@@ -954,5 +954,20 @@ namespace KaartfabriekUI.Forms
                 // swallow: throw;
             }
         }
+
+        private void BtnMonsterpuntenExport_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var service = new KaartfabriekService(_projectFile, AddProgress);
+                service.ExportSamplePointsData();
+                AddProgress("Het exporteren van de monsterpunt-data is voltooid.");
+            }
+            catch (Exception exception)
+            {
+                AddProgress("Er ging wat fout bij het exporteren van de monsterpunten. Error: " + exception.Message);
+                // swallow: throw;
+            }
+        }
     }
 }
