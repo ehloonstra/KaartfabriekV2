@@ -207,6 +207,11 @@
             Export all grids using in the formulas as 1 csv file.
             </summary>
         </member>
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.ExportSamplePointsData">
+            <summary>
+            Get values from all soil maps fot the sample points and add them to the CSV-file
+            </summary>
+        </member>
         <member name="T:KaartfabriekUI.UserControls.ColumnSelectControl">
             <summary>
             User control to select the column

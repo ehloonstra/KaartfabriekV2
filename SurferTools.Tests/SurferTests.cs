@@ -165,11 +165,11 @@ namespace SurferTools.Tests
         {
             // ListAllMethods(typeof(IPlotDocument3));
             //ListAllMethods(typeof(ISelection3));
-            //ListAllMethods(typeof(IShapes7));
+            ListAllMethods(typeof(IShapes7));
             // ListAllMethods(typeof(IMarkerFormat));
             //ListAllMethods(typeof(IColorMap));
             //ListAllMethods(typeof(IColorMap2));
-            ListAllMethods(typeof(IPostLayer2));
+            //ListAllMethods(typeof(IPostLayer2));
             //ListAllMethods(typeof(IContourLayer));
             //ListAllMethods(typeof(IMapFrame3));
         }
@@ -245,6 +245,11 @@ namespace SurferTools.Tests
             foreach (var myMethodInfo in myArrayMethodInfo)
             {
                 _output.WriteLine("\nThe name of the method is {0}. It returns {1}", myMethodInfo.Name, myMethodInfo.ReturnType);
+                var parameters = myMethodInfo.GetParameters();
+                foreach (var p in parameters)
+                {
+                    _output.WriteLine($"    Parameter name: {p.Name}, {p.ParameterType}, IsOptional: {p.IsOptional}" );
+                }
             }
         }
 
