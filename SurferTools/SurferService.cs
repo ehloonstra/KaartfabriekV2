@@ -82,7 +82,7 @@ namespace SurferTools
             if (visible)
             {
                 if (_surferApp.ActiveWindow is not null)
-                    _surferApp.ActiveWindow.Zoom(SrfZoomTypes.srfZoomFitToWindow);
+                    _surferApp.ActiveWindow.Zoom(SrfZoomTypes.srfZoomPage);
                 _surferApp.ScreenUpdating = true;
             }
 
@@ -519,8 +519,7 @@ namespace SurferTools
             // Make it fit on the page:
             var pageSetup = _activePlotDocument.PageSetup;
 
-            mapFrame.Axes.Item("Bottom Axis").ShowLabels = false;
-            mapFrame.Axes.Item("Bottom Axis").MajorTickType = SrfTickType.srfTickNone;
+            LabelsAssenWijzigen(false, mapFrame.Axes);
 
             double ratioWidth;
             if (endWidth == 0d)
@@ -543,6 +542,7 @@ namespace SurferTools
                 ratioHeight = (pageSetup.Height - pageSetup.TopMargin - startHeight) / mapFrame.Height;
             }
             var ratio = Math.Min(ratioHeight, ratioWidth);
+            ratio *= 0.9; // Make the map slightly smaller
             mapFrame.Height *= ratio;
             mapFrame.Width *= ratio;
             mapFrame.Top = pageSetup.Height - pageSetup.TopMargin;
@@ -1029,6 +1029,10 @@ namespace SurferTools
             // dus eerst uitzetten:
             LabelsAssenWijzigen(false, mapFrame.Axes);
 
+            // Reset:
+            mapFrame.Left = dimBottom.Left;
+            mapFrame.Top = dimTop.Top;
+
             // Center map:
             if (dimTop.Left - dimBottom.Left > mapFrame.Width)
                 mapFrame.Left += (dimTop.Left - mapFrame.Left - mapFrame.Width) / 2;
@@ -1037,26 +1041,31 @@ namespace SurferTools
 
             const int roundUp = 10;
 
+            // Workaround To Get the real xMapPerPU And yMapPerPU:
+            var (realXMapPerPu, realYMapPerPu) = GetRealxMapPerPuAndyMapPerPu(mapFrame);
+
             // Check if the width needs to be enlarged:
             if (dimTop.Left - dimBottom.Left > mapFrame.Width)
             {
                 //var xMin = mapFrame.Axes.Item("Left Axis").Cross1 - mapFrame.Left * mapFrame.yMapPerPU;
-                var xMin = mapFrame.Axes.Item("Left Axis").Cross1 - (mapFrame.Left - dimBottom.Left) * mapFrame.yMapPerPU;
-                xMin = (Math.Round(xMin / roundUp, MidpointRounding.ToZero) * roundUp); // 162870
+                var xMin = mapFrame.Axes.Item("Left Axis").Cross1 
+                           - (mapFrame.Left - dimBottom.Left) * realXMapPerPu;
+                // xMin = RoundUp(xMin, roundUp); // 162870
                 mapFrame.Axes.Item("Left Axis").SetScale(Cross1: xMin);
 
                 // Reset:
                 mapFrame.Left = dimBottom.Left;
 
                 var xMax = mapFrame.Axes.Item("Right Axis").Cross1 +
-                           ((dimTop.Left - (mapFrame.Left + mapFrame.Width)) * mapFrame.xMapPerPU); // 163370 163550
-                xMax /= ratio;
+                           ((dimTop.Left - mapFrame.Left - mapFrame.Width) * realXMapPerPu); // 163370 163550
                 mapFrame.Axes.Item("Right Axis").SetScale(Cross1: xMax);
 
                 // Enlarge top and bottom axes:
+                var firstMajorTick = RoundUp(xMin, roundUp);
+                if (firstMajorTick <= xMin) firstMajorTick += roundUp;
                 mapFrame.Axes.Item("Top Axis")
-                    .SetScale(Minimum: xMin, FirstMajorTick: xMin + roundUp, Maximum: xMax, LastMajorTick: xMax);
-                mapFrame.Axes.Item("Bottom Axis").SetScale(Minimum: xMin, FirstMajorTick: xMin + roundUp, Maximum: xMax,
+                    .SetScale(Minimum: xMin, FirstMajorTick: firstMajorTick, Maximum: xMax, LastMajorTick: xMax);
+                mapFrame.Axes.Item("Bottom Axis").SetScale(Minimum: xMin, FirstMajorTick: firstMajorTick, Maximum: xMax,
                     LastMajorTick: xMax);
             }
 
@@ -1064,8 +1073,9 @@ namespace SurferTools
             if (dimTop.Top - dimBottom.Top > mapFrame.Height)
             {
                 // 527420
-                var yMin = mapFrame.Axes.Item("Bottom Axis").Cross1 - (dimBottom.Top * mapFrame.xMapPerPU);
-                yMin = Math.Round(yMin / roundUp, MidpointRounding.ToZero) * roundUp; // 527340
+                var yMin = mapFrame.Axes.Item("Bottom Axis").Cross1 -
+                           (mapFrame.Top - mapFrame.Height - dimBottom.Top) * realYMapPerPu;
+                yMin = RoundUp(yMin, roundUp); // 527340
                 mapFrame.Axes.Item("Bottom Axis").SetScale(Cross1: yMin);
 
                 // Reset:
@@ -1073,15 +1083,17 @@ namespace SurferTools
 
                 // 527960
                 var yMax = mapFrame.Axes.Item("Top Axis").Cross1 +
-                           (dimTop.Top - dimBottom.Top - mapFrame.Height) * mapFrame.xMapPerPU; // 528035 516752
+                           (dimTop.Top - mapFrame.Top) * realYMapPerPu; // 528035 516752
                 //yMax /= ratio;
                 mapFrame.Axes.Item("Top Axis").SetScale(Cross1: yMax);
 
                 // Enlarge left and right axes:
+                var firstMajorTick = RoundUp(yMin, roundUp);
+                if (firstMajorTick <= yMin) firstMajorTick += roundUp;
                 mapFrame.Axes.Item("Left Axis")
-                    .SetScale(Minimum: yMin, FirstMajorTick: yMin + roundUp, Maximum: yMax, LastMajorTick: yMax);
+                    .SetScale(Minimum: yMin, FirstMajorTick: firstMajorTick, Maximum: yMax, LastMajorTick: yMax);
                 mapFrame.Axes.Item("Right Axis")
-                    .SetScale(Minimum: yMin, FirstMajorTick: yMin + roundUp, Maximum: yMax, LastMajorTick: yMax);
+                    .SetScale(Minimum: yMin, FirstMajorTick: firstMajorTick, Maximum: yMax, LastMajorTick: yMax);
             }
 
             // Set limits of Map frame:
@@ -1091,19 +1103,73 @@ namespace SurferTools
             // Reset location:
             mapFrame.Left = dimBottom.Left;
             mapFrame.Top = dimTop.Top;
+            
+            // The map scale is not properly scaled:
+            if (shapes.Item("Map Scale") is IScaleBar3 mapScale)
+            {
+                mapScale.LabelFont.Size = 8;
+                mapScale.CycleSpacing =
+                    RoundUp((mapFrame.Axes.Item("Right Axis").Cross1 - mapFrame.Axes.Item("Left Axis").Cross1) / 8,
+                        roundUp);
+                mapScale.Left = mapFrame.Left + 1;
+            }
 
             // Show labels again:
             LabelsAssenWijzigen(true, mapFrame.Axes);
-
-            // The map scale is not properly scaled:
-            if (shapes.Item("Map Scale") is not IScaleBar3 mapScale)
-                throw new Exception("Could not get Map Scale");
-            mapScale.LabelFont.Size = 8;
 
             // Remove Dimensions:
 #if !DEBUG
             groupDimensions.Delete();
 #endif
+        }
+
+        private double RoundUp(double value, int roundUp)
+        {
+            return (Math.Round(value / roundUp, MidpointRounding.ToZero) * roundUp);
+        }
+
+        private (double, double) GetRealxMapPerPuAndyMapPerPu(IMapFrame3 mapFrame)
+        {
+            // Plot.Shapes needs to be cast to IShape7 to get acces to AddEmptyBaseLayer():
+            if (_activePlotDocument.Shapes is not IShapes7 shapes)
+                throw new Exception("Could not get shapes");
+
+            // When the rectangle is added to the plot, page units are used for the parameter coordinates.
+            // When the rectangle is added to a map layer, map coordinates are used for the parameters coordinates.
+
+            try
+            {
+                // This always throws an invalid cast error, but the rectangle is added:
+                shapes.AddRectangle(0d, 0d, 1d, 1d);
+            }
+            catch
+            {
+                // swallow
+            }
+
+            _activePlotDocument.Selection.DeselectAll();
+            if (shapes.Item(shapes.Count) is not IPolygon2 polygon)
+                throw new Exception("Could not get polygon");
+
+            polygon.Select();
+            _activePlotDocument.Selection.Copy();
+
+            var tempLayer = shapes.AddEmptyBaseLayer(mapFrame);
+
+            if (tempLayer.Shapes is not IShapes7 shapesTempLayer)
+                throw new Exception("Could not get shapes of temp layer");
+
+            shapesTempLayer.StartEditing();
+            // Paste in the 1-inch rect into the map converting the page units coordinates to map units:
+            shapesTempLayer.Paste();
+
+            var realXMapPerPu = tempLayer.Shapes.Item(1).Width;
+            var realYMapPerPu = tempLayer.Shapes.Item(1).Height;
+
+            polygon.Delete(); //done with workaround, don't need this anymore
+            tempLayer.Delete(); //done with workaround, don't need this anymore
+
+            return (realXMapPerPu, realYMapPerPu);
         }
 
         private static void LabelsAssenWijzigen(bool enabled, IAxes axes)
@@ -1250,6 +1316,13 @@ namespace SurferTools
                 File.Delete(fileLocation);
         }
 
+        /// <summary>
+        /// Append PointSample
+        /// </summary>
+        /// <param name="gridFileLocation"></param>
+        /// <param name="csvLocation"></param>
+        /// <param name="zCol"></param>
+        /// <param name="columnName"></param>
         public void PointSample(string gridFileLocation, string csvLocation, int zCol, string columnName)
         {
             var wksDocument = _surferApp.PointSample(gridFileLocation, csvLocation, 1, 2, zCol);
