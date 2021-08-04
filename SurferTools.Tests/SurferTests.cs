@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Shared;
 using Shouldly;
@@ -294,6 +298,99 @@ namespace SurferTools.Tests
         {
             var result = _surferService.GetSurferSamplesLocation();
             result.ShouldBe(@"D:\Program Files\Golden Software\Surfer\Samples");
+        }
+
+        [Fact]
+        public void ParseEpsgCodes()
+        {
+            var fileLocation = _surferService.GetSystemgsjLocation();
+            // read file line by line:
+            string line;
+            var sb = new StringBuilder("{\"Data\": ["); // Start with a bracket
+            var file = new StreamReader(fileLocation);
+            var regex = new Regex(@"(.*?)=(.*)");
+            
+            while ((line = file.ReadLine()) != null)
+            {
+                if (line.StartsWith(';')) continue; // Lines beginning with a semicolon are comments.
+
+                if (line.Contains("="))
+                {
+                    // Split:
+                    var match = regex.Match(line);
+                    if (match.Success)
+                    {
+                        var key = match.Groups[1].Value.Trim().Trim('"');
+                        var value = match.Groups[2].Value.Trim().Trim('"');
+                        sb.AppendLine($@"""{key}"":""{value}"",");
+                    }
+                }
+
+                if (line == "{") sb.AppendLine("{");
+                if (line == "}") sb.AppendLine("},");
+            }
+
+            sb.AppendLine("]}");  // End with a bracket
+            file.Close();
+
+            //_output.WriteLine(sb.ToString());
+
+            var retValue = JsonSerializer.Deserialize<SurferEpsgFile>(sb.ToString(), new JsonSerializerOptions {AllowTrailingCommas = true, PropertyNameCaseInsensitive = true});
+            retValue.ShouldNotBeNull();
+            retValue.Data.ShouldNotBeNull();
+            _output.WriteLine(retValue.Data.Count.ToString());
+            var epsgCodes = retValue.Data.Where(x => string.IsNullOrEmpty(x.Posc) == false);
+            foreach (var epsgCode in epsgCodes)
+            {
+                _output.WriteLine($"{epsgCode.SplitName} - {epsgCode.Posc} - {epsgCode.Comment}");
+            }
+        }
+
+        [Fact]
+        public void ParseEpsgJson()
+        {
+            var jsonString = @"{
+                ""WorkingFolder"": ""D:\\dev\\TopX\\Loonstra\\Testdata\\Buitenland\\Szymon Cena - Polen"",
+	            ""Data"": [{
+			            ""name"": ""Projected Systems|State Plane|1927 (US feet)|State Plane 1927 - Alabama East FIPS 0101 (US feet)"",
+			            ""token"": ""SPCS27_ALABAMA_EAST_FEET"",
+			            ""legacyname"": ""SPCS27 Alabama East"",
+			            ""datum"": ""NAD27"",
+			            ""proj"": ""Transverse Mercator"",
+			            ""ellipsoid"": ""ELLIPSOID_CLARKE_1866"",
+			            ""lon0"": ""-85d50'"",
+			            ""lat0"": ""30d30'"",
+			            ""kscale"": "".99996"",
+			            ""xorg"": ""152400.3048006096"",
+			            ""yorg"": ""0.0"",
+			            ""scale"": ""3.280833333333333"",
+			            ""usgs"": ""101""
+		            },
+		            {
+			            ""token"": ""SYSTEM_EPSG28992"",
+			            ""name"": ""Projected Systems|Regional/National|Netherlands|Amersfoort / RD New"",
+			            ""datum"": ""DATUM_AMERSFOORT_BURSA"",
+			            ""projtype"": ""Stereographic"",
+			            ""ellipsoid"": ""ELLIPSOID_BESSEL_1841"",
+			            ""Scale"": ""1.0"",
+			            ""xOrg"": ""155000.00000000000000000000"",
+			            ""yOrg"": ""463000.00000000000000000000"",
+			            ""K0"": ""0.9999079"",
+			            ""Lon0"": ""5.38763888888889"",
+			            ""Lat0"": ""52.15616055555555"",
+			            ""posc"": ""28992"",
+			            ""comment"": ""(EPSG)""
+		            }
+	            ]
+            }";
+
+
+            _output.WriteLine(jsonString);
+
+            var retValue = JsonSerializer.Deserialize<SurferEpsgFile>(jsonString, new JsonSerializerOptions {AllowTrailingCommas = true, PropertyNameCaseInsensitive = true});
+            retValue.ShouldNotBeNull();
+            retValue.WorkingFolder.ShouldNotBeNull();
+            retValue.Data.ShouldNotBeNull();
         }
     }
 }

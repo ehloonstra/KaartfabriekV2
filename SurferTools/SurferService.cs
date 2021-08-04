@@ -618,7 +618,24 @@ namespace SurferTools
         /// <returns></returns>
         public string GetSurferSamplesLocation()
         {
-            return Path.Combine(_surferApp.Path, "Samples");
+            var folder = Path.Combine(_surferApp.Path, "Samples");
+            if (!Directory.Exists(folder))
+                throw new DirectoryNotFoundException("Cannot find the Surfer Samples folder");
+
+            return folder;
+        }
+
+        /// <summary>
+        /// Get the system.gsj location which contains the EPSG code 
+        /// </summary>
+        /// <returns></returns>
+        public string GetSystemgsjLocation()
+        {
+            var file = Path.Combine(_surferApp.Path, "system.gsj");
+            if (!File.Exists(file))
+                throw new FileNotFoundException("Cannot find system.gsj", file);
+
+            return file;
         }
 
         /// <summary>
