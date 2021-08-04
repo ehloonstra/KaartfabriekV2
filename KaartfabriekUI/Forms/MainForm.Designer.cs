@@ -111,6 +111,7 @@ namespace KaartfabriekUI.Forms
             this.BtnCreateSoilMaps = new System.Windows.Forms.Button();
             this.BtnAddFormula = new System.Windows.Forms.Button();
             this.TabPageExport = new System.Windows.Forms.TabPage();
+            this.BtnMonsterpuntenExport = new System.Windows.Forms.Button();
             this.BtnExportCsv = new System.Windows.Forms.Button();
             this.BtnExportEmf = new System.Windows.Forms.Button();
             this.TabPageInstellingen = new System.Windows.Forms.TabPage();
@@ -119,7 +120,6 @@ namespace KaartfabriekUI.Forms
             this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.panelVoortgang = new System.Windows.Forms.Panel();
             this.LblVoortgang = new System.Windows.Forms.Label();
-            this.BtnMonsterpuntenExport = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
             this.GroupBoxProjectInstellingen.SuspendLayout();
@@ -1080,13 +1080,23 @@ namespace KaartfabriekUI.Forms
             this.TabPageExport.Text = "Export";
             this.TabPageExport.UseVisualStyleBackColor = true;
             // 
+            // BtnMonsterpuntenExport
+            // 
+            this.BtnMonsterpuntenExport.Location = new System.Drawing.Point(27, 97);
+            this.BtnMonsterpuntenExport.Name = "BtnMonsterpuntenExport";
+            this.BtnMonsterpuntenExport.Size = new System.Drawing.Size(368, 33);
+            this.BtnMonsterpuntenExport.TabIndex = 2;
+            this.BtnMonsterpuntenExport.Text = "Exporteer alle data op de monsterpunten";
+            this.BtnMonsterpuntenExport.UseVisualStyleBackColor = true;
+            this.BtnMonsterpuntenExport.Click += new System.EventHandler(this.BtnMonsterpuntenExport_Click);
+            // 
             // BtnExportCsv
             // 
             this.BtnExportCsv.Location = new System.Drawing.Point(27, 58);
             this.BtnExportCsv.Name = "BtnExportCsv";
             this.BtnExportCsv.Size = new System.Drawing.Size(368, 33);
             this.BtnExportCsv.TabIndex = 1;
-            this.BtnExportCsv.Text = "Exporteer alle grids naar 1 CSV-besatnd";
+            this.BtnExportCsv.Text = "Exporteer alle grids naar 1 CSV-bestand";
             this.BtnExportCsv.UseVisualStyleBackColor = true;
             this.BtnExportCsv.Click += new System.EventHandler(this.BtnExportCsv_Click);
             // 
@@ -1181,16 +1191,6 @@ namespace KaartfabriekUI.Forms
             this.LblVoortgang.TabIndex = 8;
             this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
             this.LblVoortgang.DoubleClick += new System.EventHandler(this.LblVoortgang_DoubleClick);
-            // 
-            // BtnMonsterpuntenExport
-            // 
-            this.BtnMonsterpuntenExport.Location = new System.Drawing.Point(27, 97);
-            this.BtnMonsterpuntenExport.Name = "BtnMonsterpuntenExport";
-            this.BtnMonsterpuntenExport.Size = new System.Drawing.Size(368, 33);
-            this.BtnMonsterpuntenExport.TabIndex = 2;
-            this.BtnMonsterpuntenExport.Text = "Exporteer alle data op de monsterpunten";
-            this.BtnMonsterpuntenExport.UseVisualStyleBackColor = true;
-            this.BtnMonsterpuntenExport.Click += new System.EventHandler(this.BtnMonsterpuntenExport_Click);
             // 
             // MainForm
             // 
