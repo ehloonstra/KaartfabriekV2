@@ -301,7 +301,10 @@ namespace KaartfabriekUI.Service
                         if (statistics is not null)
                         {
                             var mean = Math.Round(statistics.Mean, 1, MidpointRounding.AwayFromZero);
-                            surferService.ChangeText("Gemiddelde", $"Gemiddelde: {mean}");
+                            surferService.ChangeText("Gemiddelde", $"Gemiddelde: {mean:0.0}");
+                            var minimum = Math.Round(statistics.Min, 1, MidpointRounding.AwayFromZero);
+                            var maximum = Math.Round(statistics.Max, 1, MidpointRounding.AwayFromZero);
+                            surferService.ChangeText("Range", $"Range: {minimum:0.0} – {maximum:0.0}");
                         }
 
                         surferService.SetSoilMapData(formula.Output);
@@ -370,7 +373,6 @@ namespace KaartfabriekUI.Service
                 var value = string.Format("Naam: {1}{0}{0}Perceel: {2}{0}{0}Omvang: {3} ha{0}{0}Projectie: x",
                     Environment.NewLine, pData.Customer, pData.Name, pData.Size);
                 surferService.ChangeText("Perceelgegevens", value);
-
 
                 // Change grid
                 surferService.ChangeGridSource(SurferConstants.TemplateMapName, _projectFile.NuclideGridLocations.Tc);
@@ -691,6 +693,7 @@ namespace KaartfabriekUI.Service
         /// </summary>
         public void ExportSamplePointsData()
         {
+            _addProgress("Start monsterpunten export");
             var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
                 _projectFile.WorkingFolder, _addProgress, false);
 
@@ -707,6 +710,15 @@ namespace KaartfabriekUI.Service
             var tmp = header.Split(';');
             var lastColumn = tmp.Length;
 
+            // Add nuclide grids interpolations:
+            surferService.PointSample(_projectFile.NuclideGridLocations.Alt, newLocation, ++lastColumn, nameof(_projectFile.NuclideGridLocations.Alt));
+            surferService.PointSample(_projectFile.NuclideGridLocations.Tc, newLocation, ++lastColumn, nameof(_projectFile.NuclideGridLocations.Tc));
+            surferService.PointSample(_projectFile.NuclideGridLocations.K40, newLocation, ++lastColumn, nameof(_projectFile.NuclideGridLocations.K40));
+            surferService.PointSample(_projectFile.NuclideGridLocations.U238, newLocation, ++lastColumn, nameof(_projectFile.NuclideGridLocations.U238));
+            surferService.PointSample(_projectFile.NuclideGridLocations.Th232, newLocation, ++lastColumn, nameof(_projectFile.NuclideGridLocations.Th232));
+            surferService.PointSample(_projectFile.NuclideGridLocations.Cs137, newLocation, ++lastColumn, nameof(_projectFile.NuclideGridLocations.Cs137));
+
+            // Add calculated data:
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
             foreach (var formulaData in _projectFile.FormulaData)
             {
@@ -716,6 +728,8 @@ namespace KaartfabriekUI.Service
                     $"{_projectFile.ParcelData.Name} {formulaData.Output}.grd");
                 surferService.PointSample(gridFileLocation, newLocation, ++lastColumn, formulaData.Output);
             }
+
+            _addProgress($"De export is voltooid en staat klaar op {newLocation}");
         }
     }
 }
