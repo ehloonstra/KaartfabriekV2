@@ -85,6 +85,7 @@ namespace KaartfabriekUI.Forms
             this.TabPageTemplate = new System.Windows.Forms.TabPage();
             this.BtnTemplateCreate = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.TxtTemplateProjectNr = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -163,7 +164,7 @@ namespace KaartfabriekUI.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MonsterDataLocation.FileFilter = "csv files|*.csv";
             this.MonsterDataLocation.InitialDirectory = null;
-            this.MonsterDataLocation.Label = "Locatie van de monsterdata (monsterdata-EPSG28992.csv):";
+            this.MonsterDataLocation.Label = "Locatie van de monsterdata (monsterdata-EPSGxxxx.csv):";
             this.MonsterDataLocation.Location = new System.Drawing.Point(7, 151);
             this.MonsterDataLocation.Name = "MonsterDataLocation";
             this.MonsterDataLocation.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.File;
@@ -179,7 +180,7 @@ namespace KaartfabriekUI.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.VeldDataLocation.FileFilter = "csv files|*.csv";
             this.VeldDataLocation.InitialDirectory = null;
-            this.VeldDataLocation.Label = "Locatie van de velddata (velddata-EPSG28992.csv):";
+            this.VeldDataLocation.Label = "Locatie van de velddata (velddata-EPSGxxxx.csv):";
             this.VeldDataLocation.Location = new System.Drawing.Point(7, 101);
             this.VeldDataLocation.Name = "VeldDataLocation";
             this.VeldDataLocation.SelectionType = KaartfabriekUI.UserControls.TextSelectControl.SelectType.File;
@@ -673,7 +674,7 @@ namespace KaartfabriekUI.Forms
             this.TxtBuffer.Name = "TxtBuffer";
             this.TxtBuffer.Size = new System.Drawing.Size(37, 23);
             this.TxtBuffer.TabIndex = 18;
-            this.TxtBuffer.Text = "10";
+            this.TxtBuffer.Text = "5";
             this.TxtBuffer.TextChanged += new System.EventHandler(this.TxtBuffer_TextChanged);
             // 
             // TxtGridSpacing
@@ -784,6 +785,7 @@ namespace KaartfabriekUI.Forms
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.label9);
             this.groupBox2.Controls.Add(this.TxtTemplateProjectNr);
             this.groupBox2.Controls.Add(this.label10);
             this.groupBox2.Controls.Add(this.label5);
@@ -801,6 +803,16 @@ namespace KaartfabriekUI.Forms
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Template gegevens";
             // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(158, 169);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(129, 15);
+            this.label9.TabIndex = 14;
+            this.label9.Text = "(Projectnr. + perceelnr)";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // TxtTemplateProjectNr
             // 
             this.TxtTemplateProjectNr.Location = new System.Drawing.Point(74, 166);
@@ -814,7 +826,7 @@ namespace KaartfabriekUI.Forms
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(62, 15);
             this.label10.TabIndex = 12;
-            this.label10.Text = "Projectnr.:";
+            this.label10.Text = "Perceelnr.:";
             this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // label5
@@ -1177,6 +1189,9 @@ namespace KaartfabriekUI.Forms
             // 
             // LblVoortgang
             // 
+            this.LblVoortgang.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.LblVoortgang.AutoEllipsis = true;
             this.LblVoortgang.AutoSize = true;
             this.LblVoortgang.BackColor = System.Drawing.Color.Transparent;
@@ -1326,6 +1341,7 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.Button BtnExportEmf;
         private System.Windows.Forms.Button BtnExportCsv;
         private System.Windows.Forms.Button BtnMonsterpuntenExport;
+        private System.Windows.Forms.Label label9;
     }
 }
 

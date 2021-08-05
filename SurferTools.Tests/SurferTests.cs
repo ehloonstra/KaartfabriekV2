@@ -305,11 +305,12 @@ namespace SurferTools.Tests
         {
             var fileLocation = _surferService.GetSystemgsjLocation();
             // read file line by line:
-            string line;
-            var sb = new StringBuilder("{\"Data\": ["); // Start with a bracket
             var file = new StreamReader(fileLocation);
-            var regex = new Regex(@"(.*?)=(.*)");
+
+            var sb = new StringBuilder("{\"Data\": ["); // Start with a bracket
+            var regex = new Regex(@"(.*?)=(.*)"); // Match key value pair
             
+            string line;
             while ((line = file.ReadLine()) != null)
             {
                 if (line.StartsWith(';')) continue; // Lines beginning with a semicolon are comments.

@@ -311,7 +311,7 @@ namespace KaartfabriekUI.Forms
 
             BlankFileLocation.TextboxText = File.Exists(_projectFile.FieldBorderLocation) ? _projectFile.FieldBorderLocation : string.Empty;
 
-            TxtBuffer.Text = _projectFile.FieldBorderBufferSize ?? "10";
+            TxtBuffer.Text = _projectFile.FieldBorderBufferSize ?? "5";
 
             // GWT
             CboGrondwatertrap.Data = "I; II; III+; V+; III-; V-; IV; VI; VII";
@@ -403,6 +403,8 @@ namespace KaartfabriekUI.Forms
             FillGridViewFormulas();
 
             _projectFile.SaveAs(sfd.FileName);
+
+            CboGrondwatertrap.Data = "I; II; III+; V+; III-; V-; IV; VI; VII";
 
             // Enable next groupbox:
             GroupBoxVoorbereiding.Enabled = true;

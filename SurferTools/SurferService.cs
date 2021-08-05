@@ -399,8 +399,9 @@ namespace SurferTools
         /// Add shapefile as base layer
         /// </summary>
         /// <param name="sfLocation">The location of the shapefile</param>
+        /// <param name="foreColor">The line color</param>
         /// <returns>The new map frame</returns>
-        public IMapFrame3 AddShapefile(string sfLocation)
+        public IMapFrame3 AddShapefile(string sfLocation, srfColor foreColor = srfColor.srfColorPurple)
         {
             _surferApp.ScreenUpdating = false;
 
@@ -417,7 +418,7 @@ namespace SurferTools
                     throw new Exception("Cannot get BaseMapLayer");
 
                 // Line properties:
-                baseMapLayer.Line.ForeColor = srfColor.srfColorPurple;
+                baseMapLayer.Line.ForeColor = foreColor;
                 baseMapLayer.Line.Width = 0.01;
 
                 baseMapLayer.CoordinateSystem = _coordinateSystem;
@@ -913,6 +914,7 @@ namespace SurferTools
                 throw new Exception("Could not find text with name " + label);
 
             text.Text = value;
+            text.Visible = true;
         }
 
         /// <summary>
@@ -946,6 +948,12 @@ namespace SurferTools
 
             contourLayer.CoordinateSystem = _coordinateSystem;
 
+            if (mapFrame.CoordinateSystem != _coordinateSystem)
+            {
+                mapFrame.CoordinateSystem = _coordinateSystem;
+                mapFrame.SetLimitsToData();
+            }
+
             if (File.Exists(lvlFile))
             {
                 contourLayer.Levels.LoadFile(lvlFile);
@@ -955,7 +963,7 @@ namespace SurferTools
                     contourLayer.ColorScale.LabelFormat.Type = SrfLabelType.srfLabFixed;
                 }
             }
-            else
+            else if (!string.IsNullOrEmpty(lvlFile))
             {
                 _addProgress($"Kon {Path.GetFileName(lvlFile)} niet vinden.");
             }
@@ -986,7 +994,7 @@ namespace SurferTools
                 throw new Exception("Could not get blank file layer");
 
             // Line properties:
-            baseLayer.Line.ForeColor = srfColor.srfColorPurple;
+            baseLayer.Line.ForeColor = srfColor.srfColorBlack;
             baseLayer.Line.Width = 0.01;
 
             baseLayer.CoordinateSystem = _coordinateSystem;

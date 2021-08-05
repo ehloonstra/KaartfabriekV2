@@ -60,46 +60,61 @@ namespace KaartfabriekUI.Service
             var mapFrameMonsterdata = surferService.AddPostMap(monsterDataLocation, "Monsterdata");
             surferService.SetLabelMonsterdataPostmap(mapFrameMonsterdata.Overlays.Item(1) as IPostLayer2, 3);
 
-            var velddataLimits = new Limits(mapFrameVelddata.xMin,
-                mapFrameVelddata.xMax,
-                mapFrameVelddata.yMin,
-                mapFrameVelddata.yMax);
+            IMapFrame mergedMapFrame;
 
-            // Get AAN-data:
-            var aanShapefileLocation = new ProcessTools().GetAanData(Limits.RoundUp(velddataLimits, 1), workingFolder);
-            if (!File.Exists(aanShapefileLocation))
+            if (_projectFile.EpsgCode.ToUpper().Equals("EPSG:28992"))
             {
-                throw new Exception("Kon de AAN-data niet ophalen.");
+                var velddataLimits = new Limits(mapFrameVelddata.xMin,
+                    mapFrameVelddata.xMax,
+                    mapFrameVelddata.yMin,
+                    mapFrameVelddata.yMax);
+
+                // Get AAN-data:
+                var aanShapefileLocation =
+                    new ProcessTools().GetAanData(Limits.RoundUp(velddataLimits, 1), workingFolder);
+                if (!File.Exists(aanShapefileLocation))
+                {
+                    throw new Exception("Kon de AAN-data niet ophalen.");
+                }
+
+                _addProgress("De AAN-data is opgehaald.");
+                // Add AAN-data:
+                var mapFrameAan = surferService.AddShapefile(aanShapefileLocation);
+
+                // Increase limits:
+                var luchtfotoLimits =
+                    Limits.RoundUp(new Limits(mapFrameAan.xMin, mapFrameAan.xMax, mapFrameAan.yMin, mapFrameAan.yMax),
+                        50);
+                // Get luchtfoto:
+                var luchtfotoLocation = new ProcessTools().GetLuchtfotoImage(luchtfotoLimits, workingFolder);
+                if (!File.Exists(aanShapefileLocation))
+                {
+                    throw new Exception("Kon de Luchtfoto-data niet ophalen.");
+                }
+
+                _addProgress("De luchtfoto is opgehaald.");
+                // Add luchtfoto:
+                var mapFrameLuchtfoto = surferService.AddGeoreferencedImage(luchtfotoLocation);
+
+                // Merge map frames:
+                mergedMapFrame = surferService.MergeMapFrames(mapFrameVelddata, mapFrameMonsterdata,
+                    mapFrameAan, mapFrameLuchtfoto);
+                _addProgress("Het plot document met de velddata, monsterdata, AAN-data en Luchtfoto wordt getoond.");
+            }
+            else
+            {
+                // Merge map frames:
+                mergedMapFrame = surferService.MergeMapFrames(mapFrameVelddata, mapFrameMonsterdata);
+                _addProgress("Het plot document met de velddata en monsterdata wordt getoond.");
             }
 
-            _addProgress("De AAN-data is opgehaald.");
-            // Add AAN-data:
-            var mapFrameAan = surferService.AddShapefile(aanShapefileLocation);
-
-            // Increase limits:
-            var luchtfotoLimits =
-                Limits.RoundUp(new Limits(mapFrameAan.xMin, mapFrameAan.xMax, mapFrameAan.yMin, mapFrameAan.yMax), 50);
-            // Get luchtfoto:
-            var luchtfotoLocation = new ProcessTools().GetLuchtfotoImage(luchtfotoLimits, workingFolder);
-            if (!File.Exists(aanShapefileLocation))
-            {
-                throw new Exception("Kon de Luchtfoto-data niet ophalen.");
-            }
-
-            _addProgress("De luchtfoto is opgehaald.");
-            // Add luchtfoto:
-            var mapFrameLuchtfoto = surferService.AddGeoreferencedImage(luchtfotoLocation);
-
-            // Merge map frames:
-            var mergedMapFrame = surferService.MergeMapFrames(mapFrameVelddata, mapFrameMonsterdata,
-                mapFrameAan, mapFrameLuchtfoto);
-
-            surferService.MakeMapFrameFit(mergedMapFrame);
+            // Make MapFrame Fit:
+            surferService.MakeMapFrameFit(mergedMapFrame); 
 
             // Save result:
             surferService.SaveAsPlotDocument(Path.Combine(workingFolder, "DataForBlanking.srf"));
 
-            _addProgress("Het plot document met de AAN en Luchtfoto data wordt getoond.");
+            
 
             // Toon Surfer:
             return surferService.ShowHideSurfer(true);
@@ -202,6 +217,12 @@ namespace KaartfabriekUI.Service
 
             string CreateNuclideGrid(string fileName, string layerName, int colZ)
             {
+                if (colZ == 0)
+                {
+                    _addProgress(
+                        $"De kolom voor {layerName} is niet correct gezet. Deze nuclide grid wordt niet gemaakt.");
+                    return "";
+                }
                 // Load blank file:
                 var mapBlankFile = surferService.AddShapefile(blankFileLocation);
 
