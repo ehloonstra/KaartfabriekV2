@@ -87,6 +87,11 @@ namespace KaartfabriekUI.Forms
 
         private void SetLevelFiles()
         {
+            if (string.IsNullOrEmpty(LevelsFolder))
+            {
+                MessageBox.Show(@"De locatie van de level-bestanden is nog niet opgegeven.");
+                return;
+            }
             var fileEntries = Directory.GetFiles(LevelsFolder, "*.lvl", SearchOption.TopDirectoryOnly);
             var data = fileEntries.Select(Path.GetFileName).ToList();
             CboLevels.Data = string.Join(';', data);

@@ -603,7 +603,8 @@ namespace KaartfabriekUI.Forms
             {
                 // Send values to form:
                 GridNames = _projectFile.GridNames,
-                FormulaData = new FormulaData { Output = value }
+                FormulaData = new FormulaData { Output = value },
+                LevelsFolder = _applicationSettings.LevelFilesFolder
             };
 
             if (addEditFormulaForm.ShowDialog(this) == DialogResult.OK)
