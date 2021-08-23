@@ -72,6 +72,44 @@
              the contents of this method with the code editor.
             </summary>
         </member>
+        <member name="T:KaartfabriekUI.Forms.SelectCoordinateSystemsForm">
+            <inheritdoc />
+        </member>
+        <member name="F:KaartfabriekUI.Forms.SelectCoordinateSystemsForm.CoordSystems">
+            <summary>
+            The list of coordinate systems supported by Surfer
+            </summary>
+        </member>
+        <member name="F:KaartfabriekUI.Forms.SelectCoordinateSystemsForm.SelectedEpsgCode">
+            <summary>
+            The selected EPSG code by the user
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.Forms.SelectCoordinateSystemsForm.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="M:KaartfabriekUI.Forms.SelectCoordinateSystemsForm.FillGridView">
+            <summary>
+            Fill the grid with the coordinate systems
+            </summary>
+        </member>
+        <member name="F:KaartfabriekUI.Forms.SelectCoordinateSystemsForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:KaartfabriekUI.Forms.SelectCoordinateSystemsForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:KaartfabriekUI.Forms.SelectCoordinateSystemsForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
         <member name="T:KaartfabriekUI.GuiHelpers">
             <summary>
             Class with GUI helpers
@@ -139,11 +177,12 @@
             Service for the GUI
             </summary>
         </member>
-        <member name="M:KaartfabriekUI.Service.KaartfabriekService.#ctor(Shared.ProjectFile,System.Action{System.String})">
+        <member name="M:KaartfabriekUI.Service.KaartfabriekService.#ctor(Shared.ProjectFile,System.Collections.Generic.IEnumerable{Shared.SurferEpsgData},System.Action{System.String})">
             <summary>
             Constructor
             </summary>
             <param name="projectFile"></param>
+            <param name="coordSystems"></param>
             <param name="addProgress">To log the progress in the form</param>
         </member>
         <member name="M:KaartfabriekUI.Service.KaartfabriekService.OpenDataForBlanking(System.String,System.String,System.String,System.Int32,System.Int32,System.Int32)">

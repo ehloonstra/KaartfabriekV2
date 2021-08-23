@@ -95,6 +95,18 @@ The larger the smoothing factor parameter, the less overwhelming influence any p
     <value>The Min data in ALL sectors (set to NoData if fewer) value assures that the specified number of points are encountered when interpolating a grid node. 
 If the minimum number of points is not found, the NoData value is assigned at the grid node.</value>
   </data>
+  <data name="BtnSelectCoordinateSystem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wgAADsIBFShKgAAAAYJJREFUSEvNlS03RFEUQF8QBFEQBEEQBEEQBEEQBEEQBUEQ/ADBWoIgCIIoCoIo
+        CILgBwiCIAiCKArsPW8Od5ZrZt7Hsuy19po39809595zP6b476zgBe7hnA1ts4kfiZc4ga1hMJM4izc0
+        yTNOYxY7rJaPAxnB0fKxwyTeokn8/IHBH/Ad120YwBT622uctwHG8B5NsmxDMIOPGLW04yL2wxnM4im+
+        oAllDY1x0vnWxRpG8NCa5pJYCkeacozGEN/Z37X4Ip1a6is6u5QzvOu6bQMsoAMK3E035eM3sQZpAkvl
+        lFOeMN478iBK1BeTxFo4ogjuSK9wFw8wElgW16ISseDW384uVgRUEx2hu2cfKycQO2lu8XUDG3OOueB6
+        iI1YwlxgdeF/vQqGxVOYC+7Ce5W4rWvXX+wY90romXDhxzHe1dpFgaP0wFgSd467K3dWeq6EOqQ35ham
+        wcP0wDXGw5ZLYntreNDS4JZxB1vFskTwYf4/KuPu8Wbt+WP5Y4riE4mXhi3v5GELAAAAAElFTkSuQmCC
+</value>
+  </data>
   <metadata name="TabPageTemplate.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>

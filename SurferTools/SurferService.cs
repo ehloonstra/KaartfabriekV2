@@ -630,7 +630,7 @@ namespace SurferTools
         /// Get the system.gsj location which contains the EPSG code 
         /// </summary>
         /// <returns></returns>
-        public string GetSystemgsjLocation()
+        public string GetSystemGsjLocation()
         {
             var file = Path.Combine(_surferApp.Path, "system.gsj");
             if (!File.Exists(file))

@@ -121,6 +121,7 @@ namespace KaartfabriekUI.Forms
             this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.panelVoortgang = new System.Windows.Forms.Panel();
             this.LblVoortgang = new System.Windows.Forms.Label();
+            this.BtnSelectCoordinateSystem = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
             this.GroupBoxProjectInstellingen.SuspendLayout();
@@ -449,6 +450,7 @@ namespace KaartfabriekUI.Forms
             // 
             this.GroupBoxVoorbereiding.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.GroupBoxVoorbereiding.Controls.Add(this.BtnSelectCoordinateSystem);
             this.GroupBoxVoorbereiding.Controls.Add(this.TxtEpsgCode);
             this.GroupBoxVoorbereiding.Controls.Add(this.label7);
             this.GroupBoxVoorbereiding.Controls.Add(this.BtnReprojectVelddata);
@@ -1207,6 +1209,17 @@ namespace KaartfabriekUI.Forms
             this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
             this.LblVoortgang.DoubleClick += new System.EventHandler(this.LblVoortgang_DoubleClick);
             // 
+            // BtnSelectCoordinateSystem
+            // 
+            this.BtnSelectCoordinateSystem.Image = ((System.Drawing.Image)(resources.GetObject("BtnSelectCoordinateSystem.Image")));
+            this.BtnSelectCoordinateSystem.Location = new System.Drawing.Point(223, 68);
+            this.BtnSelectCoordinateSystem.Name = "BtnSelectCoordinateSystem";
+            this.BtnSelectCoordinateSystem.Size = new System.Drawing.Size(30, 30);
+            this.BtnSelectCoordinateSystem.TabIndex = 11;
+            this.toolTip1.SetToolTip(this.BtnSelectCoordinateSystem, "Selecteer het coördinatensysteem");
+            this.BtnSelectCoordinateSystem.UseVisualStyleBackColor = true;
+            this.BtnSelectCoordinateSystem.Click += new System.EventHandler(this.BtnSelectCoordinateSystem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1342,6 +1355,7 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.Button BtnExportCsv;
         private System.Windows.Forms.Button BtnMonsterpuntenExport;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button BtnSelectCoordinateSystem;
     }
 }
 

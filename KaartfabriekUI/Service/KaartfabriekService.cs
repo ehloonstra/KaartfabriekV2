@@ -23,16 +23,19 @@ namespace KaartfabriekUI.Service
     {
 
         private readonly ProjectFile _projectFile;
+        private readonly IEnumerable<SurferEpsgData> _coordSystems;
         private readonly Action<string> _addProgress;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="projectFile"></param>
+        /// <param name="coordSystems"></param>
         /// <param name="addProgress">To log the progress in the form</param>
-        public KaartfabriekService(ProjectFile projectFile, Action<string> addProgress)
+        public KaartfabriekService(ProjectFile projectFile, IEnumerable<SurferEpsgData> coordSystems, Action<string> addProgress)
         {
             _projectFile = projectFile;
+            _coordSystems = coordSystems;
             _addProgress = addProgress;
         }
 
@@ -49,7 +52,7 @@ namespace KaartfabriekUI.Service
         public bool OpenDataForBlanking(string workingFolder, string veldDataLocation, string monsterDataLocation,
             int colX, int colY, int colK40)
         {
-            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode), workingFolder,
+            var surferService = new SurferService(GetCoordinateSystemName(_projectFile.EpsgCode), workingFolder,
                 _addProgress);
 
             // Add Velddata:
@@ -109,15 +112,32 @@ namespace KaartfabriekUI.Service
             }
 
             // Make MapFrame Fit:
-            surferService.MakeMapFrameFit(mergedMapFrame); 
+            surferService.MakeMapFrameFit(mergedMapFrame);
 
             // Save result:
             surferService.SaveAsPlotDocument(Path.Combine(workingFolder, "DataForBlanking.srf"));
 
-            
+
 
             // Toon Surfer:
             return surferService.ShowHideSurfer(true);
+        }
+
+        private string GetCoordinateSystemName(string epsgCode)
+        {
+            var tmp = epsgCode.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (tmp.Length < 2)
+                throw new Exception("Epsg code is invalid: " + epsgCode);
+
+            var code = tmp[1];
+            if (!int.TryParse(code, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+                throw new Exception("Epsg code is invalid: " + epsgCode);
+
+            var coordinateSystem = _coordSystems.FirstOrDefault(x => x.Posc == code);
+            if( coordinateSystem is null)
+                throw new Exception("Epsg code could not be found: " + epsgCode);
+
+            return coordinateSystem.SplitName;
         }
 
         /// <summary>
@@ -140,7 +160,7 @@ namespace KaartfabriekUI.Service
         {
             // TODO: Check inputs
 
-            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode), workingFolder,
+            var surferService = new SurferService(GetCoordinateSystemName(_projectFile.EpsgCode), workingFolder,
                 _addProgress, false);
 
             var nuclideGridsFolder = Path.Combine(workingFolder, SurferConstants.NuclideGridsFolder);
@@ -283,7 +303,7 @@ namespace KaartfabriekUI.Service
             Action<int, Color> colorRow)
         {
             _addProgress("Het maken van de bodembestanden is gestart.");
-            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
+            var surferService = new SurferService(GetCoordinateSystemName(_projectFile.EpsgCode),
                 _projectFile.WorkingFolder, _addProgress, false);
 
             try
@@ -373,7 +393,7 @@ namespace KaartfabriekUI.Service
         public void CreateTemplate(string surferTemplateLocation)
         {
             _addProgress("Het maken van de template is gestart.");
-            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
+            var surferService = new SurferService(GetCoordinateSystemName(_projectFile.EpsgCode),
                 _projectFile.WorkingFolder, _addProgress, false);
 
             try
@@ -547,7 +567,7 @@ namespace KaartfabriekUI.Service
             var resultFolder = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenResultaatEmfFolder);
             if (!Directory.Exists(resultFolder)) Directory.CreateDirectory(resultFolder);
 
-            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
+            var surferService = new SurferService(GetCoordinateSystemName(_projectFile.EpsgCode),
                 _projectFile.WorkingFolder, _addProgress, false);
 
             // Get all soilmaps from formula section of project file:
@@ -582,7 +602,7 @@ namespace KaartfabriekUI.Service
 
             var datFilesDict = new Dictionary<string, string>();
 
-            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
+            var surferService = new SurferService(GetCoordinateSystemName(_projectFile.EpsgCode),
                 _projectFile.WorkingFolder, _addProgress, false);
 
             // Get all nuclide grids:
@@ -715,7 +735,7 @@ namespace KaartfabriekUI.Service
         public void ExportSamplePointsData()
         {
             _addProgress("Start monsterpunten export");
-            var surferService = new SurferService(SurferConstants.GetCoordinateSystemName(_projectFile.EpsgCode),
+            var surferService = new SurferService(GetCoordinateSystemName(_projectFile.EpsgCode),
                 _projectFile.WorkingFolder, _addProgress, false);
 
             var resultFolder = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenResultaatCsvFolder);

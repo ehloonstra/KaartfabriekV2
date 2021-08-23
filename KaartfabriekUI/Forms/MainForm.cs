@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using KaartfabriekUI.Service;
 using Shared;
@@ -17,6 +19,7 @@ namespace KaartfabriekUI.Forms
     public partial class MainForm : Form
     {
         private ProjectFile _projectFile;
+        private IEnumerable<SurferEpsgData> _coordSystems;
         private readonly ApplicationSettings _applicationSettings;
 
         /// <inheritdoc />
@@ -51,6 +54,59 @@ namespace KaartfabriekUI.Forms
             {
                 // Activate settings tab:
                 tabControl1.SelectedTab = tabControl1.TabPages[nameof(TabPageInstellingen)];
+            }
+
+            // Load coordinate systems from Surfer:
+            LoadCoordinateSystems();
+        }
+
+        private void LoadCoordinateSystems()
+        {
+            AddProgress("Laden coördinatensystemen.");
+            var surferService = new SurferService("EPSG:28992", Path.GetTempPath(), AddProgress);
+            var fileLocation = surferService.GetSystemGsjLocation();
+            // read file line by line:
+            var file = new StreamReader(fileLocation);
+
+            var sb = new System.Text.StringBuilder("{\"Data\": ["); // Start with a bracket
+            var regex = new Regex(@"(.*?)=(.*)"); // Match key value pair
+            
+            string line;
+            while ((line = file.ReadLine()) != null)
+            {
+                if (line.StartsWith(';')) continue; // Lines beginning with a semicolon are comments.
+
+                if (line.Contains('='))
+                {
+                    // Split:
+                    var match = regex.Match(line);
+                    if (match.Success)
+                    {
+                        var key = match.Groups[1].Value.Trim().Trim('"');
+                        var value = match.Groups[2].Value.Trim().Trim('"');
+                        sb.AppendLine($@"""{key}"":""{value}"",");
+                    }
+                }
+
+                if (line == "{") sb.AppendLine("{");
+                if (line == "}") sb.AppendLine("},");
+            }
+
+            sb.AppendLine("]}");  // End with a bracket
+            file.Close();
+
+            var retValue = JsonSerializer.Deserialize<SurferEpsgFile>(sb.ToString(), new JsonSerializerOptions {AllowTrailingCommas = true, PropertyNameCaseInsensitive = true});
+            if (retValue != null)
+            {
+                _coordSystems = retValue.Data
+                    .Where(x => string.IsNullOrEmpty(x.Posc) == false)
+                    .OrderBy(x => x.Name);
+
+                AddProgress("De coördinatensystemen zijn geladen.");
+            }
+            else
+            {
+                AddProgress("Error: Kon de coördinatensystemen niet laden.");
             }
         }
 
@@ -110,7 +166,7 @@ namespace KaartfabriekUI.Forms
         {
             try
             {
-                var service = new KaartfabriekService(_projectFile, AddProgress);
+                var service = new KaartfabriekService(_projectFile, _coordSystems, AddProgress);
                 var result = service.OpenDataForBlanking(WorkingFolder.TextboxText, VeldDataLocation.TextboxText,
                     MonsterDataLocation.TextboxText,
                     CboXcoord.SelectedIndex, CboYcoord.SelectedIndex, CboK40.SelectedIndex);
@@ -188,7 +244,7 @@ namespace KaartfabriekUI.Forms
             // Save project file first to save potential grid settings changes:
             _projectFile.Save();
 
-            var service = new KaartfabriekService(_projectFile, AddProgress);
+            var service = new KaartfabriekService(_projectFile, _coordSystems,  AddProgress);
             AddProgress("De nuclide grids worden gemaakt.");
             var bufferDistance = 10d;
             if (double.TryParse(TxtBuffer.Text, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
@@ -643,7 +699,7 @@ namespace KaartfabriekUI.Forms
                 return;
             }
 
-            var service = new KaartfabriekService(_projectFile, AddProgress);
+            var service = new KaartfabriekService(_projectFile, _coordSystems, AddProgress);
             GridViewFormulas.ClearSelection();
             service.CreateSoilMaps(selectedFormulas, _applicationSettings.LevelFilesFolder, ColorRow);
             AddProgress("De geselecteerde grids zijn berekend.");
@@ -667,7 +723,7 @@ namespace KaartfabriekUI.Forms
             _projectFile.ProjectNr = TxtTemplateProjectNr.Text;
             _projectFile.Save();
 
-            var service = new KaartfabriekService(_projectFile, AddProgress);
+            var service = new KaartfabriekService(_projectFile, _coordSystems, AddProgress);
             service.CreateTemplate(SurferTemplateLocation.TextboxText);
             AddProgress("De template is aangemaakt.");
         }
@@ -875,7 +931,7 @@ namespace KaartfabriekUI.Forms
             try
             {
                 _projectFile = new ProjectFile();
-                var service = new KaartfabriekService(_projectFile, AddProgress);
+                var service = new KaartfabriekService(_projectFile, _coordSystems, AddProgress);
                 if (!service.ConvertOldProjectFile(ofd.FileName)) return;
             }
             catch (Exception exception)
@@ -932,7 +988,7 @@ namespace KaartfabriekUI.Forms
         {
             try
             {
-                var service = new KaartfabriekService(_projectFile, AddProgress);
+                var service = new KaartfabriekService(_projectFile, _coordSystems, AddProgress);
                 service.ExportEmf();
                 AddProgress("Het exporteren naar EMF is voltooid.");
             }
@@ -947,7 +1003,7 @@ namespace KaartfabriekUI.Forms
         {
             try
             {
-                var service = new KaartfabriekService(_projectFile, AddProgress);
+                var service = new KaartfabriekService(_projectFile, _coordSystems, AddProgress);
                 service.ExportCsv();
                 AddProgress("Het exporteren naar Csv is voltooid.");
             }
@@ -962,7 +1018,7 @@ namespace KaartfabriekUI.Forms
         {
             try
             {
-                var service = new KaartfabriekService(_projectFile, AddProgress);
+                var service = new KaartfabriekService(_projectFile, _coordSystems, AddProgress);
                 service.ExportSamplePointsData();
                 AddProgress("Het exporteren van de monsterpunt-data is voltooid.");
             }
@@ -970,6 +1026,19 @@ namespace KaartfabriekUI.Forms
             {
                 AddProgress("Er ging wat fout bij het exporteren van de monsterpunten. Error: " + exception.Message);
                 // swallow: throw;
+            }
+        }
+
+        private void BtnSelectCoordinateSystem_Click(object sender, EventArgs e)
+        {
+            // Open model form with coordinates
+            var coordinateForm = new SelectCoordinateSystemsForm {CoordSystems = _coordSystems};
+            coordinateForm.FillGridView();
+
+            var dialogResult = coordinateForm.ShowDialog(this);
+            if (dialogResult == DialogResult.OK)
+            {
+                TxtEpsgCode.Text = $@"EPSG:{coordinateForm.SelectedEpsgCode}";
             }
         }
     }

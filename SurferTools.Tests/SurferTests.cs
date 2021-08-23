@@ -303,7 +303,7 @@ namespace SurferTools.Tests
         [Fact]
         public void ParseEpsgCodes()
         {
-            var fileLocation = _surferService.GetSystemgsjLocation();
+            var fileLocation = _surferService.GetSystemGsjLocation();
             // read file line by line:
             var file = new StreamReader(fileLocation);
 
