@@ -52,6 +52,7 @@ namespace KaartfabriekUI.Forms
             this.label8 = new System.Windows.Forms.Label();
             this.BtnProjectImport = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
+            this.BtnSelectCoordinateSystem = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TabPageVoorbereiding = new System.Windows.Forms.TabPage();
             this.GroupBoxProjectInstellingen = new System.Windows.Forms.GroupBox();
@@ -120,8 +121,8 @@ namespace KaartfabriekUI.Forms
             this.LevelFilesFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.GdalFolder = new KaartfabriekUI.UserControls.TextSelectControl();
             this.panelVoortgang = new System.Windows.Forms.Panel();
-            this.LblVoortgang = new System.Windows.Forms.Label();
-            this.BtnSelectCoordinateSystem = new System.Windows.Forms.Button();
+            this.TxtVoortgang = new System.Windows.Forms.TextBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.tabControl1.SuspendLayout();
             this.TabPageVoorbereiding.SuspendLayout();
             this.GroupBoxProjectInstellingen.SuspendLayout();
@@ -141,6 +142,7 @@ namespace KaartfabriekUI.Forms
             this.TabPageInstellingen.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panelVoortgang.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // BlankFileLocation
@@ -382,11 +384,22 @@ namespace KaartfabriekUI.Forms
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(7, 76);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(68, 15);
+            this.label7.Size = new System.Drawing.Size(164, 15);
             this.label7.TabIndex = 9;
-            this.label7.Text = "EPSG Code:";
+            this.label7.Text = "EPSG Code (bijv. EPSG:28992):";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.toolTip1.SetToolTip(this.label7, "De EPSG code wordt gebruikt om de projectie te bepalen.");
+            // 
+            // BtnSelectCoordinateSystem
+            // 
+            this.BtnSelectCoordinateSystem.Image = ((System.Drawing.Image)(resources.GetObject("BtnSelectCoordinateSystem.Image")));
+            this.BtnSelectCoordinateSystem.Location = new System.Drawing.Point(319, 68);
+            this.BtnSelectCoordinateSystem.Name = "BtnSelectCoordinateSystem";
+            this.BtnSelectCoordinateSystem.Size = new System.Drawing.Size(30, 30);
+            this.BtnSelectCoordinateSystem.TabIndex = 11;
+            this.toolTip1.SetToolTip(this.BtnSelectCoordinateSystem, "Selecteer het coördinatensysteem");
+            this.BtnSelectCoordinateSystem.UseVisualStyleBackColor = true;
+            this.BtnSelectCoordinateSystem.Click += new System.EventHandler(this.BtnSelectCoordinateSystem_Click);
             // 
             // tabControl1
             // 
@@ -468,7 +481,7 @@ namespace KaartfabriekUI.Forms
             // 
             // TxtEpsgCode
             // 
-            this.TxtEpsgCode.Location = new System.Drawing.Point(81, 72);
+            this.TxtEpsgCode.Location = new System.Drawing.Point(177, 72);
             this.TxtEpsgCode.Name = "TxtEpsgCode";
             this.TxtEpsgCode.Size = new System.Drawing.Size(136, 23);
             this.TxtEpsgCode.TabIndex = 10;
@@ -665,6 +678,7 @@ namespace KaartfabriekUI.Forms
             this.GroupBoxNuclideGrids.Enabled = false;
             this.GroupBoxNuclideGrids.Location = new System.Drawing.Point(6, 572);
             this.GroupBoxNuclideGrids.Name = "GroupBoxNuclideGrids";
+            this.GroupBoxNuclideGrids.Padding = new System.Windows.Forms.Padding(10);
             this.GroupBoxNuclideGrids.Size = new System.Drawing.Size(793, 180);
             this.GroupBoxNuclideGrids.TabIndex = 5;
             this.GroupBoxNuclideGrids.TabStop = false;
@@ -1183,48 +1197,43 @@ namespace KaartfabriekUI.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelVoortgang.AutoScroll = true;
             this.panelVoortgang.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelVoortgang.Controls.Add(this.LblVoortgang);
+            this.panelVoortgang.Controls.Add(this.TxtVoortgang);
             this.panelVoortgang.Location = new System.Drawing.Point(830, 75);
             this.panelVoortgang.Name = "panelVoortgang";
             this.panelVoortgang.Size = new System.Drawing.Size(374, 761);
             this.panelVoortgang.TabIndex = 10;
             // 
-            // LblVoortgang
+            // TxtVoortgang
             // 
-            this.LblVoortgang.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblVoortgang.AutoEllipsis = true;
-            this.LblVoortgang.AutoSize = true;
-            this.LblVoortgang.BackColor = System.Drawing.Color.Transparent;
-            this.LblVoortgang.Image = global::KaartfabriekUI.Properties.Resources.logolevdw200_50_;
-            this.LblVoortgang.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.LblVoortgang.Location = new System.Drawing.Point(0, 0);
-            this.LblVoortgang.Margin = new System.Windows.Forms.Padding(3);
-            this.LblVoortgang.MaximumSize = new System.Drawing.Size(350, 0);
-            this.LblVoortgang.MinimumSize = new System.Drawing.Size(355, 755);
-            this.LblVoortgang.Name = "LblVoortgang";
-            this.LblVoortgang.Size = new System.Drawing.Size(355, 755);
-            this.LblVoortgang.TabIndex = 8;
-            this.LblVoortgang.Text = "Open eerst een bestaand of nieuw project";
-            this.LblVoortgang.DoubleClick += new System.EventHandler(this.LblVoortgang_DoubleClick);
+            this.TxtVoortgang.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TxtVoortgang.Location = new System.Drawing.Point(0, 0);
+            this.TxtVoortgang.Multiline = true;
+            this.TxtVoortgang.Name = "TxtVoortgang";
+            this.TxtVoortgang.ReadOnly = true;
+            this.TxtVoortgang.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.TxtVoortgang.Size = new System.Drawing.Size(372, 759);
+            this.TxtVoortgang.TabIndex = 13;
+            this.TxtVoortgang.Text = "Open eerst een bestaand of nieuw project";
+            this.TxtVoortgang.DoubleClick += new System.EventHandler(this.TxtVoortgang_DoubleClick);
             // 
-            // BtnSelectCoordinateSystem
+            // pictureBox2
             // 
-            this.BtnSelectCoordinateSystem.Image = ((System.Drawing.Image)(resources.GetObject("BtnSelectCoordinateSystem.Image")));
-            this.BtnSelectCoordinateSystem.Location = new System.Drawing.Point(223, 68);
-            this.BtnSelectCoordinateSystem.Name = "BtnSelectCoordinateSystem";
-            this.BtnSelectCoordinateSystem.Size = new System.Drawing.Size(30, 30);
-            this.BtnSelectCoordinateSystem.TabIndex = 11;
-            this.toolTip1.SetToolTip(this.BtnSelectCoordinateSystem, "Selecteer het coördinatensysteem");
-            this.BtnSelectCoordinateSystem.UseVisualStyleBackColor = true;
-            this.BtnSelectCoordinateSystem.Click += new System.EventHandler(this.BtnSelectCoordinateSystem_Click);
+            this.pictureBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBox2.Image = global::KaartfabriekUI.Properties.Resources.logolevdw200_50_;
+            this.pictureBox2.Location = new System.Drawing.Point(1087, 4);
+            this.pictureBox2.Margin = new System.Windows.Forms.Padding(10);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(117, 71);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox2.TabIndex = 22;
+            this.pictureBox2.TabStop = false;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1214, 843);
+            this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.BtnProjectImport);
             this.Controls.Add(this.panelVoortgang);
             this.Controls.Add(this.BtnNewProjectFile);
@@ -1260,6 +1269,7 @@ namespace KaartfabriekUI.Forms
             this.groupBox1.ResumeLayout(false);
             this.panelVoortgang.ResumeLayout(false);
             this.panelVoortgang.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1325,7 +1335,6 @@ namespace KaartfabriekUI.Forms
         private UserControls.TextSelectControl SurferTemplateLocation;
         private System.Windows.Forms.DataGridView GridViewFormulas;
         private System.Windows.Forms.Panel panelVoortgang;
-        private System.Windows.Forms.Label LblVoortgang;
         private System.Windows.Forms.TextBox TxtSearchNumSectors;
         private System.Windows.Forms.TextBox TxtSearchRadius;
         private System.Windows.Forms.Label label11;
@@ -1356,6 +1365,8 @@ namespace KaartfabriekUI.Forms
         private System.Windows.Forms.Button BtnMonsterpuntenExport;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button BtnSelectCoordinateSystem;
+        private System.Windows.Forms.TextBox TxtVoortgang;
+        private System.Windows.Forms.PictureBox pictureBox2;
     }
 }
 

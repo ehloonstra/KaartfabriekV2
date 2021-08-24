@@ -70,7 +70,7 @@ namespace KaartfabriekUI.Forms
 
             var sb = new System.Text.StringBuilder("{\"Data\": ["); // Start with a bracket
             var regex = new Regex(@"(.*?)=(.*)"); // Match key value pair
-            
+
             string line;
             while ((line = file.ReadLine()) != null)
             {
@@ -95,7 +95,7 @@ namespace KaartfabriekUI.Forms
             sb.AppendLine("]}");  // End with a bracket
             file.Close();
 
-            var retValue = JsonSerializer.Deserialize<SurferEpsgFile>(sb.ToString(), new JsonSerializerOptions {AllowTrailingCommas = true, PropertyNameCaseInsensitive = true});
+            var retValue = JsonSerializer.Deserialize<SurferEpsgFile>(sb.ToString(), new JsonSerializerOptions { AllowTrailingCommas = true, PropertyNameCaseInsensitive = true });
             if (retValue != null)
             {
                 _coordSystems = retValue.Data
@@ -154,7 +154,7 @@ namespace KaartfabriekUI.Forms
                 var retVal = new ProcessTools().ConvertLatLongToProjected(ofd.FileName, _projectFile.EpsgCode);
                 if (File.Exists(retVal))
                 {
-                    AddProgress("Het bestand is geconverteerd naar " +  _projectFile.EpsgCode);
+                    AddProgress("Het bestand is geconverteerd naar " + _projectFile.EpsgCode);
                     return retVal;
                 }
 
@@ -244,7 +244,7 @@ namespace KaartfabriekUI.Forms
             // Save project file first to save potential grid settings changes:
             _projectFile.Save();
 
-            var service = new KaartfabriekService(_projectFile, _coordSystems,  AddProgress);
+            var service = new KaartfabriekService(_projectFile, _coordSystems, AddProgress);
             AddProgress("De nuclide grids worden gemaakt.");
             var bufferDistance = 10d;
             if (double.TryParse(TxtBuffer.Text, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
@@ -301,8 +301,8 @@ namespace KaartfabriekUI.Forms
             // Reset:
             VeldDataLocation.TextboxText = string.Empty;
             MonsterDataLocation.TextboxText = string.Empty;
-           BlankFileLocation.TextboxText = string.Empty;
-            
+            BlankFileLocation.TextboxText = string.Empty;
+
             GroupBoxVelddataKolommen.Enabled = false;
             GroupBoxProjectInstellingen.Enabled = false;
             GroupBoxNuclideGrids.Enabled = false;
@@ -475,9 +475,9 @@ namespace KaartfabriekUI.Forms
         private void AddProgress(string text, bool clear)
         {
             if (clear)
-                LblVoortgang.Text = string.Empty;
+                TxtVoortgang.Text = string.Empty;
 
-            LblVoortgang.Text += $@"{text}{Environment.NewLine}";
+            TxtVoortgang.AppendText($@"{text}{Environment.NewLine}");
         }
 
         private void WorkingFolder_TextboxUpdated(object sender, EventArgs e)
@@ -726,15 +726,6 @@ namespace KaartfabriekUI.Forms
             var service = new KaartfabriekService(_projectFile, _coordSystems, AddProgress);
             service.CreateTemplate(SurferTemplateLocation.TextboxText);
             AddProgress("De template is aangemaakt.");
-        }
-
-        private void LblVoortgang_DoubleClick(object sender, EventArgs e)
-        {
-            // Create temp file and open it in Notepad:
-            var fileLocation = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetTempFileName(), ".txt"));
-            var header = $"{Text}{Environment.NewLine}Datum: {DateTime.UtcNow:f}{Environment.NewLine}Werkfolder: {_projectFile.WorkingFolder}{Environment.NewLine}";
-            File.WriteAllText(fileLocation, $"{header}{Environment.NewLine}{LblVoortgang.Text}");
-            ProcessTools.OpenFile(fileLocation);
         }
 
         private void GdalFolder_TextboxUpdated(object sender, EventArgs e)
@@ -1032,7 +1023,7 @@ namespace KaartfabriekUI.Forms
         private void BtnSelectCoordinateSystem_Click(object sender, EventArgs e)
         {
             // Open model form with coordinates
-            var coordinateForm = new SelectCoordinateSystemsForm {CoordSystems = _coordSystems};
+            var coordinateForm = new SelectCoordinateSystemsForm { CoordSystems = _coordSystems };
             coordinateForm.FillGridView();
 
             var dialogResult = coordinateForm.ShowDialog(this);
@@ -1040,6 +1031,15 @@ namespace KaartfabriekUI.Forms
             {
                 TxtEpsgCode.Text = $@"EPSG:{coordinateForm.SelectedEpsgCode}";
             }
+        }
+
+        private void TxtVoortgang_DoubleClick(object sender, EventArgs e)
+        {
+            // Create temp file and open it in Notepad:
+            var fileLocation = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetTempFileName(), ".txt"));
+            var header = $"{Text}{Environment.NewLine}Datum: {DateTime.UtcNow:f}{Environment.NewLine}Werkfolder: {_projectFile.WorkingFolder}{Environment.NewLine}";
+            File.WriteAllText(fileLocation, $"{header}{Environment.NewLine}{TxtVoortgang.Text}");
+            ProcessTools.OpenFile(fileLocation);
         }
     }
 }
