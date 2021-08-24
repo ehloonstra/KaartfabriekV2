@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Shared;
 using Surfer;
 
@@ -1177,6 +1179,7 @@ namespace SurferTools
                 throw new Exception("Could not get polygon");
 
             polygon.Select();
+            Thread.Sleep(1000); // Sometimes Copy throws an error: Unable to open clipboard
             _activePlotDocument.Selection.Copy();
 
             var tempLayer = shapes.AddEmptyBaseLayer(mapFrame);
@@ -1185,6 +1188,7 @@ namespace SurferTools
                 throw new Exception("Could not get shapes of temp layer");
 
             shapesTempLayer.StartEditing();
+            Thread.Sleep(1000); // Sometimes Paste throws an error: Unable to open clipboard
             // Paste in the 1-inch rect into the map converting the page units coordinates to map units:
             shapesTempLayer.Paste();
 
@@ -1299,7 +1303,13 @@ namespace SurferTools
             // ReSharper disable once AssignNullToNotNullAttribute
             var newFileName = Path.Combine(resultFolder, Path.ChangeExtension(Path.GetFileName(fileName), ".emf"));
 
-            return _activePlotDocument.Export2(newFileName, false, "Defaults=1,AllTextToPolygons=0,MaxBitmapSizeInMB=10", "emf");
+            var retVal = _activePlotDocument.Export2(newFileName, false, "Defaults=1,AllTextToPolygons=0,MaxBitmapSizeInMB=10", "emf");
+            if (retVal)
+            {
+                _activePlotDocument.Close(SrfSaveTypes.srfSaveChangesNo);
+            }
+
+            return retVal;
         }
 
         /// <summary>
