@@ -1365,5 +1365,13 @@ namespace SurferTools
             wksDocument.SaveAs(csvLocation);
             wksDocument.Close();
         }
+
+        /// <summary>
+        /// Close the active plot document
+        /// </summary>
+        public void CloseActivePlot()
+        {
+            _activePlotDocument.Close(SrfSaveTypes.srfSaveChangesNo);
+        }
     }
 }

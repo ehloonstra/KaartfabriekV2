@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Shared;
 using Surfer;
 
@@ -43,17 +44,18 @@ namespace SurferTools
         public bool CalculateBulkdichtheid(string outGrid)
         {
             var tmpOs = AftoppenOs();
-
-            // TODO: In VB6-code wordt ook Lutum soms afgetopt
+            var tmpLutum = AftoppenLutum(true);
 
             // OS, Lutum, Zandfactie, M50
             var gridMathInput = new List<IGridMathInput>
             {
                 _surferApp.NewGridMathInput(tmpOs, FormulaConstants.Os),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(tmpLutum, FormulaConstants.Lutum),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50)
             };
+
+            if (!CheckInputs(gridMathInput)) return false;
 
             // ReSharper disable once ConvertToConstant.Local
             var formuleKlei = $"1 / (0.6117 + (0.003601 * {FormulaConstants.Lutum}) + (0.002172 * ({FormulaConstants.Os} ^ 2)) + (0.01715 * ln({FormulaConstants.Os})))";
@@ -65,6 +67,11 @@ namespace SurferTools
             DeleteFile(outGrid);
             _surferApp.GridMath3(formula, gridMathInput.ToArray(), outGrid);
             return File.Exists(outGrid);
+        }
+
+        private static bool CheckInputs(IEnumerable<IGridMathInput> gridMathInput)
+        {
+            return gridMathInput.All(input => File.Exists(input.GridFileName));
         }
 
         /// <summary>
@@ -83,7 +90,7 @@ namespace SurferTools
 
             return true;
         }
-        
+
         /// <summary>
         /// Calculate Waterdoorlatendheid
         /// </summary>
@@ -91,11 +98,8 @@ namespace SurferTools
         /// <returns></returns>
         public bool CalculateWaterdoorlatendheid(string outGrid)
         {
-            // TODO: check op negatieve waarde:
-            // Bij hele lage waarden lutum en leem (sportvelden)
-            // gaat de berekening niet goed
-
             var tmpOs = AftoppenOs();
+            var tmpLutum = AftoppenLutum(true);
 
             // Formula is getting too long (> 256):
             var tmpKsSterKlei = CalculateWaterdoorlatendheidKsSter(tmpOs, true);
@@ -103,10 +107,12 @@ namespace SurferTools
 
             var gridMathInput = new List<IGridMathInput>
             {
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(tmpLutum, FormulaConstants.Lutum),
                 _surferApp.NewGridMathInput(tmpKsSterKlei, "A"),
                 _surferApp.NewGridMathInput(tmpKsSterZand, "B")
             };
+
+            if (!CheckInputs(gridMathInput)) return false;
 
             // ReSharper disable once ConvertToConstant.Local
             var formula = $"IF({FormulaConstants.Lutum}>=8,Exp(A),Exp(B))";
@@ -127,6 +133,9 @@ namespace SurferTools
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
             };
+
+            if (!CheckInputs(gridMathInput))
+                throw new Exception("Cannot find all input files for CalculateWaterdoorlatendheidKsSter.");
 
             string tmpFile, formula;
             if (forKlei)
@@ -158,15 +167,16 @@ namespace SurferTools
             // gaat de berekening niet goed
 
             var tmpOs = AftoppenOs();
+            var tmpLutum = AftoppenLutum(true);
 
             // BetaS
-            var tmpBetaS = CalculateWaterretentieBetaS(tmpOs);
+            var tmpBetaS = CalculateWaterretentieBetaS(tmpOs, tmpLutum);
 
             // Alpha:
-            var tmpAlpha = CalculateWaterretentieAlpha(tmpOs);
+            var tmpAlpha = CalculateWaterretentieAlpha(tmpOs, tmpLutum);
 
             // N
-            var tmpN = CalculateWaterretentieN(tmpOs);
+            var tmpN = CalculateWaterretentieN(tmpOs, tmpLutum);
 
             // ThetaPfTweePuntNul
             var tmpThetaPfTweePuntNul = CalculateWaterretentieThetaPfTweePuntNul(tmpBetaS, tmpAlpha, tmpN);
@@ -180,6 +190,8 @@ namespace SurferTools
                 _surferApp.NewGridMathInput(tmpThetaPfTweePuntNul, "A"),
                 _surferApp.NewGridMathInput(tmpThetaPfVierPuntTwee, "B")
             };
+
+            if (!CheckInputs(gridMathInput)) return false;
 
             const string formula = "(A-B)*100";
             DeleteFile(outGrid);
@@ -202,15 +214,16 @@ namespace SurferTools
             // gaat de berekening niet goed
 
             var tmpOs = AftoppenOs();
+            var tmpLutum = AftoppenLutum(true);
 
             // BetaS
-            var tmpBetaS = CalculateWaterretentieBetaS(tmpOs);
+            var tmpBetaS = CalculateWaterretentieBetaS(tmpOs, tmpLutum);
 
             // Alpha:
-            var tmpAlpha = CalculateWaterretentieAlpha(tmpOs);
+            var tmpAlpha = CalculateWaterretentieAlpha(tmpOs, tmpLutum);
 
             // N
-            var tmpN = CalculateWaterretentieN(tmpOs);
+            var tmpN = CalculateWaterretentieN(tmpOs, tmpLutum);
 
             // ThetaPfTweePuntNul
             var tmpThetaPfTweePuntNul = CalculateWaterretentieThetaPfTweePuntNul(tmpBetaS, tmpAlpha, tmpN);
@@ -220,6 +233,8 @@ namespace SurferTools
             {
                 _surferApp.NewGridMathInput(tmpThetaPfTweePuntNul, "A")
             };
+
+            if (!CheckInputs(gridMathInput)) return false;
 
             const string formula = "A*100";
             DeleteFile(outGrid);
@@ -235,25 +250,57 @@ namespace SurferTools
             {
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Os), FormulaConstants.Os)
             };
+
+            if (!CheckInputs(gridMathInput))
+                throw new Exception("Cannot find OS grid file.");
+
             var tmpOs = Path.Combine(Path.GetTempPath(), "OS15.grd");
             DeleteFile(tmpOs);
-            _surferApp.GridMath3("IF(OS>=15,14.99,OS)", gridMathInput.ToArray(), tmpOs);
+            // _surferApp.GridMath3("IF(OS>=15,14.99,OS)", gridMathInput.ToArray(), tmpOs);
+            _surferApp.GridMath3("IF(OS>=15,14.99,IF(OS<0,0.1,OS))", gridMathInput.ToArray(), tmpOs);
             if (!File.Exists(tmpOs))
                 throw new Exception("Cannot create temp OS-15 grid.");
 
             return tmpOs;
         }
 
-        private string CalculateWaterretentieBetaS(string tmpOs)
+        private string AftoppenLutum(bool negativeOnly, int maxValue = 8)
+        {
+            // Soms negatieve waarden van Lutum
+            var gridMathInput = new List<IGridMathInput>
+            {
+                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum)
+            };
+
+            if (!CheckInputs(gridMathInput))
+                throw new Exception("Cannot find Lutum grid file.");
+
+            var tmpLutum = Path.Combine(Path.GetTempPath(), "Lutum8.grd");
+            DeleteFile(tmpLutum);
+
+            var formula = $"IF(Lutum>={maxValue},{maxValue - 0.01},IF(Lutum<0,0.1,Lutum))";
+            if (negativeOnly) formula = "IF(Lutum<0,0.1,Lutum)";
+
+            _surferApp.GridMath3(formula, gridMathInput.ToArray(), tmpLutum);
+            if (!File.Exists(tmpLutum))
+                throw new Exception("Cannot create temp Lutum-8 grid.");
+
+            return tmpLutum;
+        }
+
+        private string CalculateWaterretentieBetaS(string tmpOs, string tmpLutum)
         {
             var gridMathInput = new List<IGridMathInput>
             {
                 _surferApp.NewGridMathInput(tmpOs, FormulaConstants.Os),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(tmpLutum, FormulaConstants.Lutum),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
             };
+
+            if (!CheckInputs(gridMathInput))
+                throw new Exception("Cannot find all input files for CalculateWaterretentieBetaS.");
 
             var tmpFile = Path.Combine(Path.GetTempPath(), "BetaS.grd");
             DeleteFile(tmpFile);
@@ -273,16 +320,19 @@ namespace SurferTools
             return tmpFile;
         }
 
-        private string CalculateWaterretentieAlpha(string tmpOs)
+        private string CalculateWaterretentieAlpha(string tmpOs, string tmpLutum)
         {
             var gridMathInput = new List<IGridMathInput>
             {
                 _surferApp.NewGridMathInput(tmpOs, FormulaConstants.Os),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(tmpLutum, FormulaConstants.Lutum),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
             };
+
+            if (!CheckInputs(gridMathInput))
+                throw new Exception("Cannot find all input files for CalculateWaterretentieAlpha.");
 
             var tmpFile = Path.Combine(Path.GetTempPath(), "Alpha.grd");
             DeleteFile(tmpFile);
@@ -302,16 +352,19 @@ namespace SurferTools
             return tmpFile;
         }
 
-        private string CalculateWaterretentieN(string tmpOs)
+        private string CalculateWaterretentieN(string tmpOs, string tmpLutum)
         {
             var gridMathInput = new List<IGridMathInput>
             {
                 _surferApp.NewGridMathInput(tmpOs, FormulaConstants.Os),
-                _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Lutum), FormulaConstants.Lutum),
+                _surferApp.NewGridMathInput(tmpLutum, FormulaConstants.Lutum),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Zandfractie), FormulaConstants.Zandfractie),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.M50), FormulaConstants.M50),
                 _surferApp.NewGridMathInput(SurferService.GetFullPath(_workingFolder, _fieldName, FormulaConstants.Bulkdichtheid), FormulaConstants.Bulkdichtheid)
             };
+
+            if (!CheckInputs(gridMathInput))
+                throw new Exception("Cannot find all input files for CalculateWaterretentieN.");
 
             var tmpFile = Path.Combine(Path.GetTempPath(), "N.grd");
             DeleteFile(tmpFile);
@@ -340,6 +393,9 @@ namespace SurferTools
                 _surferApp.NewGridMathInput(tmpN, "N"),
             };
 
+            if (!CheckInputs(gridMathInput))
+                throw new Exception("Cannot find all input files for CalculateWaterretentieThetaPfTweePuntNul.");
+
             var tmpFile = Path.Combine(Path.GetTempPath(), "ThetaPfTweePuntNul.grd");
             DeleteFile(tmpFile);
 
@@ -359,6 +415,9 @@ namespace SurferTools
                 _surferApp.NewGridMathInput(tmpAlpha, "Alpha"),
                 _surferApp.NewGridMathInput(tmpN, "N"),
             };
+
+            if (!CheckInputs(gridMathInput))
+                throw new Exception("Cannot find all input files for CalculateWaterretentieThetaPfVierPuntTwee.");
 
             var tmpFile = Path.Combine(Path.GetTempPath(), "ThetaPfVierPuntTwee.grd");
             DeleteFile(tmpFile);

@@ -316,6 +316,7 @@ namespace KaartfabriekUI.Service
                 if (!File.Exists(templateLocation))
                     throw new FileNotFoundException($"Kan {SurferConstants.TemplateName} niet vinden.", templateLocation);
 
+                var outputFile = string.Empty;
                 foreach (var formula in selectedFormulas)
                 {
                     try
@@ -330,8 +331,10 @@ namespace KaartfabriekUI.Service
                         _addProgress($"{formula.Output} is berekend.");
                         // Open template:
                         surferService.OpenSrf(templateLocation);
-                        surferService.SaveAsPlotDocument(Path.Combine(_projectFile.WorkingFolder,
-                            SurferConstants.BodemkaartenResultaatSurferFolder, $"{_projectFile.ParcelData.Name} {formula.Output}.srf"));
+                        outputFile = Path.Combine(_projectFile.WorkingFolder,
+                            SurferConstants.BodemkaartenResultaatSurferFolder,
+                            $"{_projectFile.ParcelData.Name} {formula.Output}.srf");
+                        surferService.SaveAsPlotDocument(outputFile);
                         // Change grid
                         var statistics = surferService.ChangeGridSource(SurferConstants.TemplateMapName,
                             Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
@@ -373,8 +376,14 @@ namespace KaartfabriekUI.Service
                     }
                     catch (Exception e)
                     {
-                        _addProgress($"Er ging wat fout bij het maken van {formula.Output}. Error: {e.Message}");
+                        _addProgress($"Er ging wat fout bij het maken van {formula.Output}. Error: {e.Message} at {e.TargetSite?.Name}");
                         colorRow(formula.RowIndex, Color.DarkRed);
+
+                        // Close this plot:
+                        surferService.CloseActivePlot();
+                        // Delete created file:
+                        if (File.Exists(outputFile)) File.Delete(outputFile);
+
                         // Swallow: throw;
                     }
 
@@ -475,7 +484,7 @@ namespace KaartfabriekUI.Service
             var formulesNode = doc.Root?.Element("Formules")?.Element("Formules");
             if (formulesNode is null) throw new XmlException("Cannot find Formules node");
 
-            var formules = _projectFile.FormulaData;
+            //var formules = _projectFile.FormulaData;
             foreach (var element in formulesNode.Descendants("Formule"))
             {
                 var output = GetCorrectGridName(element.Element("GridC")?.Value);
@@ -765,9 +774,16 @@ namespace KaartfabriekUI.Service
             {
                 if (formulaData.Output == FormulaConstants.Monsterpunten) continue;
 
-                var gridFileLocation = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder,
-                    $"{_projectFile.ParcelData.Name} {formulaData.Output}.grd");
-                surferService.PointSample(gridFileLocation, newLocation, ++lastColumn, formulaData.Output);
+                var gridFileName = $"{_projectFile.ParcelData.Name} {formulaData.Output}.grd";
+                var gridFileLocation = Path.Combine(_projectFile.WorkingFolder, SurferConstants.BodemkaartenGridsFolder, gridFileName);
+                if (File.Exists(gridFileLocation))
+                {
+                    surferService.PointSample(gridFileLocation, newLocation, ++lastColumn, formulaData.Output);
+                }
+                else
+                {
+                    _addProgress($"{gridFileName} kon niet worden gevonden en wordt niet gebruikt bij de export.");
+                }
             }
 
             _addProgress($"De export is voltooid en staat klaar op {newLocation}");

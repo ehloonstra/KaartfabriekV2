@@ -5,7 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
-    <Version>2.0.3.0</Version>
+    <Version>2.0.3.1</Version>
     <Copyright>TopX GeoICT</Copyright>
     <Company>TopX GeoICT</Company>
     <Product>Kaartfabriek</Product>
@@ -13,7 +13,7 @@
     <PackageIcon>beeldmerkmol1000.png</PackageIcon>
     <PackageIconUrl />
     <AssemblyName>Kaartfabriek</AssemblyName>
-    <AssemblyVersion>2.0.3.0</AssemblyVersion>
+    <AssemblyVersion>2.0.3.1</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
