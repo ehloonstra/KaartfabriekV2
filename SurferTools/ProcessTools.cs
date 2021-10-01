@@ -54,10 +54,30 @@ namespace SurferTools
             var newName = fileName.Replace(".csv", $"-{epsgCode.Replace(":", "")}.csv");
             if (File.Exists(newName)) File.Delete(newName);
 
-            if (!ProcessOgr2Ogr($"{arguments} \"{newName}\" \"{fileName}\""))
+            // Check if file contains , as decimal point:
+            var checkedFileName = ReplaceCommaInCsv(fileName);
+
+            if (!ProcessOgr2Ogr($"{arguments} \"{newName}\" \"{checkedFileName}\""))
                 throw new Exception("ProcessOgr2Ogr failed");
 
+            // Delete temp file:
+            if (File.Exists(checkedFileName)) File.Delete(checkedFileName);
+
             return newName;
+        }
+
+        private static string ReplaceCommaInCsv(string fileName)
+        {
+            var tempFileName = Path.GetTempFileName();
+            tempFileName = Path.ChangeExtension(tempFileName, Path.GetExtension(fileName));
+            var text = File.ReadAllText(fileName);
+            text = text.Replace(",", ".");
+            File.WriteAllText(tempFileName, text);
+
+            if (!File.Exists(tempFileName))
+                throw new Exception("Kan de csv niet fixen");
+
+            return tempFileName;
         }
 
         /// <summary>
