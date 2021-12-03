@@ -344,11 +344,19 @@ namespace KaartfabriekUI.Service
                         // Change text:
                         if (statistics is not null)
                         {
+                            var decimalsFormat = "0";
+                            var numDecimals = 1;
+                            if (formula.Output.Contains("bulkdichtheid", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                decimalsFormat = "00";
+                                numDecimals = 2;
+                            }
+
                             var mean = Math.Round(statistics.Mean, 1, MidpointRounding.AwayFromZero);
-                            surferService.ChangeText("Gemiddelde", $"Gemiddelde: {mean:0.0}");
-                            var minimum = Math.Round(statistics.Min, 1, MidpointRounding.AwayFromZero);
-                            var maximum = Math.Round(statistics.Max, 1, MidpointRounding.AwayFromZero);
-                            surferService.ChangeText("Range", $"Range: {minimum:0.0} – {maximum:0.0}");
+                            surferService.ChangeText("Gemiddelde", $"Gemiddelde: {mean.ToString($"0.{decimalsFormat}")}");
+                            var minimum = Math.Round(statistics.Min, numDecimals, MidpointRounding.AwayFromZero);
+                            var maximum = Math.Round(statistics.Max, numDecimals, MidpointRounding.AwayFromZero);
+                            surferService.ChangeText("Range", $"Range: {minimum.ToString($"0.{decimalsFormat}")} – {maximum.ToString($"0.{decimalsFormat}")}");
                         }
 
                         surferService.SetSoilMapData(formula.Output);

@@ -19,7 +19,7 @@ namespace SurferTools.Tests
     {
         private readonly ITestOutputHelper _output;
         private readonly string _csvFileLocation;
-        private SurferService _surferService;
+        private readonly SurferService _surferService;
 
         public SurferTests(ITestOutputHelper output)
         {
@@ -87,7 +87,7 @@ namespace SurferTools.Tests
         [Fact]
         public void BufferBlankFile()
         {
-            var surferApp = new Surfer.Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
+            var surferApp = new Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
             // Add PlotDocument:
             if (surferApp.Documents.Add() is not IPlotDocument3 plot)
                 throw new Exception("Could not add plot document");
@@ -136,7 +136,7 @@ namespace SurferTools.Tests
         [Fact]
         public void GridMath()
         {
-            var surferApp = new Surfer.Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
+            var surferApp = new Application { PageUnits = SrfPageUnits.srfUnitsCentimeter };
             // Add PlotDocument:
             if (surferApp.Documents.Add() is not IPlotDocument3 plot)
                 throw new Exception("Could not add plot document");
