@@ -95,7 +95,7 @@ namespace Shared
 
         public string GridNames
         {
-            get => _gridNames ?? "Alt;Cs137;K40;TC;Th232;U238;CaCO3;K-getal;Ligging; Lutum; M0; M50; Mg; Mn; Monsterpunten; OS; P-Al; pH; PW; Stikstof; Zandfractie; Bulkdichtheid; Slemp; Veldcapaciteit; Waterdoorlatendheid; Waterretentie";
+            get => _gridNames ?? "Alt;Cs137;K40;TC;Th232;U238;CaCO3;K-getal;Ligging; Lutum; M0; M50; Mg; Mn; Monsterpunten; OS; P-Al; pH; PW; Stikstof; Zandfractie; Bulkdichtheid; Slemp; Veldcapaciteit; Waterdoorlatendheid; Waterretentie; Aanvulpunt";
             set { _gridNames = value; NotifyPropertyChanged(); }
         }
 

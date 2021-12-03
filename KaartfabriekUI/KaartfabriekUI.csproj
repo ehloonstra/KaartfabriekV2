@@ -5,7 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
-    <Version>2.0.4.0</Version>
+    <Version>2.0.5.0</Version>
     <Copyright>TopX GeoICT</Copyright>
     <Company>TopX GeoICT</Company>
     <Product>Kaartfabriek</Product>
@@ -13,7 +13,7 @@
     <PackageIcon>beeldmerkmol1000.png</PackageIcon>
     <PackageIconUrl />
     <AssemblyName>Kaartfabriek</AssemblyName>
-    <AssemblyVersion>2.0.4.0</AssemblyVersion>
+    <AssemblyVersion>2.0.5.0</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,12 +23,13 @@
   <ItemGroup>
     <COMReference Include="Surfer">
       <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>12</VersionMinor>
+      <VersionMinor>13</VersionMinor>
       <VersionMajor>1</VersionMajor>
       <Guid>54c3f9a2-980b-1068-83f9-0000c02a351c</Guid>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>true</Private>
     </COMReference>
   </ItemGroup>
 
@@ -60,7 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="27.1.1" />
+    <PackageReference Include="CsvHelper" Version="27.2.1" />
   </ItemGroup>
 
 </Project>

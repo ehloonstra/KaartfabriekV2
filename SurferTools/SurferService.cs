@@ -771,7 +771,9 @@ namespace SurferTools
                 case FormulaConstants.Veldcapaciteit:
                     return specialCalculations.CalculateVeldcapaciteit(outGrid);
                 case FormulaConstants.Waterdoorlatendheid:
-                    return specialCalculations.CalculateWaterdoorlatendheid(outGrid);
+                    return specialCalculations.CalculateWaterdoorlatendheid(outGrid);                
+                case FormulaConstants.Aanvulpunt:
+                    return specialCalculations.CalculateAanvulpunt(outGrid);
                 case FormulaConstants.Waterretentie:
                     return specialCalculations.CalculateWaterretentie(outGrid);
                 case FormulaConstants.Monsterpunten:

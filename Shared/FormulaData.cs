@@ -79,6 +79,8 @@ namespace Shared
                     "Veldcapaciteit 15-35 2.5.lvl"),
                 new(FormulaConstants.Waterdoorlatendheid, FormulaConstants.Waterdoorlatendheid, "", "", "", "", "", "",
                     "Waterdoorlatendheid 0-50 5.lvl"),
+                new(FormulaConstants.Aanvulpunt, FormulaConstants.Aanvulpunt, "", "", "", "", "", "",
+                    "Waterdoorlatendheid 0-50 5.lvl"),
                 //new(FormulaConstants.BodemclassificatieNietEolisch, FormulaConstants.BodemclassificatieNietEolisch, "", "", "", "", "", "", "Bodemclassificatie Niet-Eolisch.lvl"),
                 //new(FormulaConstants.BodemclassificatieEolisch, FormulaConstants.BodemclassificatieEolisch, "", "", "", "", "", "", "Bodemclassificatie Eolisch.lvl"),
                 new(FormulaConstants.Slemp, FormulaConstants.Slemp, "", "", "", "", "", "", "Slemp.lvl"),

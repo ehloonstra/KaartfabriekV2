@@ -352,7 +352,7 @@ namespace KaartfabriekUI.Service
                                 numDecimals = 2;
                             }
 
-                            var mean = Math.Round(statistics.Mean, 1, MidpointRounding.AwayFromZero);
+                            var mean = Math.Round(statistics.Mean, numDecimals, MidpointRounding.AwayFromZero);
                             surferService.ChangeText("Gemiddelde", $"Gemiddelde: {mean.ToString($"0.{decimalsFormat}")}");
                             var minimum = Math.Round(statistics.Min, numDecimals, MidpointRounding.AwayFromZero);
                             var maximum = Math.Round(statistics.Max, numDecimals, MidpointRounding.AwayFromZero);

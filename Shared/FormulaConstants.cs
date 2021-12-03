@@ -8,6 +8,7 @@ namespace Shared
         public const string Waterretentie = "Waterretentie";
         public const string Veldcapaciteit = "Veldcapaciteit";
         public const string Waterdoorlatendheid = "Waterdoorlatendheid";
+        public const string Aanvulpunt = "Aanvulpunt";
         public const string BodemclassificatieNietEolisch = "Bodemclassificatie Niet-Eolisch";
         public const string BodemclassificatieEolisch = "Bodemclassificatie Eolisch";
         public const string Slemp = "Slemp";

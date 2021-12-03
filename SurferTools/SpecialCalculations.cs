@@ -200,6 +200,47 @@ namespace SurferTools
         }
 
         /// <summary>
+        /// Calculate Aanvulpunt (pF 3.0)
+        /// Veel overeenkomsten met Waterretentie
+        /// </summary>
+        /// <param name="outGrid"></param>
+        /// <returns></returns>
+        public bool CalculateAanvulpunt(string outGrid)
+        {
+            // TODO: check op negatieve waarde:
+            // Bij hele lage waarden lutum en leem (sportvelden)
+            // gaat de berekening niet goed
+
+            var tmpOs = AftoppenOs();
+            var tmpLutum = AftoppenLutum(true);
+
+            // BetaS
+            var tmpBetaS = CalculateWaterretentieBetaS(tmpOs, tmpLutum);
+
+            // Alpha:
+            var tmpAlpha = CalculateWaterretentieAlpha(tmpOs, tmpLutum);
+
+            // N
+            var tmpN = CalculateWaterretentieN(tmpOs, tmpLutum);
+
+            // ThetaPfDriePuntNul
+            var tmpThetaPfDriePuntNul = CalculateWaterretentieThetaPfDriePuntNul(tmpBetaS, tmpAlpha, tmpN);
+
+            // Waterretentie:
+            var gridMathInput = new List<IGridMathInput>
+            {
+                _surferApp.NewGridMathInput(tmpThetaPfDriePuntNul, "A")
+            };
+
+            if (!CheckInputs(gridMathInput)) return false;
+
+            const string formula = "A*100";
+            DeleteFile(outGrid);
+            _surferApp.GridMath3(formula, gridMathInput.ToArray(), outGrid);
+            return File.Exists(outGrid);
+        }
+        
+        /// <summary>
         /// Calculate Veldcapaciteit
         /// Veel overeenkomsten met Waterretentie
         /// </summary>
@@ -407,6 +448,7 @@ namespace SurferTools
 
             return tmpFile;
         }
+
         private string CalculateWaterretentieThetaPfVierPuntTwee(string tmpBetaS, string tmpAlpha, string tmpN)
         {
             var gridMathInput = new List<IGridMathInput>
@@ -431,6 +473,29 @@ namespace SurferTools
             return tmpFile;
         }
 
+        private string CalculateWaterretentieThetaPfDriePuntNul(string tmpBetaS, string tmpAlpha, string tmpN)
+        {
+            var gridMathInput = new List<IGridMathInput>
+            {
+                _surferApp.NewGridMathInput(tmpBetaS, "BetaS"),
+                _surferApp.NewGridMathInput(tmpAlpha, "Alpha"),
+                _surferApp.NewGridMathInput(tmpN, "N"),
+            };
+
+            if (!CheckInputs(gridMathInput))
+                throw new Exception("Cannot find all input files for CalculateWaterretentieThetaPfDriePuntNul.");
+
+            var tmpFile = Path.Combine(Path.GetTempPath(), "ThetaPfDriePuntNul.grd");
+            DeleteFile(tmpFile);
+
+            const string formula = "0.01 + (BetaS - 0.01) / ((1 + (Alpha * (10 ^ 3.0)) ^ N) ^ (1 - 1 / N))";
+
+            _surferApp.GridMath3(formula, gridMathInput.ToArray(), tmpFile);
+            if (!File.Exists(tmpFile))
+                throw new Exception("Cannot create temp ThetaPfDriePuntNul grid.");
+
+            return tmpFile;
+        }
 
         private void DeleteFile(string fileLocation)
         {
